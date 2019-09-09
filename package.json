@@ -1,0 +1,34 @@
+{
+  "name": "quasar",
+  "version": "0.0.1",
+  "description": "Smart contract based file storage",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openworklabs/quasar.git"
+  },
+  "keywords": [
+    "ethereum",
+    "ipfs",
+    "smart",
+    "contracts",
+    "distributed",
+    "file",
+    "storage"
+  ],
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/openworklabs/Quasar/issues"
+  },
+  "homepage": "https://github.com/openworklabs/Quasar#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.9.1",
+    "path": "^0.12.7"
+  }
+}
