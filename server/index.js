@@ -4,11 +4,16 @@ const cors = require('cors')
 const morgan = require('morgan')
 const PORT = process.env.PORT || 3001
 const app = express()
+const ipfs = require('./ipfs')
+
 module.exports = app
 
-// if (process.env.NODE_ENV !== 'production') require('../secrets')
+if (!process.env['NODE_ENV']) {
+  require('dotenv').config({ path: __dirname + '/.env' })
+}
 
 const createApp = () => {
+  ipfs.init()
   // logging middleware
   app.use(morgan('dev'))
 
@@ -50,3 +55,8 @@ const startListening = () => {
 
 createApp()
 startListening()
+
+// Test pin
+setTimeout(() => {
+  ipfs.pin()
+}, 3000)
