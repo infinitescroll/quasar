@@ -35,8 +35,8 @@ function chain_ready {
 }
 
 function start {
-  listener_ready &
   chain_ready &
+  listener_ready
 }
 
 start
