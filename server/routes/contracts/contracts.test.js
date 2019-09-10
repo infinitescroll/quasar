@@ -16,10 +16,14 @@ test('POST well-formed smart contract', () => {
     .expect(200)
 })
 
-test('Save well-formed smart contract', async () => {
-  initSmartContracts()
-  await request.post('/api/v0/contracts').send(demoSmartContract)
-  expect(getSmartContracts()).toMatchObject([demoSmartContract])
+test('Save well-formed smart contract', done => {
+  const postContract = async () => {
+    initSmartContracts()
+    await request.post('/api/v0/contracts').send(demoSmartContract)
+    expect(getSmartContracts()).toMatchObject([demoSmartContract])
+    done()
+  }
+  postContract()
 })
 
 test('POST malformed smart contract', () => {
