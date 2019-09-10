@@ -4,7 +4,11 @@
   "description": "Smart contract based file storage",
   "main": "server/index.js",
   "scripts": {
+    "test:script": "scripts/index.sh",
+    "setup:env": "npm run start:local:chain && truffle compile && truffle migrate",
     "start": "node server",
+    "start:local:chain": "ganache-cli -b 3",
+    "start:dev:server": "nodemon server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -34,5 +38,18 @@
     "ipfs-http-client": "^35.1.0",
     "morgan": "^1.9.1",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "ganache-cli": "^6.7.0",
+    "nodemon": "^1.19.2",
+    "truffle": "^5.0.35"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "build/*",
+      "contracts/*",
+      "migrations/*",
+      "scripts/*"
+    ]
   }
 }
