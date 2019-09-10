@@ -5,7 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -29,10 +30,15 @@
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "immutable": "^4.0.0-rc.12",
     "form-data": "^2.5.1",
     "ipfs-http-client": "^35.1.0",
     "morgan": "^1.9.1",
     "path": "^0.12.7",
     "web3": "^1.2.1"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   }
 }
