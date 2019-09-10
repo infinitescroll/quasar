@@ -42,4 +42,4 @@ const startListening = () => {
 
 createApp()
 startListening()
-ethereum.testWatching()
+// ethereum.testWatching()
