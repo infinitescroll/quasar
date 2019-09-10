@@ -22,17 +22,19 @@ let smartContracts
 const initSmartContracts = () => {
   smartContracts = List()
 }
-initSmartContracts()
 
 const addSmartContract = smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
   if (invalidFields.length > 0) return invalidFields.join(' ')
 
   smartContracts = smartContracts.push(smartContractObj)
+  return
 }
 
 const getSmartContracts = () => {
   return smartContracts.toArray()
 }
+
+initSmartContracts()
 
 module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
