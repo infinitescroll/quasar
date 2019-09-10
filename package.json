@@ -4,8 +4,8 @@
   "description": "Smart contract based file storage",
   "main": "server/index.js",
   "scripts": {
-    "test:script": "scripts/index.sh",
-    "start:dev": "killall node && npm run start:local:chain && truffle compile && truffle migrate",
+    "create:event": "node ./scripts/createEvent.js",
+    "start:dev": "scripts/index.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
     "test": "echo \"Error: no test specified\" && exit 1"
