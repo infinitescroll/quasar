@@ -4,6 +4,8 @@
   "description": "Smart contract based file storage",
   "main": "server/index.js",
   "scripts": {
+    "compile": "truffle compile",
+    "start:chain": "ganache-cli",
     "create:event": "node ./scripts/createEvent.js",
     "start:dev": "scripts/index.sh",
     "start": "node server",

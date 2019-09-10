@@ -24,12 +24,8 @@ function start_chain {
 }
 
 function compile_and_migrate_contracts {
-  truffle compile &
-  compile_pid=$!
-  wait $compile_pid
-  truffle migrate &
-  migrate_pid=$!
-  wait migrate_pid
+  truffle compile
+  truffle migrate
 }
 
 function chain_ready {
@@ -40,11 +36,7 @@ function chain_ready {
 
 function start {
   listener_ready &
-  server_pid=$!
-  wait server_pid
   chain_ready &
-  chain_pid=$!
-  wait chain_pid
 }
 
 start
