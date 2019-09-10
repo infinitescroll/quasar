@@ -1,15 +1,19 @@
 {
   "env": {
     "node": true,
-    "es6": true
+    "es6": true,
+    "jest/globals": true
   },
+  "plugins": ["jest", "prettier"],
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 8,
     "sourceType": "module"
   },
   "root": true,
-  "extends": ["fullstack", "prettier"],
+  "extends": ["eslint:recommended", "prettier", "plugin:jest/recommended"],
   "rules": {
-    "semi": 0
+    "semi": 0,
+    "prettier/prettier": ["error"],
+    "no-unused-vars": ["error", { "args": "all", "argsIgnorePattern": "^_" }]
   }
 }
