@@ -20,7 +20,7 @@ function listener_ready {
 }
 
 function start_chain {
-  ganache-cli -b 3
+  node ./scripts/testNet.js
 }
 
 function compile_and_migrate_contracts {
@@ -42,11 +42,9 @@ function start {
   listener_ready &
   server_pid=$!
   wait server_pid
-  echo "SERVER AND IPFS DAEMON ARE UP AND RUNNING"
   chain_ready &
   chain_pid=$!
   wait chain_pid
-  echo "LOCAL CHAIN RUNNING, CONTRACTS COMPILED AND MIGRATED"
 }
 
 start

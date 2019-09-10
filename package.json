@@ -5,10 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "test:script": "scripts/index.sh",
-    "setup:env": "npm run start:local:chain && truffle compile && truffle migrate",
+    "start:dev": "killall node && npm run start:local:chain && truffle compile && truffle migrate",
     "start": "node server",
-    "start:local:chain": "ganache-cli -b 3",
-    "start:dev:server": "nodemon server",
+    "stop": "killall node && ipfs shutdown",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -49,7 +48,8 @@
       "build/*",
       "contracts/*",
       "migrations/*",
-      "scripts/*"
+      "scripts/*",
+      "accounts.json"
     ]
   }
 }
