@@ -6,7 +6,7 @@ const {
 
 const demoSmartContract = {
 	smartContract: 'asdfasdfjahkj',
-	network: 'MainNet',
+	network: 'mainnet',
 	abi: 'whatever'
 }
 
@@ -22,4 +22,24 @@ test('add two smart contracts', () => {
 	addSmartContract(demoSmartContract)
 
 	expect(getSmartContracts().length).toBe(2)
+})
+
+test('malformed smart contracts thow errors', () => {
+	expect(addSmartContract({ wrong: 'keys' })).toBe(
+		'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
+	)
+
+	expect(addSmartContract({ smartContract: 'keys' })).toBe(
+		'Error: network is missing or invalid. Error: abi is missing or invalid.'
+	)
+
+	expect(
+		addSmartContract({ smartContract: 'keys', network: 'wrongnetwork' })
+	).toBe(
+		'Error: network is missing or invalid. Error: abi is missing or invalid.'
+	)
+
+	expect(addSmartContract({ smartContract: 'keys', network: 'rinkeby' })).toBe(
+		'Error: abi is missing or invalid.'
+	)
 })
