@@ -11,6 +11,9 @@
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
+  "jest": {
+    "collectCoverage": true
+  },
   "lint-staged": {
     "*.{js}": [
       "prettier --write",
