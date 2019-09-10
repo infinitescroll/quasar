@@ -24,11 +24,12 @@ const initSmartContracts = () => {
 }
 initSmartContracts()
 
-const addSmartContract = smartContractObj => {
+const addSmartContract = async smartContractObj => {
 	const invalidFields = findInvalidSmartContractFields(smartContractObj)
-	if (invalidFields.length > 0) return invalidFields.join(' ')
+	if (invalidFields.length > 0) throw new Error(invalidFields.join(' '))
 
 	smartContracts = smartContracts.push(smartContractObj)
+	return
 }
 
 const getSmartContracts = () => {

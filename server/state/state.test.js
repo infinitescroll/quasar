@@ -25,21 +25,21 @@ test('add two smart contracts', () => {
 })
 
 test('robustly handle malformed smart contracts', () => {
-	expect(addSmartContract({ wrong: 'keys' })).toBe(
+	expect(addSmartContract({ wrong: 'keys' })).rejects.toMatch(
 		'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
 	)
 
-	expect(addSmartContract({ smartContract: 'keys' })).toBe(
+	expect(addSmartContract({ smartContract: 'keys' })).rejects.toMatch(
 		'Error: network is missing or invalid. Error: abi is missing or invalid.'
 	)
 
 	expect(
 		addSmartContract({ smartContract: 'keys', network: 'wrongnetwork' })
-	).toBe(
+	).rejects.toMatch(
 		'Error: network is missing or invalid. Error: abi is missing or invalid.'
 	)
 
-	expect(addSmartContract({ smartContract: 'keys', network: 'rinkeby' })).toBe(
-		'Error: abi is missing or invalid.'
-	)
+	expect(
+		addSmartContract({ smartContract: 'keys', network: 'rinkeby' })
+	).rejects.toMatch('Error: abi is missing or invalid.')
 })

@@ -8,15 +8,15 @@ const demoSmartContract = {
 	abi: 'whatever'
 }
 
-test('POST well-formed smart contract', async () => {
-	await request
+test('POST well-formed smart contract', () => {
+	request
 		.post('/api/v0/contracts')
 		.send(demoSmartContract)
 		.expect(200)
 })
 
-test('POST malformed smart contract', async () => {
-	await request
+test('POST malformed smart contract', () => {
+	request
 		.post('/api/v0/contracts')
 		.send({ wrong: 'structure' })
 		.expect(400)
