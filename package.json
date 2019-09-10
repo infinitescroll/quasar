@@ -8,7 +8,8 @@
     "start:dev": "scripts/index.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -36,12 +37,15 @@
     "form-data": "^2.5.1",
     "ipfs-http-client": "^35.1.0",
     "morgan": "^1.9.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "web3": "^1.2.1"
   },
   "devDependencies": {
     "ganache-cli": "^6.7.0",
     "nodemon": "^1.19.2",
-    "truffle": "^5.0.35"
+    "truffle": "^5.0.35",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   },
   "nodemonConfig": {
     "ignore": [
