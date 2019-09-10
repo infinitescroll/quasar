@@ -1,0 +1,15 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "root": true,
+  "extends": ["fullstack", "prettier"],
+  "rules": {
+    "semi": 0
+  }
+}
