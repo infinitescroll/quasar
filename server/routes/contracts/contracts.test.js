@@ -9,11 +9,13 @@ const demoSmartContract = {
   abi: 'whatever'
 }
 
-test('POST well-formed smart contract', () => {
+test('POST well-formed smart contract', done => {
   request
     .post('/api/v0/contracts')
     .send(demoSmartContract)
     .expect(200)
+
+  done()
 })
 
 test('Save well-formed smart contract', done => {
@@ -26,7 +28,7 @@ test('Save well-formed smart contract', done => {
   postContract()
 })
 
-test('POST malformed smart contract', () => {
+test('POST malformed smart contract', done => {
   request
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
@@ -34,4 +36,6 @@ test('POST malformed smart contract', () => {
     .expect(
       'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
     )
+
+  done()
 })
