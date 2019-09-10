@@ -24,7 +24,7 @@ test('add two smart contracts', () => {
 	expect(getSmartContracts().length).toBe(2)
 })
 
-test('malformed smart contracts thow errors', () => {
+test('robustly handle malformed smart contracts', () => {
 	expect(addSmartContract({ wrong: 'keys' })).toBe(
 		'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
 	)
