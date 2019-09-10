@@ -1,20 +1,22 @@
-const { List }= require('immutable')
+const { List } = require('immutable')
 
-const initialState = List()
+let smartContracts
+const initSmartContracts = () => {
+	smartContracts = List()
+}
+initSmartContracts()
 
-var smartContracts = initialState
-
-const addSmartContract = ({smartContract, network, abi}) => {
-    let smartContractToAdd = {
-        smartContract,
-        network,
-        abi
-    }
-    smartContracts = smartContracts.push(smartContractToAdd)
+const addSmartContract = ({ smartContract, network, abi }) => {
+	let smartContractToAdd = {
+		smartContract,
+		network,
+		abi
+	}
+	smartContracts = smartContracts.push(smartContractToAdd)
 }
 
 const getSmartContracts = () => {
-    return smartContracts.toArray()
+	return smartContracts.toArray()
 }
 
-module.exports = {getSmartContracts, addSmartContract}
+module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
