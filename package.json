@@ -7,7 +7,7 @@
     "compile": "truffle compile",
     "start:chain": "ganache-cli",
     "create:event": "node ./scripts/createEvent.js",
-    "start:dev": "scripts/index.sh",
+    "start:dev:local": "scripts/local.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
     "test": "jest",
