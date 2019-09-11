@@ -13,6 +13,8 @@ if (!process.env['NODE_ENV']) {
 }
 
 const createApp = () => {
+  ipfs.init()
+
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
