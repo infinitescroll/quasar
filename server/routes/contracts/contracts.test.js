@@ -4,9 +4,9 @@ const { getSmartContracts, initSmartContracts } = require('../../state')
 const request = supertest(app)
 
 const demoSmartContract = {
-  smartContract: 'asdfasdfjahkj',
+  address: 'asdfasdfjahkj',
   network: 'mainnet',
-  abi: 'whatever'
+  abi: { name: 'contractName' }
 }
 
 test('POST well-formed smart contract', done => {
