@@ -24,7 +24,7 @@ const initSmartContracts = () => {
 }
 
 const isDuplicateSmartContract = smartContract => {
-  if (smartContracts.filter(x => x.smartContract === smartContract).size > 0) {
+  if (smartContracts.find(x => x.smartContract === smartContract)) {
     return true
   } else return false
 }
