@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const { abi } = require('../build/contracts/Storage.json')
+const storageJSON = require('../build/contracts/Storage.json')
 const accounts = require('../accounts.json')
 
 const createEvent = () =>
@@ -11,8 +11,8 @@ const createEvent = () =>
     const testKey = web3.utils.fromAscii('testKey')
 
     const contract = new web3.eth.Contract(
-      abi,
-      '0xB895BB22cCa9DC1689d1D04aE294F59Fa92cF51C'
+      storageJSON.abi,
+      storageJSON.networks['123'].address
     )
 
     contract.methods

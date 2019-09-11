@@ -27,7 +27,7 @@ const init = () => {
     ? process.env.IPFS_NODE_HOST
     : 'localhost'
 
-  const port = process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5002'
+  const port = process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5001'
 
   const protocol = process.env.IPFS_NODE_PROTOCOL
     ? process.env.IPFS_NODE_PROTOCOL

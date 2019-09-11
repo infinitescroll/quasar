@@ -1,12 +1,14 @@
 const Web3 = require('web3')
 const ipfs = require('./ipfs')
+const storageJSON = require('../../build/contracts/Storage.json')
+const accounts = require('../../accounts.json')
 
 const web3 = new Web3(
   new Web3.providers.WebsocketProvider('ws://localhost:8545')
 )
 
 const registerWatcher = contract => {
-  contract.events.Registered({}, (err, event) => {
+  contract.events.Registered({}, async (err, event) => {
     if (err) console.error('Error subscribing: ', err)
 
     ipfs
@@ -22,20 +24,21 @@ const registerWatcher = contract => {
 }
 
 // TODO: Move to a test file
-const testAddress = ''
 const testKey = web3.utils.fromAscii('testKey')
-const testAbi = []
-
 const testWatching = () => {
-  const contract = new web3.eth.Contract(testAbi, testAddress)
+  const contract = new web3.eth.Contract(
+    storageJSON.abi,
+    storageJSON.networks['123'].address
+  )
+
   registerWatcher(contract)
 
   contract.methods
     .registerData(
       testKey,
-      'bafyreidyficfemkwhbtuitk5ylymbychz7chvl4cpozn2brwyntxxnflym'
+      'bafyreiextvfmingotbut6j5tkszqhrqkm5ii5r3alh6g3xt2uuzmx7vrpi'
     )
-    .send({ from: '0xa3BAC6292281000FD29eF747be28E31093DaC61c' })
+    .send({ from: accounts[0] })
 }
 
 module.exports = { registerWatcher, testWatching }

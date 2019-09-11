@@ -2,7 +2,7 @@ const ganache = require('ganache-cli')
 const fs = require('fs')
 
 const start = () => {
-  const server = ganache.server()
+  const server = ganache.server({ network_id: 123, block_time: 3 })
   server.listen(8545, (err, blockchain) => {
     if (err) throw new Error(err)
     fs.writeFile(
