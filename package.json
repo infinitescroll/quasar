@@ -5,7 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server",
-    "test": "jest",
+    "test": "jest --coverage --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
