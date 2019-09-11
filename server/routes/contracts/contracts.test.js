@@ -31,7 +31,7 @@ test('POST malformed smart contract', done => {
     .send({ wrong: 'structure' })
     .expect(400)
     .expect(
-      '"smartContract is missing or invalid, network is missing or invalid, abi is missing or invalid"'
+      '"the following fields are missing or invalid: smartContract, network, abi"'
     )
 
   done()
