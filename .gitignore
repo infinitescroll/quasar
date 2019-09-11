@@ -3,3 +3,4 @@ node_modules
 accounts.json
 build
 .coveralls.yml
+coverage

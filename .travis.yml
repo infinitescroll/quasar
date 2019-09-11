@@ -1,3 +1,12 @@
 language: node_js
 node_js:
   - node
+install:
+  - npm i
+  - npm install -g codecov
+cache:
+  directories:
+    - node_modules
+script:
+  - npm test
+  - codecov

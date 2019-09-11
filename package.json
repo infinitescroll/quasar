@@ -16,9 +16,6 @@
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
-  "jest": {
-    "collectCoverage": false
-  },
   "lint-staged": {
     "*.{js}": [
       "prettier --write",
@@ -29,6 +26,10 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   },
   "husky": {
     "hooks": {
