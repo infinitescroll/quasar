@@ -1,39 +1,40 @@
 const { List } = require('immutable')
 
 const smartContractSchema = {
-	smartContract: val => typeof val === 'string',
-	network: val =>
-		val &&
-		(val.toLowerCase() === 'rinkeby' ||
-			val.toLowerCase() === 'mainnet' ||
-			val.toLowerCase() === 'localhost'),
-	abi: val => typeof val === 'string'
+  smartContract: val => typeof val === 'string',
+  network: val =>
+    val &&
+    (val.toLowerCase() === 'rinkeby' ||
+      val.toLowerCase() === 'mainnet' ||
+      val.toLowerCase() === 'localhost'),
+  abi: val => typeof val === 'string'
 }
 
 const findInvalidSmartContractFields = smartContractObj =>
-	Object.entries(smartContractSchema).reduce((errors, [property, validate]) => {
-		if (!validate(smartContractObj[property])) {
-			errors.push(new Error(`${property} is missing or invalid.`))
-		}
-		return errors
-	}, [])
+  Object.entries(smartContractSchema).reduce((errors, [property, validate]) => {
+    if (!validate(smartContractObj[property])) {
+      errors.push(`${property} is missing or invalid`)
+    }
+    return errors
+  }, [])
 
 let smartContracts
 const initSmartContracts = () => {
-	smartContracts = List()
+  smartContracts = List()
 }
-initSmartContracts()
 
 const addSmartContract = async smartContractObj => {
-	const invalidFields = findInvalidSmartContractFields(smartContractObj)
-	if (invalidFields.length > 0) throw new Error(invalidFields.join(' '))
+  const invalidFields = findInvalidSmartContractFields(smartContractObj)
+  if (invalidFields.length > 0) throw new Error(invalidFields.join(', '))
 
-	smartContracts = smartContracts.push(smartContractObj)
-	return
+  smartContracts = smartContracts.push(smartContractObj)
+  return
 }
 
 const getSmartContracts = () => {
-	return smartContracts.toArray()
+  return smartContracts.toArray()
 }
+
+initSmartContracts()
 
 module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
