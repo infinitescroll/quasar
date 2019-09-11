@@ -23,6 +23,12 @@
       "git add"
     ]
   },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcov"
+    ]
+  },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint"
