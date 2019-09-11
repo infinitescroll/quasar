@@ -2,9 +2,10 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const ipfs = require('./utils/ipfs')
+// const ethereum = require('./utils/ethereum')
 const PORT = process.env.PORT || 3001
 const app = express()
-const ipfs = require('./ipfs')
 
 module.exports = app
 
@@ -12,7 +13,7 @@ if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
-const createApp = () => {
+const createApp = async () => {
   ipfs.init()
 
   app.use(morgan('dev'))
@@ -44,3 +45,4 @@ const startListening = () => {
 
 createApp()
 startListening()
+// ethereum.testWatching()

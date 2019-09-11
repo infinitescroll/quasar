@@ -1,13 +1,13 @@
 const { List } = require('immutable')
 
 const smartContractSchema = {
-  smartContract: val => typeof val === 'string',
+  address: val => typeof val === 'string',
   network: val =>
     val &&
     (val.toLowerCase() === 'rinkeby' ||
       val.toLowerCase() === 'mainnet' ||
       val.toLowerCase() === 'localhost'),
-  abi: val => typeof val === 'string'
+  abi: val => typeof val === 'object'
 }
 
 const findInvalidSmartContractFields = smartContractObj =>
