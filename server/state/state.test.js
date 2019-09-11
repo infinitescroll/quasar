@@ -9,6 +9,11 @@ const demoSmartContract = {
   network: 'mainnet',
   abi: 'whatever'
 }
+const demoSmartContract2 = {
+  smartContract: 'asoijijiji',
+  network: 'mainnet',
+  abi: 'whatever'
+}
 
 test('add/get smart contract', () => {
   initSmartContracts()
@@ -19,7 +24,7 @@ test('add/get smart contract', () => {
 test('add two smart contracts', () => {
   initSmartContracts()
   addSmartContract(demoSmartContract)
-  addSmartContract(demoSmartContract)
+  addSmartContract(demoSmartContract2)
 
   expect(getSmartContracts().length).toBe(2)
 })
@@ -40,4 +45,11 @@ test('robustly handle malformed smart contracts', async () => {
   await expect(
     addSmartContract({ smartContract: 'keys', network: 'rinkeby' })
   ).rejects.toThrow('the following fields are missing or invalid: abi')
+})
+
+test('do not add duplicate smart contract', async () => {
+  addSmartContract(demoSmartContract)
+  await expect(addSmartContract(demoSmartContract)).rejects.toThrow(
+    'already listening to the contract at this address'
+  )
 })

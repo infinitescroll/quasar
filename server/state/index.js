@@ -23,21 +23,30 @@ const initSmartContracts = () => {
   smartContracts = List()
 }
 
+const isDuplicateSmartContract = smartContract => {
+  if (smartContracts.filter(x => x.smartContract === smartContract).size > 0) {
+    return true
+  } else return false
+}
+
 const addSmartContract = async smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
-  if (invalidFields.length > 0)
+  if (invalidFields.length > 0) {
     throw new Error(
       `the following fields are missing or invalid: ${invalidFields.join(', ')}`
     )
+  }
+  if (isDuplicateSmartContract(smartContractObj.smartContract)) {
+    throw new Error('already listening to the contract at this address')
+  }
 
   smartContracts = smartContracts.push(smartContractObj)
+
   return
 }
 
 const getSmartContracts = () => {
   return smartContracts.toArray()
 }
-
-initSmartContracts()
 
 module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
