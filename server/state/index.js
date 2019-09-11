@@ -23,15 +23,8 @@ const initSmartContracts = () => {
   smartContracts = List()
 }
 
-const isDuplicateSmartContract = address => {
-  if (
-    smartContracts.find(
-      smartContractObj => smartContractObj.address === address
-    )
-  ) {
-    return true
-  } else return false
-}
+const isDuplicateSmartContract = address =>
+  smartContracts.find(smartContractObj => smartContractObj.address === address)
 
 const addSmartContract = async smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
