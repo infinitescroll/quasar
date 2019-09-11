@@ -1,7 +1,7 @@
 const { List } = require('immutable')
 
 const smartContractSchema = {
-  smartContract: val => typeof val === 'string',
+  address: val => typeof val === 'string',
   network: val =>
     val &&
     (val.toLowerCase() === 'rinkeby' ||
@@ -23,8 +23,12 @@ const initSmartContracts = () => {
   smartContracts = List()
 }
 
-const isDuplicateSmartContract = smartContract => {
-  if (smartContracts.find(x => x.smartContract === smartContract)) {
+const isDuplicateSmartContract = address => {
+  if (
+    smartContracts.find(
+      smartContractObj => smartContractObj.address === address
+    )
+  ) {
     return true
   } else return false
 }
@@ -36,7 +40,7 @@ const addSmartContract = async smartContractObj => {
       `the following fields are missing or invalid: ${invalidFields.join(', ')}`
     )
   }
-  if (isDuplicateSmartContract(smartContractObj.smartContract)) {
+  if (isDuplicateSmartContract(smartContractObj.address)) {
     throw new Error('already listening to the contract at this address')
   }
 

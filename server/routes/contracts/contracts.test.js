@@ -4,7 +4,7 @@ const { getSmartContracts, initSmartContracts } = require('../../state')
 const request = supertest(app)
 
 const demoSmartContract = {
-  smartContract: 'asdfasdfjahkj',
+  address: 'asdfasdfjahkj',
   network: 'mainnet',
   abi: 'whatever'
 }

@@ -5,12 +5,12 @@ const {
 } = require('./index')
 
 const demoSmartContract = {
-  smartContract: 'asdfasdfjahkj',
+  address: 'asdfasdfjahkj',
   network: 'mainnet',
   abi: 'whatever'
 }
 const demoSmartContract2 = {
-  smartContract: 'asoijijiji',
+  address: 'asoijijiji',
   network: 'mainnet',
   abi: 'whatever'
 }
@@ -31,19 +31,19 @@ test('add two smart contracts', () => {
 
 test('robustly handle malformed smart contracts', async () => {
   await expect(addSmartContract({ wrong: 'keys' })).rejects.toThrow(
-    'the following fields are missing or invalid: smartContract, network, abi'
+    'the following fields are missing or invalid: address, network, abi'
   )
 
-  await expect(addSmartContract({ smartContract: 'keys' })).rejects.toThrow(
+  await expect(addSmartContract({ address: 'keys' })).rejects.toThrow(
     'the following fields are missing or invalid: network, abi'
   )
 
   await expect(
-    addSmartContract({ smartContract: 'keys', network: 'wrongnetwork' })
+    addSmartContract({ address: 'keys', network: 'wrongnetwork' })
   ).rejects.toThrow('the following fields are missing or invalid: network, abi')
 
   await expect(
-    addSmartContract({ smartContract: 'keys', network: 'rinkeby' })
+    addSmartContract({ address: 'keys', network: 'rinkeby' })
   ).rejects.toThrow('the following fields are missing or invalid: abi')
 })
 
