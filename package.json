@@ -5,14 +5,14 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server",
-    "test": "jest --coverage --detectOpenHandles --forceExit",
+    "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
   "jest": {
-    "collectCoverage": true
+    "collectCoverage": false
   },
   "lint-staged": {
     "*.{js}": [

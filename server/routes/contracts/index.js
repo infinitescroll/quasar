@@ -3,7 +3,10 @@ const { addSmartContract } = require('../../state')
 module.exports = router
 
 router.post('/', (req, res, _next) => {
-  const invalidFields = addSmartContract(req.body)
-  if (invalidFields) res.status(400).send({ error: invalidFields })
-  else res.status(200).send('OK')
+  try {
+    addSmartContract(req.body)
+    res.status(200).send('OK')
+  } catch (err) {
+    res.status(400).send({ error: err })
+  }
 })

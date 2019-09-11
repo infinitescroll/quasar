@@ -4,7 +4,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const PORT = process.env.PORT || 3001
 const app = express()
-// const ipfs = require('./ipfs')
+const ipfs = require('./ipfs')
 
 module.exports = app
 

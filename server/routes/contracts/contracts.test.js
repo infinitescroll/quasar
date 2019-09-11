@@ -9,8 +9,8 @@ const demoSmartContract = {
   abi: 'whatever'
 }
 
-test('POST well-formed smart contract', async done => {
-  await request
+test('POST well-formed smart contract', done => {
+  request
     .post('/api/v0/contracts')
     .send(demoSmartContract)
     .expect(200)
@@ -25,15 +25,14 @@ test('Save well-formed smart contract', async done => {
   done()
 })
 
-test('POST malformed smart contract', async done => {
-  await request
+test('POST malformed smart contract', done => {
+  request
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
     .expect(400)
-    .expect({
-      error:
-        'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
-    })
+    .expect(
+      '"the following fields are missing or invalid: smartContract, network, abi"'
+    )
 
   done()
 })
