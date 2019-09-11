@@ -7,12 +7,12 @@ const {
 const demoSmartContract = {
   address: 'asdfasdfjahkj',
   network: 'mainnet',
-  abi: 'whatever'
+  abi: { name: 'contractName' }
 }
 const demoSmartContract2 = {
   address: 'asoijijiji',
   network: 'mainnet',
-  abi: 'whatever'
+  abi: { name: 'contractName' }
 }
 
 test('add/get smart contract', () => {
@@ -30,20 +30,20 @@ test('add two smart contracts', () => {
 })
 
 test('robustly handle malformed smart contracts', async () => {
-  await expect(addSmartContract({ wrong: 'keys' })).rejects.toThrow(
+  await expect(addSmartContract({ wrong: 'address' })).rejects.toThrow(
     'the following fields are missing or invalid: address, network, abi'
   )
 
-  await expect(addSmartContract({ address: 'keys' })).rejects.toThrow(
+  await expect(addSmartContract({ address: 'address' })).rejects.toThrow(
     'the following fields are missing or invalid: network, abi'
   )
 
   await expect(
-    addSmartContract({ address: 'keys', network: 'wrongnetwork' })
+    addSmartContract({ address: 'address', network: 'wrongnetwork' })
   ).rejects.toThrow('the following fields are missing or invalid: network, abi')
 
   await expect(
-    addSmartContract({ address: 'keys', network: 'rinkeby' })
+    addSmartContract({ address: 'address', network: 'rinkeby' })
   ).rejects.toThrow('the following fields are missing or invalid: abi')
 })
 

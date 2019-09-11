@@ -7,7 +7,7 @@ const smartContractSchema = {
     (val.toLowerCase() === 'rinkeby' ||
       val.toLowerCase() === 'mainnet' ||
       val.toLowerCase() === 'localhost'),
-  abi: val => typeof val === 'string'
+  abi: val => typeof val === 'object'
 }
 
 const findInvalidSmartContractFields = smartContractObj =>
