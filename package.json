@@ -9,8 +9,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
-    "prettify": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+    "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
   "lint-staged": {
     "*.{js}": [
@@ -22,6 +21,10 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   },
   "husky": {
     "hooks": {
@@ -58,7 +61,6 @@
     "web3": "^1.2.1"
   },
   "devDependencies": {
-    "coveralls": "^3.0.6",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-jest": "^22.17.0",
