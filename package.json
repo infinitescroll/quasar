@@ -4,15 +4,20 @@
   "description": "Smart contract based file storage",
   "main": "server/index.js",
   "scripts": {
+    "compile": "truffle compile",
+    "start:chain": "ganache-cli",
+    "create:event": "node ./scripts/createEvent.js",
+    "start:dev:local": "scripts/local.sh",
     "start": "node server",
-    "test": "jest --coverage --detectOpenHandles --forceExit",
+    "stop": "killall node && ipfs shutdown",
+    "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
   },
   "jest": {
-    "collectCoverage": true
+    "collectCoverage": false
   },
   "lint-staged": {
     "*.{js}": [
@@ -64,10 +69,22 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "ganache-cli": "^6.7.0",
     "husky": "^3.0.5",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.5",
+    "nodemon": "^1.19.2",
     "prettier": "^1.18.2",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "truffle": "^5.0.35"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "build/*",
+      "contracts/*",
+      "migrations/*",
+      "scripts/*",
+      "accounts.json"
+    ]
   }
 }

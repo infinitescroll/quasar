@@ -24,22 +24,20 @@ test('add two smart contracts', () => {
   expect(getSmartContracts().length).toBe(2)
 })
 
-test('robustly handle malformed smart contracts', () => {
-  expect(addSmartContract({ wrong: 'keys' })).toBe(
-    'Error: smartContract is missing or invalid. Error: network is missing or invalid. Error: abi is missing or invalid.'
+test('robustly handle malformed smart contracts', async () => {
+  await expect(addSmartContract({ wrong: 'keys' })).rejects.toThrow(
+    'the following fields are missing or invalid: smartContract, network, abi'
   )
 
-  expect(addSmartContract({ smartContract: 'keys' })).toBe(
-    'Error: network is missing or invalid. Error: abi is missing or invalid.'
+  await expect(addSmartContract({ smartContract: 'keys' })).rejects.toThrow(
+    'the following fields are missing or invalid: network, abi'
   )
 
-  expect(
+  await expect(
     addSmartContract({ smartContract: 'keys', network: 'wrongnetwork' })
-  ).toBe(
-    'Error: network is missing or invalid. Error: abi is missing or invalid.'
-  )
+  ).rejects.toThrow('the following fields are missing or invalid: network, abi')
 
-  expect(addSmartContract({ smartContract: 'keys', network: 'rinkeby' })).toBe(
-    'Error: abi is missing or invalid.'
-  )
+  await expect(
+    addSmartContract({ smartContract: 'keys', network: 'rinkeby' })
+  ).rejects.toThrow('the following fields are missing or invalid: abi')
 })

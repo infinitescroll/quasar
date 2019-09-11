@@ -13,7 +13,7 @@ const smartContractSchema = {
 const findInvalidSmartContractFields = smartContractObj =>
   Object.entries(smartContractSchema).reduce((errors, [property, validate]) => {
     if (!validate(smartContractObj[property])) {
-      errors.push(new Error(`${property} is missing or invalid.`))
+      errors.push(`${property}`)
     }
     return errors
   }, [])
@@ -23,9 +23,12 @@ const initSmartContracts = () => {
   smartContracts = List()
 }
 
-const addSmartContract = smartContractObj => {
+const addSmartContract = async smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
-  if (invalidFields.length > 0) return invalidFields.join(' ')
+  if (invalidFields.length > 0)
+    throw new Error(
+      `the following fields are missing or invalid: ${invalidFields.join(', ')}`
+    )
 
   smartContracts = smartContracts.push(smartContractObj)
   return
