@@ -7,8 +7,12 @@ const web3 = new Web3(
   new Web3.providers.WebsocketProvider('ws://localhost:8545')
 )
 
+const getContract = smartContractObj => {
+  return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
+}
+
 const registerWatcher = contract => {
-  contract.events.Registered({}, async (err, event) => {
+  return contract.events.Registered({}, async (err, event) => {
     if (err) console.error('Error subscribing: ', err)
 
     ipfs
@@ -41,4 +45,4 @@ const testWatching = () => {
     .send({ from: accounts[0] })
 }
 
-module.exports = { registerWatcher, testWatching }
+module.exports = { registerWatcher, testWatching, getContract }
