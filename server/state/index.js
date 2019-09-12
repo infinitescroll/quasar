@@ -44,7 +44,6 @@ const addSmartContract = async smartContractObj => {
 
   smartContractObj.listener = listener
   smartContracts = smartContracts.push(smartContractObj)
-  unsubscribe(smartContractObj.address)
 }
 
 const getSmartContracts = () => {
