@@ -12,7 +12,7 @@ const getContract = smartContractObj => {
 }
 
 const registerWatcher = contract => {
-  return contract.events.Registered({}, async (err, event) => {
+  return contract.events.PinHash({}, async (err, event) => {
     if (err) console.error('Error subscribing: ', err)
 
     ipfs
