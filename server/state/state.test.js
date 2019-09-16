@@ -3,11 +3,12 @@ const {
   getSmartContracts,
   initSmartContracts
 } = require('./index')
+const { abi, networks } = require('../../build/contracts/Storage.json')
 
 const demoSmartContract = {
-  address: 'asdfasdfjahkj',
+  address: networks['123'].address,
   network: 'mainnet',
-  abi: { name: 'contractName' }
+  abi
 }
 
 test('add/get smart contract', () => {

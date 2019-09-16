@@ -41,6 +41,8 @@ const init = () => {
     })
     process.exit()
   })
+
+  return node
 }
 
 module.exports = { node, getAndPin, init }
