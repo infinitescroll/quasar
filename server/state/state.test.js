@@ -15,13 +15,13 @@ const demoSmartContract2 = {
   abi: { name: 'contractName' }
 }
 
-test('add/get smart contract', () => {
+test('adding/get smart contract works', () => {
   initSmartContracts()
   addSmartContract(demoSmartContract)
   expect(getSmartContracts()).toMatchObject([demoSmartContract])
 })
 
-test('add two smart contracts', () => {
+test('adding two different smart contracts works', () => {
   initSmartContracts()
   addSmartContract(demoSmartContract)
   addSmartContract(demoSmartContract2)
@@ -29,7 +29,7 @@ test('add two smart contracts', () => {
   expect(getSmartContracts().length).toBe(2)
 })
 
-test('robustly handle malformed smart contracts', async () => {
+test('adding malformed smart contract throws helpful error', async () => {
   await expect(addSmartContract({ wrong: 'address' })).rejects.toThrow(
     'the following fields are missing or invalid: address, network, abi'
   )
@@ -47,7 +47,7 @@ test('robustly handle malformed smart contracts', async () => {
   ).rejects.toThrow('the following fields are missing or invalid: abi')
 })
 
-test('do not add duplicate smart contract', async () => {
+test('adding duplicate smart contract throws error', async () => {
   addSmartContract(demoSmartContract)
   await expect(addSmartContract(demoSmartContract)).rejects.toThrow(
     'already listening to the contract at this address'

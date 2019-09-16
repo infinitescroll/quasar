@@ -9,7 +9,7 @@ const demoSmartContract = {
   abi: { name: 'contractName' }
 }
 
-test('POST well-formed smart contract', done => {
+test('posting well-formed smart contract returns 200', done => {
   request
     .post('/api/v0/contracts')
     .send(demoSmartContract)
@@ -18,14 +18,14 @@ test('POST well-formed smart contract', done => {
   done()
 })
 
-test('Save well-formed smart contract', async done => {
+test('Saving well-formed smart contract works', async done => {
   initSmartContracts()
   await request.post('/api/v0/contracts').send(demoSmartContract)
   expect(getSmartContracts()).toMatchObject([demoSmartContract])
   done()
 })
 
-test('POST malformed smart contract', done => {
+test('posting malformed smart contract returns 400 + error', done => {
   request
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
