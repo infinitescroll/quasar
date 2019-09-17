@@ -1,6 +1,46 @@
 const { List } = require('immutable')
 // const ethereum = require('../ethereum')
 
+const SmartContractsStore = () => {
+  let smartContracts = List()
+  return {
+    get: () => {
+      return smartContracts.toArray()
+    },
+
+    unsubscribe: address => {
+      const contractIndex = smartContracts.findIndex(i => i.address === address)
+      smartContracts.get(contractIndex).listener.unsubscribe()
+      smartContracts = smartContracts.delete(contractIndex)
+    },
+
+    add: async smartContractObj => {
+      const invalidFields = findInvalidSmartContractFields(smartContractObj)
+
+      if (invalidFields.length > 0) {
+        throw new Error(
+          `the following fields are missing or invalid: ${invalidFields.join(
+            ', '
+          )}`
+        )
+      }
+      if (isDuplicateSmartContract(smartContracts, smartContractObj.address)) {
+        throw new Error('already listening to the contract at this address')
+      }
+
+      // const contract = ethereum.getContract(smartContractObj)
+      // const listener = ethereum.registerWatcher(contract)
+      // smartContractObj.listener = listener
+      let newSmartContracts = smartContracts.push(smartContractObj)
+      smartContracts = newSmartContracts
+    },
+
+    clear: () => {
+      smartContracts = List()
+    }
+  }
+}
+
 const smartContractSchema = {
   address: val => typeof val === 'string',
   network: val =>
@@ -8,7 +48,7 @@ const smartContractSchema = {
     (val.toLowerCase() === 'rinkeby' ||
       val.toLowerCase() === 'mainnet' ||
       val.toLowerCase() === 'localhost'),
-  abi: val => typeof val === 'object'
+  abi: val => Array.isArray(val)
 }
 
 const findInvalidSmartContractFields = smartContractObj =>
@@ -19,39 +59,8 @@ const findInvalidSmartContractFields = smartContractObj =>
     return errors
   }, [])
 
-let smartContracts
-const initSmartContracts = () => {
-  smartContracts = List()
-}
+const isDuplicateSmartContract = (smartContracts, address) =>
+  smartContracts.find(smartContractObj => smartContractObj.address === address)
 
-const unsubscribe = address => {
-  const contract = smartContracts.find(i => i.address === address)
-  contract.listener.unsubscribe()
-  // Todo: remove item from immutable list
-}
-
-const addSmartContract = async smartContractObj => {
-  const invalidFields = findInvalidSmartContractFields(smartContractObj)
-  if (invalidFields.length > 0)
-    throw new Error(
-      `the following fields are missing or invalid: ${invalidFields.join(', ')}`
-    )
-
-  // const contract = ethereum.getContract(smartContractObj)
-  // const listener = ethereum.registerWatcher(contract)
-  // smartContractObj.listener = listener
-  smartContracts = smartContracts.push(smartContractObj)
-}
-
-const getSmartContracts = () => {
-  return smartContracts.toArray()
-}
-
-initSmartContracts()
-
-module.exports = {
-  getSmartContracts,
-  addSmartContract,
-  initSmartContracts,
-  unsubscribe
-}
+const smartContracts = SmartContractsStore()
+module.exports = smartContracts

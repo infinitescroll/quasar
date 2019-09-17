@@ -1,26 +1,39 @@
 const request = require('supertest')
 const app = require('../../../server')
-const { getSmartContracts, initSmartContracts } = require('../../state')
-const { demoSmartContractJson } = require('../../../mockData')
+const smartContracts = require('../../state')
+const {
+  demoSmartContractJson1,
+  demoSmartContractJson2
+} = require('../../../mockData')
 
-test('POST well-formed smart contract', () => {
-  return request(app)
-    .post('/api/v0/contracts')
-    .send(demoSmartContractJson)
-    .expect(200)
+beforeEach(() => {
+  smartContracts.clear()
 })
 
-test('Save well-formed smart contract', async done => {
-  initSmartContracts()
+test('posting well-formed smart contract returns 200', async done => {
   await request(app)
     .post('/api/v0/contracts')
-    .send(demoSmartContractJson)
-  expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
+    .send(demoSmartContractJson1)
+    .expect(200)
   done()
 })
 
-test('POST malformed smart contract', done => {
-  request(app)
+test('Saving well-formed smart contract works', async done => {
+  await request(app)
+    .post('/api/v0/contracts')
+    .send(demoSmartContractJson1)
+  await request(app)
+    .post('/api/v0/contracts')
+    .send(demoSmartContractJson2)
+  expect(smartContracts.get()).toMatchObject([
+    demoSmartContractJson1,
+    demoSmartContractJson2
+  ])
+  done()
+})
+
+test('posting malformed smart contract returns 400 + error', async done => {
+  await request(app)
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
     .expect(400)
