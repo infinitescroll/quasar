@@ -11,7 +11,7 @@
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
     "test": "jest --detectOpenHandles --forceExit",
-    "test:watch": "scripts/start_test_env.sh",
+    "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
