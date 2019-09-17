@@ -4,7 +4,7 @@ pragma solidity ^0.4.24;
 contract Storage {
 
     /// Events
-    event Registered(bytes32 indexed key, string cid);
+    event PinHash(string cid);
     event RegisterStorageProvider(string provider, string uri, address providerSetter);
 
     /// State: data registry
@@ -23,7 +23,7 @@ contract Storage {
         // TODO: check that _key is an app proxy
         // TODO: check that _key is installed in this org
         registeredData[_key] = _value;
-        emit Registered(_key, _value);
+        emit PinHash(_value);
     }
 
     function getRegisteredData(bytes32 _key) external view returns(string) {

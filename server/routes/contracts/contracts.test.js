@@ -1,18 +1,13 @@
 const supertest = require('supertest')
 const app = require('../../../server')
 const { getSmartContracts, initSmartContracts } = require('../../state')
+const { demoSmartContractJson } = require('../../../mockData')
 const request = supertest(app)
-
-const demoSmartContract = {
-  address: 'asdfasdfjahkj',
-  network: 'mainnet',
-  abi: { name: 'contractName' }
-}
 
 test('posting well-formed smart contract returns 200', done => {
   request
     .post('/api/v0/contracts')
-    .send(demoSmartContract)
+    .send(demoSmartContractJson)
     .expect(200)
 
   done()
@@ -20,8 +15,8 @@ test('posting well-formed smart contract returns 200', done => {
 
 test('Saving well-formed smart contract works', async done => {
   initSmartContracts()
-  await request.post('/api/v0/contracts').send(demoSmartContract)
-  expect(getSmartContracts()).toMatchObject([demoSmartContract])
+  await request.post('/api/v0/contracts').send(demoSmartContractJson)
+  expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
   done()
 })
 

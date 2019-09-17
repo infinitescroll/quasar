@@ -1,4 +1,5 @@
 const { List } = require('immutable')
+// const ethereum = require('../ethereum')
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
@@ -25,6 +26,11 @@ const initSmartContracts = () => {
 
 const isDuplicateSmartContract = address =>
   smartContracts.find(smartContractObj => smartContractObj.address === address)
+const unsubscribe = address => {
+  const contract = smartContracts.find(i => i.address === address)
+  contract.listener.unsubscribe()
+  // Todo: remove item from immutable list
+}
 
 const addSmartContract = async smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
@@ -37,13 +43,21 @@ const addSmartContract = async smartContractObj => {
     throw new Error('already listening to the contract at this address')
   }
 
+  // const contract = ethereum.getContract(smartContractObj)
+  // const listener = ethereum.registerWatcher(contract)
+  // smartContractObj.listener = listener
   smartContracts = smartContracts.push(smartContractObj)
-
-  return
 }
 
 const getSmartContracts = () => {
   return smartContracts.toArray()
 }
 
-module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
+initSmartContracts()
+
+module.exports = {
+  getSmartContracts,
+  addSmartContract,
+  initSmartContracts,
+  unsubscribe
+}

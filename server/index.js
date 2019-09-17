@@ -2,8 +2,6 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const ipfs = require('./utils/ipfs')
-// const ethereum = require('./utils/ethereum')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -14,8 +12,6 @@ if (!process.env['NODE_ENV']) {
 }
 
 const createApp = async () => {
-  ipfs.init()
-
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
@@ -45,4 +41,3 @@ const startListening = () => {
 
 createApp()
 startListening()
-// ethereum.testWatching()

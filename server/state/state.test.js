@@ -3,28 +3,18 @@ const {
   getSmartContracts,
   initSmartContracts
 } = require('./index')
-
-const demoSmartContract = {
-  address: 'asdfasdfjahkj',
-  network: 'mainnet',
-  abi: { name: 'contractName' }
-}
-const demoSmartContract2 = {
-  address: 'asoijijiji',
-  network: 'mainnet',
-  abi: { name: 'contractName' }
-}
+const { demoSmartContractJson } = require('../../mockData')
 
 test('adding/get smart contract works', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  expect(getSmartContracts()).toMatchObject([demoSmartContract])
+  addSmartContract(demoSmartContractJson)
+  expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
 })
 
 test('adding two different smart contracts works', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  addSmartContract(demoSmartContract2)
+  addSmartContract(demoSmartContractJson)
+  addSmartContract(demoSmartContractJson)
 
   expect(getSmartContracts().length).toBe(2)
 })
@@ -48,8 +38,8 @@ test('adding malformed smart contract throws helpful error', async () => {
 })
 
 test('adding duplicate smart contract throws error', async () => {
-  addSmartContract(demoSmartContract)
-  await expect(addSmartContract(demoSmartContract)).rejects.toThrow(
+  addSmartContract(demoSmartContractJson)
+  await expect(addSmartContract(demoSmartContractJson)).rejects.toThrow(
     'already listening to the contract at this address'
   )
 })
