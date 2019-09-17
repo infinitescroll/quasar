@@ -17,19 +17,19 @@ const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
 }
 
-const registerWatcher = contract => {
-  return contract.events.PinHash({}, async (err, event) => {
-    if (err) console.error('Error subscribing: ', err)
+const handlePinHashEvent = async (err, event) => {
+  if (err) console.error('Error subscribing: ', err)
 
-    try {
-      const result = await node.getAndPin(event.returnValues.cid)
-      if (!result[0]) throw new Error('no result found')
-      return result
-    } catch (error) {
-      console.log('there was an error getting and pinning file: ', error)
-      throw new Error(error)
-    }
-  })
+  try {
+    const result = await node.getAndPin(event.returnValues.cid)
+    if (!result[0]) throw new Error('no result found')
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
 }
+
+const registerWatcher = contract =>
+  contract.events.PinHash({}, handlePinHashEvent)
 
 module.exports = { registerWatcher, getContract }
