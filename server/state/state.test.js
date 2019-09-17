@@ -5,16 +5,16 @@ const {
 } = require('./index')
 const { demoSmartContractJson } = require('../../mockData')
 
-test('add/get smart contract', () => {
+test('add/get smart contract', async () => {
   initSmartContracts()
-  addSmartContract(demoSmartContractJson)
+  await addSmartContract(demoSmartContractJson)
   expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
 })
 
-test('add two smart contracts', () => {
+test('add two smart contracts', async () => {
   initSmartContracts()
-  addSmartContract(demoSmartContractJson)
-  addSmartContract(demoSmartContractJson)
+  await addSmartContract(demoSmartContractJson)
+  await addSmartContract(demoSmartContractJson)
 
   expect(getSmartContracts().length).toBe(2)
 })
