@@ -1,19 +1,19 @@
-const { smartContracts } = require('./index')
+const smartContracts = require('./index')
 const {
   demoSmartContractJson1,
   demoSmartContractJson2
 } = require('../../mockData')
 
-test('adding/get smart contract works', () => {
+test('adding/getting smart contract works', async () => {
   smartContracts.clear()
-  smartContracts.add(demoSmartContractJson1)
+  await smartContracts.add(demoSmartContractJson1)
   expect(smartContracts.get()).toMatchObject([demoSmartContractJson1])
 })
 
-test('adding two different smart contracts works', () => {
+test('adding two different smart contracts works', async () => {
   smartContracts.clear()
-  smartContracts.add(demoSmartContractJson1)
-  smartContracts.add(demoSmartContractJson2)
+  await smartContracts.add(demoSmartContractJson1)
+  await smartContracts.add(demoSmartContractJson2)
 
   expect(smartContracts.get().length).toBe(2)
 })

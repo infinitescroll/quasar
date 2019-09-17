@@ -7,7 +7,7 @@ const demoSmartContractJson1 = {
 }
 
 const demoSmartContractJson2 = {
-  address: networks['456'].address,
+  address: networks['123'].address.replace('0', '1'),
   network: 'mainnet',
   abi
 }
