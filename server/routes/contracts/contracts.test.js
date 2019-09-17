@@ -1,5 +1,5 @@
 const supertest = require('supertest')
-const app = require('../../../server')
+const { app } = require('../../../server')
 const { abi, networks } = require('../../../build/contracts/Storage.json')
 const { getSmartContracts, initSmartContracts } = require('../../state')
 const request = supertest(app)
