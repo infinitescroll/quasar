@@ -1,13 +1,18 @@
+const IPFS = require('ipfs')
 const ipfsWrapper = require('./')
 const dag = { test: 'dag' }
+let node
+let getAndPin
 
-const { node, getAndPin } = ipfsWrapper({
-  host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
-  port: process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5001',
-  protocol: process.env.IPFS_NODE_PROTOCOL
-    ? process.env.IPFS_NODE_PROTOCOL
-    : 'http',
-  headers: null
+beforeAll(async () => {
+  await IPFS.create()
+  const ipfsWrapped = ipfsWrapper({
+    host: 'localhost',
+    port: '5001',
+    protocol: 'http'
+  })
+  node = ipfsWrapped.node
+  getAndPin = ipfsWrapped.getAndPin
 })
 
 test('getAndPin gets and pins object that was added by dag.put', async done => {

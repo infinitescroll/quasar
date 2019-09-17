@@ -1,5 +1,5 @@
 const { List } = require('immutable')
-const ethereum = require('../ethereum')
+// const ethereum = require('../ethereum')
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
@@ -37,12 +37,9 @@ const addSmartContract = async smartContractObj => {
       `the following fields are missing or invalid: ${invalidFields.join(', ')}`
     )
 
-  const contract = ethereum.getContract(smartContractObj)
-  const listener = ethereum.registerWatcher(contract)
-  if (!listener || !listener.unsubscribe)
-    throw new Error('There was a problem registering the smart contract.')
-
-  smartContractObj.listener = listener
+  // const contract = ethereum.getContract(smartContractObj)
+  // const listener = ethereum.registerWatcher(contract)
+  // smartContractObj.listener = listener
   smartContracts = smartContracts.push(smartContractObj)
 }
 

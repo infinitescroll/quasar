@@ -19,13 +19,11 @@ const getContract = smartContractObj => {
 
 const registerWatcher = contract => {
   return contract.events.PinHash({}, async (err, event) => {
-    console.log('YOOOO', event)
     if (err) console.error('Error subscribing: ', err)
 
     try {
       const result = await node.getAndPin(event.returnValues.cid)
       if (!result[0]) throw new Error('no result found')
-      console.log('YOOOO WE GOT A RESULT', result)
       return result
     } catch (error) {
       console.log('there was an error getting and pinning file: ', error)

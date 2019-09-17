@@ -11,10 +11,6 @@ function start_ipfs_daemon {
   ipfs daemon
 }
 
-function start_server {
-  nodemon server
-}
-
 function listener_ready {
   start_ipfs_daemon &
   sleep 5
