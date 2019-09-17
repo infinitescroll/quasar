@@ -4,7 +4,7 @@ const { getSmartContracts, initSmartContracts } = require('../../state')
 const { demoSmartContractJson } = require('../../../mockData')
 const request = supertest(app)
 
-test('POST well-formed smart contract', done => {
+test('posting well-formed smart contract returns 200', done => {
   request
     .post('/api/v0/contracts')
     .send(demoSmartContractJson)
@@ -13,14 +13,14 @@ test('POST well-formed smart contract', done => {
   done()
 })
 
-test('Save well-formed smart contract', async done => {
+test('Saving well-formed smart contract works', async done => {
   initSmartContracts()
   await request.post('/api/v0/contracts').send(demoSmartContractJson)
   expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
   done()
 })
 
-test('POST malformed smart contract', done => {
+test('posting malformed smart contract returns 400 + error', done => {
   request
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
