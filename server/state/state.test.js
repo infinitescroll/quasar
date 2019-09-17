@@ -3,18 +3,18 @@ const {
   getSmartContracts,
   initSmartContracts
 } = require('./index')
-const { demoSmartContract } = require('../../mockData')
+const { demoSmartContractJson } = require('../../mockData')
 
 test('add/get smart contract', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  expect(getSmartContracts()).toMatchObject([demoSmartContract])
+  addSmartContract(demoSmartContractJson)
+  expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
 })
 
 test('add two smart contracts', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  addSmartContract(demoSmartContract)
+  addSmartContract(demoSmartContractJson)
+  addSmartContract(demoSmartContractJson)
 
   expect(getSmartContracts().length).toBe(2)
 })
