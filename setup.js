@@ -7,7 +7,7 @@ module.exports = async () => {
   new IPFS({
     config: {
       Addresses: {
-        API: `/ip4/127.0.0.1/tcp/5001`
+        API: `/ip4/0.0.0.0/tcp/5001`
       }
     }
   })
