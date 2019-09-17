@@ -5,10 +5,7 @@ const morgan = require('morgan')
 const PORT = process.env.PORT || 3001
 const app = express()
 
-module.exports = {
-  app,
-  node
-}
+module.exports = app
 
 if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })

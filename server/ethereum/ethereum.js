@@ -1,5 +1,4 @@
 const Web3 = require('web3')
-const ipfs = require('../state/ipfs')
 const storageJSON = require('../../build/contracts/Storage.json')
 const accounts = require('../../accounts.json')
 const ipfsWrapper = require('../ipfs')

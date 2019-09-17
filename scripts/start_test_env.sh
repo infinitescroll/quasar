@@ -25,6 +25,7 @@ function start_chain {
 }
 
 function compile_and_migrate_contracts {
+  rm -rf ./build
   truffle compile
   truffle migrate
 }
