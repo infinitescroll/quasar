@@ -1,12 +1,13 @@
 const supertest = require('supertest')
-const app = require('../../../server')
+const { app } = require('../../../server')
+const { abi, networks } = require('../../../build/contracts/Storage.json')
 const { getSmartContracts, initSmartContracts } = require('../../state')
 const request = supertest(app)
 
 const demoSmartContract = {
-  address: 'asdfasdfjahkj',
+  address: networks['123'].address,
   network: 'mainnet',
-  abi: { name: 'contractName' }
+  abi
 }
 
 test('POST well-formed smart contract', done => {

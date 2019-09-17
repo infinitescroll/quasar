@@ -2,20 +2,29 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const ipfs = require('./utils/ipfs')
+const ipfsWrapper = require('./state/ipfs')
 // const ethereum = require('./utils/ethereum')
 const PORT = process.env.PORT || 3001
 const app = express()
+const node = ipfsWrapper({
+  host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
+  port: process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5001',
+  protocol: process.env.IPFS_NODE_PROTOCOL
+    ? process.env.IPFS_NODE_PROTOCOL
+    : 'http',
+  headers: null
+})
 
-module.exports = app
+module.exports = {
+  app,
+  node
+}
 
 if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
 const createApp = async () => {
-  ipfs.init()
-
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
