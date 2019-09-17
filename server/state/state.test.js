@@ -3,23 +3,18 @@ const {
   getSmartContracts,
   initSmartContracts
 } = require('./index')
-
-const demoSmartContract = {
-  address: 'asdfasdfjahkj',
-  network: 'mainnet',
-  abi: { name: 'contractName' }
-}
+const { demoSmartContractJson } = require('../../mockData')
 
 test('add/get smart contract', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  expect(getSmartContracts()).toMatchObject([demoSmartContract])
+  addSmartContract(demoSmartContractJson)
+  expect(getSmartContracts()).toMatchObject([demoSmartContractJson])
 })
 
 test('add two smart contracts', () => {
   initSmartContracts()
-  addSmartContract(demoSmartContract)
-  addSmartContract(demoSmartContract)
+  addSmartContract(demoSmartContractJson)
+  addSmartContract(demoSmartContractJson)
 
   expect(getSmartContracts().length).toBe(2)
 })

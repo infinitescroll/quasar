@@ -1,4 +1,5 @@
 const { List } = require('immutable')
+// const ethereum = require('../ethereum')
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
@@ -23,6 +24,12 @@ const initSmartContracts = () => {
   smartContracts = List()
 }
 
+const unsubscribe = address => {
+  const contract = smartContracts.find(i => i.address === address)
+  contract.listener.unsubscribe()
+  // Todo: remove item from immutable list
+}
+
 const addSmartContract = async smartContractObj => {
   const invalidFields = findInvalidSmartContractFields(smartContractObj)
   if (invalidFields.length > 0)
@@ -30,8 +37,10 @@ const addSmartContract = async smartContractObj => {
       `the following fields are missing or invalid: ${invalidFields.join(', ')}`
     )
 
+  // const contract = ethereum.getContract(smartContractObj)
+  // const listener = ethereum.registerWatcher(contract)
+  // smartContractObj.listener = listener
   smartContracts = smartContracts.push(smartContractObj)
-  return
 }
 
 const getSmartContracts = () => {
@@ -40,4 +49,9 @@ const getSmartContracts = () => {
 
 initSmartContracts()
 
-module.exports = { getSmartContracts, addSmartContract, initSmartContracts }
+module.exports = {
+  getSmartContracts,
+  addSmartContract,
+  initSmartContracts,
+  unsubscribe
+}
