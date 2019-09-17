@@ -26,10 +26,11 @@ const initSmartContracts = () => {
 
 const isDuplicateSmartContract = address =>
   smartContracts.find(smartContractObj => smartContractObj.address === address)
+
 const unsubscribe = address => {
-  const contract = smartContracts.find(i => i.address === address)
-  contract.listener.unsubscribe()
-  // Todo: remove item from immutable list
+  const contractIndex = smartContracts.findIndex(i => i.address === address)
+  smartContracts.get(contractIndex).listener.unsubscribe()
+  smartContracts = smartContracts.delete(contractIndex)
 }
 
 const addSmartContract = async smartContractObj => {
