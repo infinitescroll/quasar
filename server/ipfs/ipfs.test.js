@@ -1,4 +1,4 @@
-const ipfsWrapper = require('./ipfs')
+const ipfsWrapper = require('./')
 const dag = { test: 'dag' }
 
 const { node, getAndPin } = ipfsWrapper({

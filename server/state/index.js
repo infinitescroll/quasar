@@ -1,5 +1,5 @@
 const { List } = require('immutable')
-const ethereum = require('../utils/ethereum')
+const ethereum = require('../ethereum/ethereum')
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
