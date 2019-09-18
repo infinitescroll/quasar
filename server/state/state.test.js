@@ -22,20 +22,20 @@ test('adding two different smart contracts works', async () => {
 
 test('adding malformed smart contract throws helpful error', async () => {
   await expect(smartContracts.add({ wrong: 'address' })).rejects.toThrow(
-    'the following fields are missing or invalid: address, network, abi'
+    'the following fields are missing or invalid: address, abi'
   )
 
   await expect(smartContracts.add({ address: 'address' })).rejects.toThrow(
-    'the following fields are missing or invalid: network, abi'
+    'the following fields are missing or invalid: abi'
   )
 
-  await expect(
-    smartContracts.add({ address: 'address', network: 'wrongnetwork' })
-  ).rejects.toThrow('the following fields are missing or invalid: network, abi')
+  await expect(smartContracts.add({ abi: [] })).rejects.toThrow(
+    'the following fields are missing or invalid: address'
+  )
 
-  await expect(
-    smartContracts.add({ address: 'address', network: 'rinkeby' })
-  ).rejects.toThrow('the following fields are missing or invalid: abi')
+  await expect(smartContracts.add({ abi: 'wrong abi' })).rejects.toThrow(
+    'the following fields are missing or invalid: address'
+  )
 })
 
 test('adding duplicate smart contract throws error', async () => {

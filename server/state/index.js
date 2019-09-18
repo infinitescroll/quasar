@@ -43,11 +43,6 @@ const SmartContractsStore = () => {
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
-  network: val =>
-    val &&
-    (val.toLowerCase() === 'rinkeby' ||
-      val.toLowerCase() === 'mainnet' ||
-      val.toLowerCase() === 'localhost'),
   abi: val => Array.isArray(val)
 }
 

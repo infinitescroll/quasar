@@ -37,8 +37,6 @@ test('posting malformed smart contract returns 400 + error', async done => {
     .post('/api/v0/contracts')
     .send({ wrong: 'structure' })
     .expect(400)
-    .expect(
-      'the following fields are missing or invalid: address, network, abi'
-    )
+    .expect('the following fields are missing or invalid: address, abi')
   done()
 })
