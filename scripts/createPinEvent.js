@@ -2,7 +2,7 @@ const Web3 = require('web3')
 const storageJSON = require('../build/contracts/Storage.json')
 const accounts = require('../accounts.json')
 
-const createEvent = () =>
+const createPinEvent = () =>
   new Promise((resolve, reject) => {
     const web3 = new Web3(
       new Web3.providers.WebsocketProvider('ws://localhost:8545')
@@ -25,7 +25,7 @@ const createEvent = () =>
 
 const start = async () => {
   try {
-    const res = await createEvent()
+    const res = await createPinEvent()
     console.log('tx successfully completed: ', res)
   } catch (error) {
     console.log('tx unsuccessfull, error: ', error)

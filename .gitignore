@@ -4,3 +4,4 @@ accounts.json
 build
 .coveralls.yml
 coverage
+.DS_Store

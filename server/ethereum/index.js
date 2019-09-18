@@ -29,7 +29,12 @@ const handlePinHashEvent = async (err, event) => {
   }
 }
 
-const registerWatcher = contract =>
+const handleListenEvent = console.log
+
+const registerPinWatcher = contract =>
   contract.events.PinHash({}, handlePinHashEvent)
 
-module.exports = { registerWatcher, getContract }
+const registerListenWatcher = contract =>
+  contract.events.Listen({}, handleListenEvent)
+
+module.exports = { registerPinWatcher, registerListenWatcher, getContract }
