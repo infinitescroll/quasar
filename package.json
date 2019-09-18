@@ -10,7 +10,7 @@
     "start:dev:local": "scripts/local.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
-    "test": "jsipfs init && scripts/test.sh && jsipfs shutdown",
+    "test": "scripts/test.sh && jsipfs shutdown",
     "test:watch": "jest --watch",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
