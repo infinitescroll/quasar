@@ -1,8 +1,14 @@
 const Web3 = require('web3')
-const { registerListenWatcher, registerPinWatcher } = require('./')
+const {
+  registerListenWatcher,
+  registerPinWatcher,
+  handleListenEvent
+} = require('./')
 const ipfsWrapper = require('../ipfs')
+const smartContracts = require('../state')
 const { demoSmartContractJson1 } = require('../../mockData')
 const accounts = require('../../accounts.json')
+const storageJSON = require('../../build/contracts/Storage.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
 
 let web3
@@ -52,13 +58,34 @@ test('firing a pin event pins a file', async done => {
     })
 })
 
+// problem: addresses don't match
 test('firing a listen event listens to a new contract', async done => {
+  const newSmartContract = {
+    address: demoSmartContractJson1.address,
+    abi: storageJSON.abi
+  }
   registerListenWatcher(listenerContract)
   listenerContract.methods
     .listenToContract(demoSmartContractJson1.address)
     .send({ from: accounts[0] }, () => {
       setTimeout(() => {
+        expect(smartContracts.get()).toMatchObject([newSmartContract])
         done()
       }, 2000)
     })
+})
+
+// problem: ABIs are different 🤔
+test('handleListenEvent adds smart contract to state', async done => {
+  const newSmartContract = {
+    address: demoSmartContractJson1.address,
+    abi: storageJSON.abi
+  }
+  const eventObj = {
+    address: demoSmartContractJson1.address
+  }
+
+  await handleListenEvent(null, eventObj)
+  expect(smartContracts.get()).toMatchObject([newSmartContract])
+  done()
 })

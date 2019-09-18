@@ -1,5 +1,8 @@
 const Web3 = require('web3')
 const ipfsWrapper = require('../ipfs')
+const smartContracts = require('../state')
+const storageJSON = require('../../build/contracts/Storage.json')
+
 const node = ipfsWrapper({
   host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
   port: process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5002',
@@ -29,7 +32,18 @@ const handlePinHashEvent = async (err, event) => {
   }
 }
 
-const handleListenEvent = console.log
+const handleListenEvent = async (err, event) => {
+  if (err) console.error('Error subcribing: ', err)
+  const newSmartContract = {
+    address: event.address,
+    abi: storageJSON.abi
+  }
+  try {
+    smartContracts.add(newSmartContract)
+  } catch (err) {
+    throw new Error(err)
+  }
+}
 
 const registerPinWatcher = contract =>
   contract.events.PinHash({}, handlePinHashEvent)
@@ -37,4 +51,9 @@ const registerPinWatcher = contract =>
 const registerListenWatcher = contract =>
   contract.events.Listen({}, handleListenEvent)
 
-module.exports = { registerPinWatcher, registerListenWatcher, getContract }
+module.exports = {
+  registerPinWatcher,
+  registerListenWatcher,
+  getContract,
+  handleListenEvent
+}
