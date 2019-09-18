@@ -37,13 +37,15 @@ test('watcher pins file from registerData function', async done => {
   registerWatcher(contract)
   contract.methods
     .registerData(testKey, hash.toBaseEncodedString())
-    .send({ from: accounts[0] }, async () => {
-      const pins = await node.pin.ls()
-      const match = pins.find(item => {
-        return item.hash === hash.toBaseEncodedString()
-      })
-      expect(match).toBeDefined()
-      done()
+    .send({ from: accounts[0] }, () => {
+      setTimeout(async () => {
+        const pins = await node.pin.ls()
+        const match = pins.find(item => {
+          return item.hash === hash.toBaseEncodedString()
+        })
+        expect(match).toBeDefined()
+        done()
+      }, 2000)
     })
 })
 
