@@ -32,4 +32,4 @@ const handlePinHashEvent = async (err, event) => {
 const registerWatcher = contract =>
   contract.events.PinHash({}, handlePinHashEvent)
 
-module.exports = { registerWatcher, getContract }
+module.exports = { getContract, handlePinHashEvent, registerWatcher }
