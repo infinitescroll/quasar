@@ -2,7 +2,6 @@ const ipfsClient = require('ipfs-http-client')
 
 const ipfsWrapper = ({ port, host, protocol, headers }) => {
   const node = ipfsClient({ port, host, protocol, headers })
-
   const getAndPin = async cid => {
     const objToStore = await node.dag.get(cid)
     const newCid = await node.dag.put(objToStore.value)

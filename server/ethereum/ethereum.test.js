@@ -16,7 +16,7 @@ beforeAll(() => {
   )
   const ipfs = ipfsWrapper({
     host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
-    port: process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5001',
+    port: '5002',
     protocol: process.env.IPFS_NODE_PROTOCOL
       ? process.env.IPFS_NODE_PROTOCOL
       : 'http',

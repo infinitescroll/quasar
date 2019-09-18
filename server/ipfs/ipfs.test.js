@@ -3,11 +3,14 @@ const ipfsWrapper = require('./')
 let node
 let getAndPin
 
-beforeAll(async () => {
+beforeAll(() => {
   const ipfsWrapped = ipfsWrapper({
-    host: 'localhost',
-    port: '5001',
-    protocol: 'http'
+    host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
+    port: '5002',
+    protocol: process.env.IPFS_NODE_PROTOCOL
+      ? process.env.IPFS_NODE_PROTOCOL
+      : 'http',
+    headers: null
   })
   node = ipfsWrapped.node
   getAndPin = ipfsWrapped.getAndPin
@@ -17,7 +20,6 @@ test('getAndPin gets and pins object that was added by dag.put', async done => {
   const dag = { test: 'value' }
   const cid = await node.dag.put(dag)
   const hashObj = await getAndPin(cid.toBaseEncodedString())
-
   expect(hashObj[0].hash).toBe(cid.toBaseEncodedString())
   done()
 })
