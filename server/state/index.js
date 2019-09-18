@@ -31,8 +31,7 @@ const SmartContractsStore = () => {
       // const contract = ethereum.getContract(smartContractObj)
       // const listener = ethereum.registerWatcher(contract)
       // smartContractObj.listener = listener
-      let newSmartContracts = smartContracts.push(smartContractObj)
-      smartContracts = newSmartContracts
+      smartContracts = smartContracts.push(smartContractObj)
     },
 
     clear: () => {
