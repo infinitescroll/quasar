@@ -10,8 +10,8 @@
     "start:dev:local": "scripts/local.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
-    "test": "jest --detectOpenHandles --forceExit",
-    "test:watch": "scripts/start_test_env.sh",
+    "test": "scripts/test.sh && jsipfs shutdown",
+    "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
@@ -29,7 +29,8 @@
   },
   "jest": {
     "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "collectCoverage": true,
+    "globalSetup": "./setup.js/"
   },
   "husky": {
     "hooks": {
@@ -72,6 +73,7 @@
     "eslint-plugin-prettier": "^3.1.0",
     "ganache-cli": "^6.7.0",
     "husky": "^3.0.5",
+    "ipfs": "^0.37.1",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.5",
     "nodemon": "^1.19.2",

@@ -35,9 +35,13 @@ const createApp = async () => {
   })
 }
 
-const startListening = () => {
+const startListening = async () => {
+  await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-createApp()
-startListening()
+if (require.main === module) {
+  startListening()
+} else {
+  createApp()
+}

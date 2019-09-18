@@ -7,4 +7,4 @@ echo "Running: "$0
 
 jsipfs daemon &
 sleep 5 &
-jest --watch
+jest --detectOpenHandles --forceExit
