@@ -8,7 +8,7 @@ let web3
 let contract
 let node
 
-beforeAll(async () => {
+beforeAll(() => {
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
   contract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
