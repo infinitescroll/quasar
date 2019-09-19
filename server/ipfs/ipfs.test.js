@@ -26,7 +26,11 @@ beforeEach(async () => {
   }
 
   await asyncForEach(pins, async item => {
-    await node.pin.rm(item.hash)
+    try {
+      await node.pin.rm(item.hash)
+    } catch (error) {
+      console.error('Error removing pin: ', error)
+    }
   })
 
   pins = await node.pin.ls()
