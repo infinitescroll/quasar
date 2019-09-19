@@ -7,9 +7,8 @@ const accounts = require('../../accounts.json')
 let web3
 let contract
 let node
-const dag = { testKey: 'testVal' }
 
-beforeAll(() => {
+beforeAll(async () => {
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
   contract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
@@ -23,7 +22,22 @@ beforeAll(() => {
       : 'http',
     headers: null
   })
+
   node = ipfs.node
+  let pins = await node.pin.ls()
+
+  async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array)
+    }
+  }
+
+  await asyncForEach(pins, async item => {
+    await node.pin.rm(item.hash)
+  })
+
+  pins = await node.pin.ls()
+  if (pins.length > 0) throw new Error("Pins weren't removed properly.")
 })
 
 afterAll(() => {
@@ -32,6 +46,7 @@ afterAll(() => {
 
 test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
+  const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
 
   registerWatcher(contract)
@@ -50,7 +65,7 @@ test('watcher pins file from registerData function', async done => {
 })
 
 test('handlePinHashEvent pins file of cid it was passed', async done => {
-  dag.testKey = 'handlePinHashEventTestVal'
+  const dag = { secondTestKey: 'secondTestVal' }
   const hash = await node.dag.put(dag)
   const eventObj = {
     returnValues: {
@@ -98,7 +113,7 @@ test('getContract throws when an invalid contract is passed', async done => {
 
 // Uncomment this when timeout in ipfs.dag.get is working. Will need to adjust jest.setTimeout.Timeout past the dag.get timeout time.
 
-// test('handlePinHashEvent throws and error with an invalid cid', async done => {
+// test('handlePinHashEvent throws an error after X seconds if the cid is unavailable on the network', async done => {
 //   const invalidEventObj = {
 //     returnValues: {
 //       cid: 'bafyreigunyjtx4oyopevaygyizasvgwitymlcnlwitlkiszl4krdpofpro'
