@@ -24,6 +24,9 @@ beforeAll(async () => {
   })
 
   node = ipfs.node
+})
+
+beforeEach(async () => {
   let pins = await node.pin.ls()
 
   async function asyncForEach(array, callback) {
@@ -48,6 +51,12 @@ test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
+
+  const pins = await node.pin.ls()
+  const match = pins.find(item => {
+    return item.hash === hash.toBaseEncodedString()
+  })
+  expect(match).toBeUndefined()
 
   registerWatcher(contract)
   contract.methods
@@ -79,14 +88,8 @@ test('handlePinHashEvent pins file of cid it was passed', async done => {
 })
 
 test('handlePinHashEvent throws error with empty params', async done => {
-  try {
-    await handlePinHashEvent()
-    expect(true).toBe(false)
-    done()
-  } catch (error) {
-    expect(error).toBeDefined()
-    done()
-  }
+  await expect(handlePinHashEvent()).rejects.toThrow()
+  done()
 })
 
 test('getContract returns a contract', async done => {
