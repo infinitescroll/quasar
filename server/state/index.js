@@ -12,8 +12,8 @@ const SmartContractsStore = () => {
       const contractIndex = smartContracts.findIndex(i => i.address === address)
       const contractToRemove = smartContracts.get(contractIndex)
 
-      if (contractToRemove && contractToRemove.listener) {
-        contractToRemove.listener.unsubscribe()
+      if (contractToRemove) {
+        if (contractToRemove.listener) contractToRemove.listener.unsubscribe()
         smartContracts = smartContracts.delete(contractIndex)
       }
     },

@@ -44,3 +44,11 @@ test('adding duplicate smart contract throws error', async () => {
     'already listening to the contract at this address'
   )
 })
+
+test('unsubscribing removes smart contract from state', async () => {
+  smartContracts.add(demoSmartContractJson1)
+  expect(smartContracts.get().length).toBe(1)
+
+  smartContracts.unsubscribe(demoSmartContractJson1.address)
+  expect(smartContracts.get().length).toBe(0)
+})

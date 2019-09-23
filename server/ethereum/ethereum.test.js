@@ -199,6 +199,25 @@ test('getContract returns a contract', async done => {
   done()
 })
 
+test('unsubscribe event deletes smart contract from state', async done => {
+  await listenerContract.methods
+    .listenToContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {}, 1000)
+    })
+  expect(smartContracts.get().length).toBe(1)
+
+  listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {
+        expect(smartContracts.get().length).toBe(0)
+        done()
+      }, 2000)
+    })
+})
+
+// this test must go last bc it mutates demoSmartContractJson1!!
 test('getContract throws when an invalid contract is passed', async done => {
   demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
   const badCall = () => {
