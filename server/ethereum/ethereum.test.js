@@ -62,7 +62,7 @@ test('firing a pin event pins a file', async done => {
     })
 })
 
-test('firing a listen event listens to a new contract', async done => {
+test('firing a listen event adds a new contract to listen to into state', async done => {
   const newSmartContract = {
     address: demoSmartContractJson1.address,
     abi: storageJSON.abi
