@@ -50,15 +50,24 @@ const handleListenEvent = async (err, event) => {
   }
 }
 
+const handleStopListeningEvent = async (err, event) => {
+  if (err) console.error('Error subcribing: ', err)
+  smartContracts.unsubscribe(event.returnValues.contractAddress)
+}
+
 const registerPinWatcher = contract =>
   contract.events.PinHash({}, handlePinHashEvent)
 
 const registerListenWatcher = contract =>
   contract.events.Listen({}, handleListenEvent)
 
+const registerStopListeningWatcher = contract =>
+  contract.events.StopListening({}, handleStopListeningEvent)
+
 module.exports = {
   registerPinWatcher,
   registerListenWatcher,
+  registerStopListeningWatcher,
   getContract,
   handleListenEvent,
   handlePinHashEvent

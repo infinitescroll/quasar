@@ -10,8 +10,12 @@ const SmartContractsStore = () => {
 
     unsubscribe: address => {
       const contractIndex = smartContracts.findIndex(i => i.address === address)
-      smartContracts.get(contractIndex).listener.unsubscribe()
-      smartContracts = smartContracts.delete(contractIndex)
+      const contractToRemove = smartContracts.get(contractIndex)
+
+      if (contractToRemove && contractToRemove.listener) {
+        contractToRemove.listener.unsubscribe()
+        smartContracts = smartContracts.delete(contractIndex)
+      }
     },
 
     add: async smartContractObj => {
