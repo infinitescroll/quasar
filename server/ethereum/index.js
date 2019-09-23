@@ -56,5 +56,6 @@ module.exports = {
   registerPinWatcher,
   registerListenWatcher,
   getContract,
-  handleListenEvent
+  handleListenEvent,
+  handlePinHashEvent
 }

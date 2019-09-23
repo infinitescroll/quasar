@@ -2,8 +2,11 @@ const Web3 = require('web3')
 const {
   registerListenWatcher,
   registerPinWatcher,
-  handleListenEvent
+  handleListenEvent,
+  handlePinHashEvent,
+  getContract
 } = require('./')
+
 const ipfsWrapper = require('../ipfs')
 const smartContracts = require('../state')
 const { demoSmartContractJson1 } = require('../../mockData')
@@ -35,10 +38,30 @@ beforeAll(() => {
       : 'http',
     headers: null
   })
+
   node = ipfs.node
 })
 
-beforeEach(() => {
+beforeEach(async () => {
+  let pins = await node.pin.ls()
+
+  async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array)
+    }
+  }
+
+  await asyncForEach(pins, async item => {
+    try {
+      await node.pin.rm(item.hash)
+    } catch (error) {
+      console.error('Error removing pin: ', error)
+    }
+  })
+
+  pins = await node.pin.ls()
+  if (pins.length > 0) throw new Error("Pins weren't removed properly.")
+
   smartContracts.clear()
 })
 
@@ -46,17 +69,27 @@ afterAll(() => {
   web3.currentProvider.connection.close()
 })
 
-// NOTE - this isn't really testing anything yet, just showing how to fire an event and getting the testing framework working
-test('firing a pin event pins a file', async done => {
+test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
-  const testVal = { dag: 'killinnnnnn it' }
-  const hash = await node.dag.put(testVal)
+  const dag = { testKey: 'testVal' }
+  const hash = await node.dag.put(dag)
+
+  const pins = await node.pin.ls()
+  const match = pins.find(item => {
+    return item.hash === hash.toBaseEncodedString()
+  })
+  expect(match).toBeUndefined()
 
   registerPinWatcher(contract)
   contract.methods
     .registerData(testKey, hash.toBaseEncodedString())
     .send({ from: accounts[0] }, () => {
-      setTimeout(() => {
+      setTimeout(async () => {
+        const pins = await node.pin.ls()
+        const match = pins.find(item => {
+          return item.hash === hash.toBaseEncodedString()
+        })
+        expect(match).toBeDefined()
         done()
       }, 2000)
     })
@@ -91,3 +124,62 @@ test('handleListenEvent adds smart contract to state', async done => {
   expect(smartContracts.get()).toMatchObject([newSmartContract])
   done()
 })
+test('handlePinHashEvent pins file of cid it was passed', async done => {
+  const dag = { secondTestKey: 'secondTestVal' }
+  const hash = await node.dag.put(dag)
+  const eventObj = {
+    returnValues: {
+      cid: hash.toBaseEncodedString()
+    }
+  }
+
+  const res = await handlePinHashEvent(null, eventObj)
+  expect(res[0].hash).toBe(hash.toBaseEncodedString())
+  done()
+})
+
+test('handlePinHashEvent throws error with empty params', async done => {
+  await expect(handlePinHashEvent()).rejects.toThrow()
+  done()
+})
+
+test('getContract returns a contract', async done => {
+  const contract = getContract(
+    demoSmartContractJson1,
+    demoSmartContractJson1.address
+  )
+  expect(contract._address).toBe(demoSmartContractJson1.address)
+  done()
+})
+
+test('getContract throws when an invalid contract is passed', async done => {
+  demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
+  const badCall = () => {
+    return getContract(
+      demoSmartContractJson1,
+      '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
+    )
+  }
+
+  expect(badCall).toThrow()
+  done()
+})
+
+// Uncomment this when timeout in ipfs.dag.get is working. Will need to adjust jest.setTimeout.Timeout past the dag.get timeout time.
+
+// test('handlePinHashEvent throws an error after X seconds if the cid is unavailable on the network', async done => {
+//   const invalidEventObj = {
+//     returnValues: {
+//       cid: 'bafyreigunyjtx4oyopevaygyizasvgwitymlcnlwitlkiszl4krdpofpro'
+//     }
+//   }
+
+//   try {
+//     await handlePinHashEvent(null, invalidEventObj)
+//     expect(true).toBe(false)
+//     done()
+//   } catch (error) {
+//     expect(error).toBeDefined()
+//     done()
+//   }
+// })
