@@ -38,6 +38,10 @@ beforeAll(() => {
   node = ipfs.node
 })
 
+beforeEach(() => {
+  smartContracts.clear()
+})
+
 afterAll(() => {
   web3.currentProvider.connection.close()
 })
@@ -58,7 +62,6 @@ test('firing a pin event pins a file', async done => {
     })
 })
 
-// problem: addresses don't match
 test('firing a listen event listens to a new contract', async done => {
   const newSmartContract = {
     address: demoSmartContractJson1.address,
@@ -75,14 +78,13 @@ test('firing a listen event listens to a new contract', async done => {
     })
 })
 
-// problem: ABIs are different 🤔
 test('handleListenEvent adds smart contract to state', async done => {
   const newSmartContract = {
     address: demoSmartContractJson1.address,
     abi: storageJSON.abi
   }
   const eventObj = {
-    address: demoSmartContractJson1.address
+    returnValues: { contractAddress: demoSmartContractJson1.address }
   }
 
   await handleListenEvent(null, eventObj)

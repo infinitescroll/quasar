@@ -34,8 +34,9 @@ const handlePinHashEvent = async (err, event) => {
 
 const handleListenEvent = async (err, event) => {
   if (err) console.error('Error subcribing: ', err)
+
   const newSmartContract = {
-    address: event.address,
+    address: event.returnValues.contractAddress,
     abi: storageJSON.abi
   }
   try {
