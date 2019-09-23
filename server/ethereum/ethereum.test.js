@@ -2,6 +2,7 @@ const Web3 = require('web3')
 const {
   registerListenWatcher,
   registerPinWatcher,
+  registerStopListeningWatcher,
   handleListenEvent,
   handlePinHashEvent,
   getContract
@@ -30,6 +31,10 @@ beforeAll(() => {
     listenerJSON.abi,
     listenerJSON.networks['123'].address
   )
+
+  registerStopListeningWatcher(listenerContract)
+  registerListenWatcher(listenerContract)
+
   const ipfs = ipfsWrapper({
     host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
     port: '5002',
@@ -74,6 +79,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
+
   const emitPinEventAndCheck = () => {
     contract.methods
       .registerData(testKey, hash.toBaseEncodedString())
@@ -88,6 +94,12 @@ from pinning contract (without registering pinner) pins file`, async done => {
         }, 2000)
       })
   }
+
+  await listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {}, 1000)
+    })
 
   listenerContract.methods
     .listenToContract(demoSmartContractJson1.address)
@@ -109,6 +121,12 @@ test('watcher pins file from registerData function', async done => {
   })
   expect(match).toBeUndefined()
 
+  await listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {}, 1000)
+    })
+
   registerPinWatcher(contract)
   contract.methods
     .registerData(testKey, hash.toBaseEncodedString())
@@ -129,8 +147,7 @@ test('firing a listen event adds a new contract to listen to into state', async 
     address: demoSmartContractJson1.address,
     abi: storageJSON.abi
   }
-  registerListenWatcher(listenerContract)
-  console.log(smartContracts.get())
+
   listenerContract.methods
     .listenToContract(demoSmartContractJson1.address)
     .send({ from: accounts[0] }, () => {
