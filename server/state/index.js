@@ -24,6 +24,7 @@ const SmartContractsStore = () => {
           )}`
         )
       }
+
       if (isDuplicateSmartContract(smartContracts, smartContractObj.address)) {
         throw new Error('already listening to the contract at this address')
       }

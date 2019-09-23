@@ -69,6 +69,35 @@ afterAll(() => {
   web3.currentProvider.connection.close()
 })
 
+test(`emitting listen event from listener, then emittting pin event
+from pinning contract (without registering pinner) pins file`, async done => {
+  const testKey = web3.utils.fromAscii('testKey')
+  const dag = { testKey: 'testVal' }
+  const hash = await node.dag.put(dag)
+  const emitPinEventAndCheck = () => {
+    contract.methods
+      .registerData(testKey, hash.toBaseEncodedString())
+      .send({ from: accounts[0] }, () => {
+        setTimeout(async () => {
+          const pins = await node.pin.ls()
+          const match = pins.find(item => {
+            return item.hash === hash.toBaseEncodedString()
+          })
+          expect(match).toBeDefined()
+          done()
+        }, 2000)
+      })
+  }
+
+  listenerContract.methods
+    .listenToContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {
+        emitPinEventAndCheck()
+      }, 2000)
+    })
+})
+
 test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
@@ -101,6 +130,7 @@ test('firing a listen event adds a new contract to listen to into state', async 
     abi: storageJSON.abi
   }
   registerListenWatcher(listenerContract)
+  console.log(smartContracts.get())
   listenerContract.methods
     .listenToContract(demoSmartContractJson1.address)
     .send({ from: accounts[0] }, () => {

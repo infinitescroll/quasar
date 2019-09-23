@@ -22,7 +22,6 @@ const getContract = smartContractObj => {
 
 const handlePinHashEvent = async (err, event) => {
   if (err) console.error('Error subscribing: ', err)
-
   try {
     const result = await node.getAndPin(event.returnValues.cid)
     if (!result[0]) throw new Error('no result found')
@@ -34,13 +33,18 @@ const handlePinHashEvent = async (err, event) => {
 
 const handleListenEvent = async (err, event) => {
   if (err) console.error('Error subcribing: ', err)
+  const contract = new web3.eth.Contract(
+    storageJSON.abi,
+    event.returnValues.contractAddress
+  )
 
-  const newSmartContract = {
+  const smartContractObj = {
     address: event.returnValues.contractAddress,
     abi: storageJSON.abi
   }
   try {
-    smartContracts.add(newSmartContract)
+    smartContracts.add(smartContractObj)
+    registerPinWatcher(contract)
   } catch (err) {
     throw new Error(err)
   }
