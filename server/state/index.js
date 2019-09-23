@@ -33,9 +33,6 @@ const SmartContractsStore = () => {
         throw new Error('already listening to the contract at this address')
       }
 
-      // const contract = ethereum.getContract(smartContractObj)
-      // const listener = ethereum.registerWatcher(contract)
-      // smartContractObj.listener = listener
       smartContracts = smartContracts.push(smartContractObj)
     },
 
