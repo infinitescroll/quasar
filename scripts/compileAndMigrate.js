@@ -14,9 +14,9 @@ const compile = () =>
 const migrate = (network = '') =>
   new Promise((resolve, reject) => {
     const migrateCmd =
-      network !== 'local'
-        ? `truffle migrate --network ${network}`
-        : 'truffle migrate'
+      network === 'local' || !network
+        ? 'truffle migrate'
+        : `truffle migrate --network ${network}`
     log(chalk.green(`running ${migrateCmd}`))
 
     exec(migrateCmd, (error, stdout) => {

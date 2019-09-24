@@ -6,8 +6,10 @@ let provider, networkId
 if (providerNetwork === 'rinkeby') {
   networkId = '4'
   provider = rinkebyInfuraWsUrl
-}
-if (providerNetwork === 'local') {
+} else if (providerNetwork === 'local') {
+  networkId = '123'
+  provider = 'ws://localhost:8545'
+} else {
   networkId = '123'
   provider = 'ws://localhost:8545'
 }
