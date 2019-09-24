@@ -5,8 +5,9 @@ const demoSmartContractJson1 = {
   abi
 }
 
+const address2 = networks['123'].address.slice(0, -1) + 'z'
 const demoSmartContractJson2 = {
-  address: networks['123'].address.replace('0', '1'),
+  address: address2,
   abi
 }
 
