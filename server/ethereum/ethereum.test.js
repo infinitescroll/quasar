@@ -10,7 +10,10 @@ const {
 
 const ipfsWrapper = require('../ipfs')
 const smartContracts = require('../state')
-const { demoSmartContractJson1 } = require('../../mockData')
+const {
+  demoSmartContractJson1,
+  demoSmartContractJson2
+} = require('../../mockData')
 const accounts = require('../../accounts.json')
 const storageJSON = require('../../build/contracts/Storage.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
@@ -19,6 +22,7 @@ let web3
 let contract
 let listenerContract
 let node
+let listenerUnsubscribe
 
 beforeAll(() => {
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
@@ -44,6 +48,17 @@ beforeAll(() => {
     headers: null
   })
 
+  listenerUnsubscribe = () =>
+    new Promise((resolve, reject) => {
+      listenerContract.methods
+        .unsubscribeContract(demoSmartContractJson1.address)
+        .send({ from: accounts[0] }, err => {
+          if (err) reject(err)
+          setTimeout(() => {
+            resolve()
+          }, 500)
+        })
+    })
   node = ipfs.node
 })
 
@@ -95,11 +110,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
       })
   }
 
-  await listenerContract.methods
-    .unsubscribeContract(demoSmartContractJson1.address)
-    .send({ from: accounts[0] }, () => {
-      setTimeout(() => {}, 1000)
-    })
+  await listenerUnsubscribe()
 
   listenerContract.methods
     .listenToContract(demoSmartContractJson1.address)
@@ -121,11 +132,7 @@ test('watcher pins file from registerData function', async done => {
   })
   expect(match).toBeUndefined()
 
-  await listenerContract.methods
-    .unsubscribeContract(demoSmartContractJson1.address)
-    .send({ from: accounts[0] }, () => {
-      setTimeout(() => {}, 1000)
-    })
+  await listenerUnsubscribe()
 
   registerPinWatcher(contract)
   contract.methods
@@ -142,19 +149,48 @@ test('watcher pins file from registerData function', async done => {
     })
 })
 
-test('firing a listen event adds a new contract to listen to into state', async done => {
+test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
   const newSmartContract = {
     address: demoSmartContractJson1.address,
     abi: storageJSON.abi
   }
+  const newSmartContract2 = {
+    address: demoSmartContractJson2.address,
+    abi: storageJSON.abi
+  }
+
+  await new Promise(resolve => {
+    listenerContract.methods
+      .listenToContract(demoSmartContractJson1.address)
+      .send({ from: accounts[0] }, () => {
+        setTimeout(() => {
+          expect(smartContracts.get()).toMatchObject([newSmartContract])
+          resolve()
+        }, 1000)
+      })
+  })
+
+  await new Promise(resolve => {
+    listenerContract.methods
+      .listenToContract(demoSmartContractJson2.address)
+      .send({ from: accounts[0] }, () => {
+        setTimeout(() => {
+          expect(smartContracts.get()).toMatchObject([
+            newSmartContract,
+            newSmartContract2
+          ])
+          resolve()
+        }, 1000)
+      })
+  })
 
   listenerContract.methods
-    .listenToContract(demoSmartContractJson1.address)
+    .unsubscribeContract(demoSmartContractJson1.address)
     .send({ from: accounts[0] }, () => {
       setTimeout(() => {
-        expect(smartContracts.get()).toMatchObject([newSmartContract])
+        expect(smartContracts.get()).toMatchObject([newSmartContract2])
         done()
-      }, 2000)
+      }, 1000)
     })
 })
 
@@ -169,6 +205,11 @@ test('handleListenEvent adds smart contract to state', async done => {
 
   await handleListenEvent(null, eventObj)
   expect(smartContracts.get()).toMatchObject([newSmartContract])
+  done()
+})
+
+test('handleListenEvent throws error with empty params', async done => {
+  await expect(handleListenEvent()).rejects.toThrow()
   done()
 })
 test('handlePinHashEvent pins file of cid it was passed', async done => {
@@ -197,24 +238,6 @@ test('getContract returns a contract', async done => {
   )
   expect(contract._address).toBe(demoSmartContractJson1.address)
   done()
-})
-
-test('unsubscribe event deletes smart contract from state', async done => {
-  await listenerContract.methods
-    .listenToContract(demoSmartContractJson1.address)
-    .send({ from: accounts[0] }, () => {
-      setTimeout(() => {}, 1000)
-    })
-  expect(smartContracts.get().length).toBe(1)
-
-  listenerContract.methods
-    .unsubscribeContract(demoSmartContractJson1.address)
-    .send({ from: accounts[0] }, () => {
-      setTimeout(() => {
-        expect(smartContracts.get().length).toBe(0)
-        done()
-      }, 2000)
-    })
 })
 
 // this test must go last bc it mutates demoSmartContractJson1!!
