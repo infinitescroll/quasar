@@ -11,18 +11,25 @@ const compile = () =>
     })
   })
 
-const migrate = () =>
+const migrate = (network = '') =>
   new Promise((resolve, reject) => {
-    exec('truffle migrate', (error, stdout) => {
+    const migrateCmd =
+      network !== 'local'
+        ? `truffle migrate --network ${network}`
+        : 'truffle migrate'
+    log(chalk.green(`running ${migrateCmd}`))
+
+    exec(migrateCmd, (error, stdout) => {
       if (error) return reject(error)
       log(chalk.blue('contracts successfully migrated'))
       resolve(stdout)
     })
   })
 
-const compileAndMigrate = async () => {
+const compileAndMigrate = async network => {
   await compile()
-  await migrate()
+  await migrate(network)
+  return
 }
 
 module.exports = compileAndMigrate
