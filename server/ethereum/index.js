@@ -38,20 +38,20 @@ const handleListenEvent = async (err, event) => {
     event.returnValues.contractAddress
   )
 
-  const smartContractObj = {
-    address: event.returnValues.contractAddress,
-    abi: storageJSON.abi
-  }
   try {
+    const listener = registerPinWatcher(contract)
+    const smartContractObj = {
+      address: event.returnValues.contractAddress,
+      listener
+    }
     smartContracts.add(smartContractObj)
-    registerPinWatcher(contract)
   } catch (err) {
     throw new Error(err)
   }
 }
 
 const handleStopListeningEvent = async (err, event) => {
-  if (err) console.error('Error subcribing: ', err)
+  if (err) console.error('Error unsubcribing: ', err)
   smartContracts.unsubscribe(event.returnValues.contractAddress)
 }
 
