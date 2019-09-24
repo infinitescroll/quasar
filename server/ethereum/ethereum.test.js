@@ -56,7 +56,7 @@ beforeAll(() => {
           if (err) reject(err)
           setTimeout(() => {
             resolve()
-          }, 500)
+          }, 1000)
         })
     })
   node = ipfs.node
@@ -106,7 +106,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
           })
           expect(match).toBeDefined()
           done()
-        }, 2000)
+        }, 1000)
       })
   }
 
@@ -117,7 +117,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
     .send({ from: accounts[0] }, () => {
       setTimeout(() => {
         emitPinEventAndCheck()
-      }, 2000)
+      }, 1000)
     })
 })
 
