@@ -7,5 +7,5 @@ echo "Running: "$0
 
 jsipfs daemon &
 sleep 5 &
-node ./scripts/startLocal.js
+node ./scripts/start.js
 

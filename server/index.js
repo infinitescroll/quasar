@@ -8,6 +8,7 @@ const {
 } = require('./ethereum')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { web3 } = require('./ethereum')
+const { networkId } = require('./ethereum/provider')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -15,9 +16,10 @@ if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
+// should look at ENV vars
 const listenerContract = new web3.eth.Contract(
   listenerJSON.abi,
-  listenerJSON.networks['123'].address
+  listenerJSON.networks[networkId].address
 )
 
 const createApp = async () => {
@@ -49,12 +51,6 @@ const createApp = async () => {
 const startListening = async () => {
   await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
-}
-
-if (require.main === module) {
-  startListening()
-} else {
-  createApp()
 }
 
 module.exports = { listenerContract, startListening }

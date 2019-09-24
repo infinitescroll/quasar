@@ -10,7 +10,7 @@
     "create:listenEvent": "node ./scripts/createListenEvent.js",
     "start:local": "cross-env BLOCKCHAIN_NETWORK=local scripts/start.sh && jsipfs shutdown",
     "start:rinkeby:alt": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
-    "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby nodemon server",
+    "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
     "test": "scripts/test.sh && jsipfs shutdown",
