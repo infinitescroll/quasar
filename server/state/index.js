@@ -1,5 +1,4 @@
 const { List } = require('immutable')
-// const ethereum = require('../ethereum')
 
 const SmartContractsStore = () => {
   let smartContracts = List()
