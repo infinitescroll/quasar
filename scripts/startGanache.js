@@ -1,6 +1,8 @@
 const ganache = require('ganache-cli')
 const fs = require('fs')
 const isPortTaken = require('./isPortTaken')
+const chalk = require('chalk')
+const log = console.log
 
 const startGanache = () =>
   new Promise(async (resolve, reject) => {
@@ -14,6 +16,7 @@ const startGanache = () =>
           JSON.stringify(Object.keys(blockchain.accounts)),
           error => {
             if (err) reject(error)
+            log(chalk.blue('Testnet successfully started and accounts printed'))
             return resolve(true)
           }
         )

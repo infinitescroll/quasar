@@ -2,27 +2,24 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const Web3 = require('web3')
 const {
   registerListenWatcher,
   registerStopListeningWatcher
 } = require('./ethereum')
 const listenerJSON = require('../build/contracts/Listener.json')
+const { web3 } = require('./ethereum')
+const { networkId } = require('./ethereum/provider')
 const PORT = process.env.PORT || 3001
 const app = express()
-
-module.exports = app
 
 if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
-const web3 = new Web3(
-  new Web3.providers.WebsocketProvider('ws://localhost:8545')
-)
+// should look at ENV vars
 const listenerContract = new web3.eth.Contract(
   listenerJSON.abi,
-  listenerJSON.networks['123'].address
+  listenerJSON.networks[networkId].address
 )
 
 const createApp = async () => {
@@ -33,7 +30,6 @@ const createApp = async () => {
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use('/api/v0', require('./routes'))
 
   app.use((req, _res, next) => {
     if (path.extname(req.path).length) {
@@ -57,10 +53,4 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-if (require.main === module) {
-  startListening()
-} else {
-  createApp()
-}
-
-module.exports = { listenerContract, web3, createApp }
+module.exports = { listenerContract, startListening }

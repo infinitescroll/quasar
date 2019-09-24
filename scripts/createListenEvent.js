@@ -1,25 +1,36 @@
 const Web3 = require('web3')
+const HDWalletProvider = require('@truffle/hdwallet-provider')
 const storageJSON = require('../build/contracts/Storage.json')
 const listenerJSON = require('../build/contracts/Listener.json')
+const accounts = require('../accounts.json')
+const { mnemonic, rinkebyProviderHTTPUrl } = require('../secrets')
+const { provider, networkId } = require('../server/ethereum/provider')
+
+const web3Provider =
+  provider === 'rinkeby'
+    ? new HDWalletProvider(mnemonic, rinkebyProviderHTTPUrl, 1)
+    : new Web3.providers.WebsocketProvider('ws://localhost:8545')
 
 const createListenEvent = () =>
-  new Promise(resolve => {
-    const web3 = new Web3(
-      new Web3.providers.WebsocketProvider('ws://localhost:8545')
-    )
+  new Promise((resolve, reject) => {
+    const web3 = new Web3(web3Provider)
+    web3.eth.getAccounts((err, [account]) => {
+      if (err) return reject(err)
+      const listenerContract = new web3.eth.Contract(
+        listenerJSON.abi,
+        listenerJSON.networks[networkId].address
+      )
 
-    const contractToAdd = new web3.eth.Contract(
-      storageJSON.abi,
-      storageJSON.networks['123'].address
-    )
-
-    const listenerContract = new web3.eth.Contract(
-      listenerJSON.abi,
-      listenerJSON.networks['123'].address
-    )
-    listenerContract.methods.listenToContract(contractToAdd)
-
-    resolve()
+      listenerContract.methods
+        .listenToContract(storageJSON.networks[networkId].address)
+        .send(
+          { from: provider === 'rinkeby' ? account : accounts[0] },
+          (error, res) => {
+            if (error) reject(error)
+            resolve(res)
+          }
+        )
+    })
   })
 
 const start = async () => {
