@@ -62,7 +62,7 @@ beforeAll(() => {
   node = ipfs.node
 })
 
-beforeEach(async () => {
+beforeEach(async done => {
   let pins = await node.pin.ls()
 
   async function asyncForEach(array, callback) {
@@ -83,6 +83,8 @@ beforeEach(async () => {
   if (pins.length > 0) throw new Error("Pins weren't removed properly.")
 
   smartContracts.clear()
+
+  done()
 })
 
 afterAll(() => {
