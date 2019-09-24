@@ -75,7 +75,7 @@ beforeEach(async () => {
     try {
       await node.pin.rm(item.hash)
     } catch (error) {
-      console.error('Error removing pin: ', error)
+      console.log('Error removing pin: ', error)
     }
   })
 
