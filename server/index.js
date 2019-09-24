@@ -11,8 +11,6 @@ const listenerJSON = require('../build/contracts/Listener.json')
 const PORT = process.env.PORT || 3001
 const app = express()
 
-module.exports = app
-
 if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
@@ -33,7 +31,6 @@ const createApp = async () => {
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use('/api/v0', require('./routes'))
 
   app.use((req, _res, next) => {
     if (path.extname(req.path).length) {
@@ -56,11 +53,12 @@ const startListening = async () => {
   await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
-
+console.log('did we even make it hur')
 if (require.main === module) {
   startListening()
 } else {
+  console.log('module not main lolz')
   createApp()
 }
 
-module.exports = { listenerContract, web3, createApp }
+module.exports = { listenerContract, web3, startListening }
