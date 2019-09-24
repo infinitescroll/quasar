@@ -53,11 +53,10 @@ const startListening = async () => {
   await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
-console.log('did we even make it hur')
+
 if (require.main === module) {
   startListening()
 } else {
-  console.log('module not main lolz')
   createApp()
 }
 
