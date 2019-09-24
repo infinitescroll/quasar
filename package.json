@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "truffle compile",
     "start:chain": "ganache-cli",
-    "create:event": "node ./scripts/createEvent.js",
+    "create:pinEvent": "node ./scripts/createPinEvent.js",
+    "create:listenEvent": "node ./scripts/createListenEvent.js",
     "start:dev:local": "scripts/local.sh",
     "start": "node server",
     "stop": "killall node && ipfs shutdown",
@@ -30,7 +31,7 @@
   "jest": {
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
-    "globalSetup": "./setup.js/"
+    "globalSetup": "./setup.js"
   },
   "husky": {
     "hooks": {

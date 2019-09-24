@@ -1,5 +1,4 @@
 const { List } = require('immutable')
-// const ethereum = require('../ethereum')
 
 const SmartContractsStore = () => {
   let smartContracts = List()
@@ -10,8 +9,12 @@ const SmartContractsStore = () => {
 
     unsubscribe: address => {
       const contractIndex = smartContracts.findIndex(i => i.address === address)
-      smartContracts.get(contractIndex).listener.unsubscribe()
-      smartContracts = smartContracts.delete(contractIndex)
+      const contractToRemove = smartContracts.get(contractIndex)
+
+      if (contractToRemove) {
+        if (contractToRemove.listener) contractToRemove.listener.unsubscribe()
+        smartContracts = smartContracts.delete(contractIndex)
+      }
     },
 
     add: async smartContractObj => {
@@ -24,15 +27,12 @@ const SmartContractsStore = () => {
           )}`
         )
       }
+
       if (isDuplicateSmartContract(smartContracts, smartContractObj.address)) {
         throw new Error('already listening to the contract at this address')
       }
 
-      // const contract = ethereum.getContract(smartContractObj)
-      // const listener = ethereum.registerWatcher(contract)
-      // smartContractObj.listener = listener
-      let newSmartContracts = smartContracts.push(smartContractObj)
-      smartContracts = newSmartContracts
+      smartContracts = smartContracts.push(smartContractObj)
     },
 
     clear: () => {
@@ -43,11 +43,6 @@ const SmartContractsStore = () => {
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
-  network: val =>
-    val &&
-    (val.toLowerCase() === 'rinkeby' ||
-      val.toLowerCase() === 'mainnet' ||
-      val.toLowerCase() === 'localhost'),
   abi: val => Array.isArray(val)
 }
 

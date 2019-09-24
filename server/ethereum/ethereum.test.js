@@ -1,12 +1,28 @@
 const Web3 = require('web3')
-const { getContract, handlePinHashEvent, registerWatcher } = require('./')
+const {
+  registerListenWatcher,
+  registerPinWatcher,
+  registerStopListeningWatcher,
+  handleListenEvent,
+  handlePinHashEvent,
+  getContract
+} = require('./')
+
 const ipfsWrapper = require('../ipfs')
-const { demoSmartContractJson1 } = require('../../mockData')
+const smartContracts = require('../state')
+const {
+  demoSmartContractJson1,
+  demoSmartContractJson2
+} = require('../../mockData')
 const accounts = require('../../accounts.json')
+const storageJSON = require('../../build/contracts/Storage.json')
+const listenerJSON = require('../../build/contracts/Listener.json')
 
 let web3
 let contract
+let listenerContract
 let node
+let listenerUnsubscribe
 
 beforeAll(() => {
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
@@ -14,6 +30,15 @@ beforeAll(() => {
     demoSmartContractJson1.abi,
     demoSmartContractJson1.address
   )
+
+  listenerContract = new web3.eth.Contract(
+    listenerJSON.abi,
+    listenerJSON.networks['123'].address
+  )
+
+  registerStopListeningWatcher(listenerContract)
+  registerListenWatcher(listenerContract)
+
   const ipfs = ipfsWrapper({
     host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
     port: '5002',
@@ -23,10 +48,21 @@ beforeAll(() => {
     headers: null
   })
 
+  listenerUnsubscribe = () =>
+    new Promise((resolve, reject) => {
+      listenerContract.methods
+        .unsubscribeContract(demoSmartContractJson1.address)
+        .send({ from: accounts[0] }, err => {
+          if (err) reject(err)
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+    })
   node = ipfs.node
 })
 
-beforeEach(async () => {
+beforeEach(async done => {
   let pins = await node.pin.ls()
 
   async function asyncForEach(array, callback) {
@@ -39,16 +75,52 @@ beforeEach(async () => {
     try {
       await node.pin.rm(item.hash)
     } catch (error) {
-      console.error('Error removing pin: ', error)
+      console.log('Error removing pin: ', error)
     }
   })
 
   pins = await node.pin.ls()
   if (pins.length > 0) throw new Error("Pins weren't removed properly.")
+
+  smartContracts.clear()
+
+  done()
 })
 
 afterAll(() => {
   web3.currentProvider.connection.close()
+})
+
+test(`emitting listen event from listener, then emittting pin event
+from pinning contract (without registering pinner) pins file`, async done => {
+  const testKey = web3.utils.fromAscii('testKey')
+  const dag = { testKey: 'testVal' }
+  const hash = await node.dag.put(dag)
+
+  const emitPinEventAndCheck = () => {
+    contract.methods
+      .registerData(testKey, hash.toBaseEncodedString())
+      .send({ from: accounts[0] }, () => {
+        setTimeout(async () => {
+          const pins = await node.pin.ls()
+          const match = pins.find(item => {
+            return item.hash === hash.toBaseEncodedString()
+          })
+          expect(match).toBeDefined()
+          done()
+        }, 1000)
+      })
+  }
+
+  await listenerUnsubscribe()
+
+  listenerContract.methods
+    .listenToContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {
+        emitPinEventAndCheck()
+      }, 1000)
+    })
 })
 
 test('watcher pins file from registerData function', async done => {
@@ -62,7 +134,9 @@ test('watcher pins file from registerData function', async done => {
   })
   expect(match).toBeUndefined()
 
-  registerWatcher(contract)
+  await listenerUnsubscribe()
+
+  registerPinWatcher(contract)
   contract.methods
     .registerData(testKey, hash.toBaseEncodedString())
     .send({ from: accounts[0] }, () => {
@@ -77,6 +151,69 @@ test('watcher pins file from registerData function', async done => {
     })
 })
 
+test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
+  const newSmartContract = {
+    address: demoSmartContractJson1.address,
+    abi: storageJSON.abi
+  }
+  const newSmartContract2 = {
+    address: demoSmartContractJson2.address,
+    abi: storageJSON.abi
+  }
+
+  await new Promise(resolve => {
+    listenerContract.methods
+      .listenToContract(demoSmartContractJson1.address)
+      .send({ from: accounts[0] }, () => {
+        setTimeout(() => {
+          expect(smartContracts.get()).toMatchObject([newSmartContract])
+          resolve()
+        }, 1000)
+      })
+  })
+
+  await new Promise(resolve => {
+    listenerContract.methods
+      .listenToContract(demoSmartContractJson2.address)
+      .send({ from: accounts[0] }, () => {
+        setTimeout(() => {
+          expect(smartContracts.get()).toMatchObject([
+            newSmartContract,
+            newSmartContract2
+          ])
+          resolve()
+        }, 1000)
+      })
+  })
+
+  listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {
+        expect(smartContracts.get()).toMatchObject([newSmartContract2])
+        done()
+      }, 1000)
+    })
+})
+
+test('handleListenEvent adds smart contract to state', async done => {
+  const newSmartContract = {
+    address: demoSmartContractJson1.address,
+    abi: storageJSON.abi
+  }
+  const eventObj = {
+    returnValues: { contractAddress: demoSmartContractJson1.address }
+  }
+
+  await handleListenEvent(null, eventObj)
+  expect(smartContracts.get()).toMatchObject([newSmartContract])
+  done()
+})
+
+test('handleListenEvent throws error with empty params', async done => {
+  await expect(handleListenEvent()).rejects.toThrow()
+  done()
+})
 test('handlePinHashEvent pins file of cid it was passed', async done => {
   const dag = { secondTestKey: 'secondTestVal' }
   const hash = await node.dag.put(dag)
@@ -105,6 +242,7 @@ test('getContract returns a contract', async done => {
   done()
 })
 
+// this test must go last bc it mutates demoSmartContractJson1!!
 test('getContract throws when an invalid contract is passed', async done => {
   demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
   const badCall = () => {

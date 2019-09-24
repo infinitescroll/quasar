@@ -1,46 +1,54 @@
-const state = require('./')
+const smartContracts = require('./')
 const {
   demoSmartContractJson1,
   demoSmartContractJson2
 } = require('../../mockData')
 
 beforeEach(() => {
-  state.clear()
+  smartContracts.clear()
 })
 
 test('adding/getting smart contract works', async () => {
-  await state.add(demoSmartContractJson1)
-  expect(state.get()).toMatchObject([demoSmartContractJson1])
+  await smartContracts.add(demoSmartContractJson1)
+  expect(smartContracts.get()).toMatchObject([demoSmartContractJson1])
 })
 
 test('adding two different smart contracts works', async () => {
-  await state.add(demoSmartContractJson1)
-  await state.add(demoSmartContractJson2)
+  await smartContracts.add(demoSmartContractJson1)
+  await smartContracts.add(demoSmartContractJson2)
 
-  expect(state.get().length).toBe(2)
+  expect(smartContracts.get().length).toBe(2)
 })
 
 test('adding malformed smart contract throws helpful error', async () => {
-  await expect(state.add({ wrong: 'address' })).rejects.toThrow(
-    'the following fields are missing or invalid: address, network, abi'
+  await expect(smartContracts.add({ wrong: 'address' })).rejects.toThrow(
+    'the following fields are missing or invalid: address, abi'
   )
 
-  await expect(state.add({ address: 'address' })).rejects.toThrow(
-    'the following fields are missing or invalid: network, abi'
+  await expect(smartContracts.add({ address: 'address' })).rejects.toThrow(
+    'the following fields are missing or invalid: abi'
   )
 
-  await expect(
-    state.add({ address: 'address', network: 'wrongnetwork' })
-  ).rejects.toThrow('the following fields are missing or invalid: network, abi')
+  await expect(smartContracts.add({ abi: [] })).rejects.toThrow(
+    'the following fields are missing or invalid: address'
+  )
 
-  await expect(
-    state.add({ address: 'address', network: 'rinkeby' })
-  ).rejects.toThrow('the following fields are missing or invalid: abi')
+  await expect(smartContracts.add({ abi: 'wrong abi' })).rejects.toThrow(
+    'the following fields are missing or invalid: address'
+  )
 })
 
 test('adding duplicate smart contract throws error', async () => {
-  state.add(demoSmartContractJson1)
-  await expect(state.add(demoSmartContractJson1)).rejects.toThrow(
+  smartContracts.add(demoSmartContractJson1)
+  await expect(smartContracts.add(demoSmartContractJson1)).rejects.toThrow(
     'already listening to the contract at this address'
   )
+})
+
+test('unsubscribing removes smart contract from state', async () => {
+  smartContracts.add(demoSmartContractJson1)
+  expect(smartContracts.get().length).toBe(1)
+
+  smartContracts.unsubscribe(demoSmartContractJson1.address)
+  expect(smartContracts.get().length).toBe(0)
 })
