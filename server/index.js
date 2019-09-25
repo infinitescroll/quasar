@@ -16,7 +16,6 @@ if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
-// should look at ENV vars
 const listenerContract = new web3.eth.Contract(
   listenerJSON.abi,
   listenerJSON.networks[networkId].address

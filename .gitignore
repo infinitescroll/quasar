@@ -5,4 +5,3 @@ build
 .coveralls.yml
 coverage
 .DS_Store
-secrets.js
