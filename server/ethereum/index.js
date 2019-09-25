@@ -3,6 +3,8 @@ const ipfsWrapper = require('../ipfs')
 const smartContracts = require('../state')
 const storageJSON = require('../../build/contracts/Storage.json')
 
+const { provider } = require('./provider')
+
 const node = ipfsWrapper({
   host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
   port: process.env.IPFS_NODE_PORT ? process.env.IPFS_NODE_PORT : '5002',
@@ -12,9 +14,7 @@ const node = ipfsWrapper({
   headers: null
 })
 
-const web3 = new Web3(
-  new Web3.providers.WebsocketProvider('ws://localhost:8545')
-)
+const web3 = new Web3(new Web3.providers.WebsocketProvider(provider))
 
 const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
@@ -70,5 +70,6 @@ module.exports = {
   registerStopListeningWatcher,
   getContract,
   handleListenEvent,
-  handlePinHashEvent
+  handlePinHashEvent,
+  web3
 }
