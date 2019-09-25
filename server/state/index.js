@@ -12,7 +12,7 @@ const SmartContractsStore = () => {
       const contractToRemove = smartContracts.get(contractIndex)
 
       if (contractToRemove) {
-        if (contractToRemove.listener) contractToRemove.listener.unsubscribe()
+        contractToRemove.listener.unsubscribe()
         smartContracts = smartContracts.delete(contractIndex)
       }
     },
@@ -43,7 +43,7 @@ const SmartContractsStore = () => {
 
 const smartContractSchema = {
   address: val => typeof val === 'string',
-  abi: val => Array.isArray(val)
+  listener: val => typeof val === 'object'
 }
 
 const findInvalidSmartContractFields = smartContractObj =>
