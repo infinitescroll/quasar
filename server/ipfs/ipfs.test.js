@@ -1,30 +1,20 @@
-const ipfsWrapper = require('./')
+const ipfs = require('./')
 
 let node
 let getAndPin
 
 beforeAll(() => {
-  const ipfsWrapped = ipfsWrapper({
-    host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
-    port: '5002',
-    protocol: process.env.IPFS_NODE_PROTOCOL
-      ? process.env.IPFS_NODE_PROTOCOL
-      : 'http',
-    headers: null
-  })
-  node = ipfsWrapped.node
-  getAndPin = ipfsWrapped.getAndPin
+  node = ipfs.node
+  getAndPin = ipfs.getAndPin
 })
 
 beforeEach(async () => {
   let pins = await node.pin.ls()
-
   async function asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array)
     }
   }
-
   await asyncForEach(pins, async item => {
     try {
       await node.pin.rm(item.hash)
@@ -32,7 +22,6 @@ beforeEach(async () => {
       console.error('Error removing pin: ', error)
     }
   })
-
   pins = await node.pin.ls()
   if (pins.length > 0) throw new Error("Pins weren't removed properly.")
 })
