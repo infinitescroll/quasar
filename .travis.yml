@@ -11,3 +11,4 @@ script:
   - jsipfs init
   - npm test
   - codecov
+services: mongodb
