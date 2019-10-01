@@ -10,7 +10,7 @@
     "create:pinEvent:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby node ./scripts/createPinEvent.js",
     "create:listenEvent:local": "cross-env BLOCKCHAIN_NETWORK=local node ./scripts/createListenEvent.js",
     "create:listenEvent:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby node ./scripts/createListenEvent.js",
-    "start:local": "cross-env BLOCKCHAIN_NETWORK=local scripts/start.sh && jsipfs shutdown",
+    "prepare:local:dev": "cross-env BLOCKCHAIN_NETWORK=local scripts/start.sh && jsipfs shutdown",
     "start:rinkeby:alt": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start": "node server",

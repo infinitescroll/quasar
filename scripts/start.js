@@ -22,6 +22,12 @@ const start = async () => {
       )
     )
   }
+
+  log(
+    chalk.green(
+      'SUCCESS! NOW RUN NPM RUN START:DEV IN A SEPARATE TERMINAL WINDOW'
+    )
+  )
 }
 
 start()
