@@ -15,9 +15,9 @@
     "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start": "node server",
     "start:dev": "nodemon server",
-    "stop": "killall node && ipfs shutdown",
-    "test": "scripts/test.sh && jsipfs shutdown",
-    "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown",
+    "stop": "killall node && ipfs shutdown && killall mongod",
+    "test": "scripts/test.sh && jsipfs shutdown && killall mongod",
+    "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown && killall mongod",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
@@ -39,7 +39,8 @@
     "globalSetup": "./setup.js",
     "setupFiles": [
       "dotenv/config"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "husky": {
     "hooks": {
