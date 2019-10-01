@@ -31,7 +31,8 @@
   "jest": {
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
-    "globalSetup": "./setup.js"
+    "globalSetup": "./setup.js",
+    "setupFiles": ["dotenv/config"]
   },
   "husky": {
     "hooks": {

@@ -5,12 +5,13 @@ let getAndPin
 
 beforeAll(() => {
   const ipfsWrapped = ipfsWrapper({
-    host: process.env.IPFS_NODE_HOST ? process.env.IPFS_NODE_HOST : 'localhost',
-    port: '5002',
-    protocol: process.env.IPFS_NODE_PROTOCOL
-      ? process.env.IPFS_NODE_PROTOCOL
-      : 'http',
-    headers: null
+    host: process.env.IPFS_NODE_HOST || 'localhost',
+    port: process.env.IPFS_NODE_PORT || '5002',
+    protocol: process.env.IPFS_NODE_PROTOCOL || 'http',
+    headers: {
+      Authorization: process.env.IPFS_AUTH || null
+    },
+    apiPath: process.env.IPFS_API_PATH || ''
   })
   node = ipfsWrapped.node
   getAndPin = ipfsWrapped.getAndPin
