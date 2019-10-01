@@ -15,7 +15,6 @@ const {
   demoSmartContractJson2
 } = require('../../mockData')
 const accounts = require('../../accounts.json')
-const storageJSON = require('../../build/contracts/Storage.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
 
 let web3
@@ -142,21 +141,15 @@ test('watcher pins file from registerData function', async done => {
 }, 20000)
 
 test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
-  const newSmartContract = {
-    address: demoSmartContractJson1.address,
-    abi: storageJSON.abi
-  }
-  const newSmartContract2 = {
-    address: demoSmartContractJson2.address,
-    abi: storageJSON.abi
-  }
-
   await new Promise(resolve => {
     listenerContract.methods
       .listenToContract(demoSmartContractJson1.address)
       .send({ from: accounts[0] }, () => {
         setTimeout(() => {
-          expect(smartContracts.get()).toMatchObject([newSmartContract])
+          expect(smartContracts.get()[0].address).toBe(
+            demoSmartContractJson1.address
+          )
+          expect(smartContracts.get()[0]).toHaveProperty('listener')
           resolve()
         }, 1000)
       })
@@ -167,10 +160,10 @@ test('firing a listen event adds a new contract to state + unsubscribing removes
       .listenToContract(demoSmartContractJson2.address)
       .send({ from: accounts[0] }, () => {
         setTimeout(() => {
-          expect(smartContracts.get()).toMatchObject([
-            newSmartContract,
-            newSmartContract2
-          ])
+          expect(smartContracts.get()[1].address).toBe(
+            demoSmartContractJson2.address
+          )
+          expect(smartContracts.get()[1]).toHaveProperty('listener')
           resolve()
         }, 1000)
       })
@@ -180,23 +173,24 @@ test('firing a listen event adds a new contract to state + unsubscribing removes
     .unsubscribeContract(demoSmartContractJson1.address)
     .send({ from: accounts[0] }, () => {
       setTimeout(() => {
-        expect(smartContracts.get()).toMatchObject([newSmartContract2])
+        expect(smartContracts.get().length).toBe(1)
+        expect(smartContracts.get()[0].address).toBe(
+          demoSmartContractJson2.address
+        )
+        expect(smartContracts.get()[0]).toHaveProperty('listener')
         done()
       }, 1000)
     })
 })
 
 test('handleListenEvent adds smart contract to state', async done => {
-  const newSmartContract = {
-    address: demoSmartContractJson1.address,
-    abi: storageJSON.abi
-  }
   const eventObj = {
     returnValues: { contractAddress: demoSmartContractJson1.address }
   }
 
   await handleListenEvent(null, eventObj)
-  expect(smartContracts.get()).toMatchObject([newSmartContract])
+  expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
+  expect(smartContracts.get()[0]).toHaveProperty('listener')
   done()
 })
 

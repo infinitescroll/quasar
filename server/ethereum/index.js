@@ -3,9 +3,9 @@ const ipfs = require('../ipfs')
 const smartContracts = require('../state')
 const storageJSON = require('../../build/contracts/Storage.json')
 
-const web3 = new Web3(
-  new Web3.providers.WebsocketProvider('ws://localhost:8545')
-)
+const { provider } = require('./provider')
+
+const web3 = new Web3(new Web3.providers.WebsocketProvider(provider))
 
 const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
@@ -29,20 +29,20 @@ const handleListenEvent = async (err, event) => {
     event.returnValues.contractAddress
   )
 
-  const smartContractObj = {
-    address: event.returnValues.contractAddress,
-    abi: storageJSON.abi
-  }
   try {
+    const listener = registerPinWatcher(contract)
+    const smartContractObj = {
+      address: event.returnValues.contractAddress,
+      listener
+    }
     smartContracts.add(smartContractObj)
-    registerPinWatcher(contract)
   } catch (err) {
     throw new Error(err)
   }
 }
 
 const handleStopListeningEvent = async (err, event) => {
-  if (err) console.error('Error subcribing: ', err)
+  if (err) console.error('Error unsubcribing: ', err)
   smartContracts.unsubscribe(event.returnValues.contractAddress)
 }
 
@@ -61,5 +61,6 @@ module.exports = {
   registerStopListeningWatcher,
   getContract,
   handleListenEvent,
-  handlePinHashEvent
+  handlePinHashEvent,
+  web3
 }
