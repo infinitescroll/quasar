@@ -14,6 +14,7 @@
     "start:rinkeby:alt": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start": "node server",
+    "start:dev": "nodemon server",
     "stop": "killall node && ipfs shutdown",
     "test": "scripts/test.sh && jsipfs shutdown",
     "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown",

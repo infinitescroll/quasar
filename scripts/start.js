@@ -1,6 +1,5 @@
 const chalk = require('chalk')
 const { compileAndMigrate, startGanache } = require('.')
-const { startListening } = require('../server')
 
 const log = console.log
 
@@ -23,8 +22,6 @@ const start = async () => {
       )
     )
   }
-
-  startListening()
 }
 
 start()
