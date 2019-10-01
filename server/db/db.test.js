@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { Pin, findandRemoveOldPins } = require('./')
 const ipfs = require('../ipfs')
-
+const { demoSmartContractJson1 } = require('../../mockData')
 const ttl = process.env.TTL || 14
 let oldDate = new Date()
 oldDate.setDate(oldDate.getDate() - ttl - 1)
@@ -9,28 +9,28 @@ oldDate.setDate(oldDate.getDate() - ttl - 1)
 const demoNewPin1 = new Pin({
   size: 2000,
   cid: 'abc',
-  smartContract: 'xyz',
+  smartContract: demoSmartContractJson1.address,
   time: new Date()
 })
 
 const demoNewPin2 = new Pin({
   size: 2000,
   cid: 'def',
-  smartContract: 'xyz',
+  smartContract: demoSmartContractJson1.address,
   time: new Date()
 })
 
 const demoOldPin1 = new Pin({
   size: 2000,
   cid: 'abc',
-  smartContract: 'xyz',
+  smartContract: demoSmartContractJson1.address,
   time: oldDate
 })
 
 const demoOldPin2 = new Pin({
   size: 2000,
   cid: 'def',
-  smartContract: 'xyz',
+  smartContract: demoSmartContractJson1.address,
   time: oldDate
 })
 
@@ -81,6 +81,46 @@ test('can add + remove old pins from db', async done => {
   await findandRemoveOldPins()
   const oldPins = await Pin.find({ time: { $lt: cuttoff } })
   expect(oldPins.length).toBe(0)
+
+  done()
+})
+
+test('adding malformed pin object throws', async done => {
+  const badCid = new Pin({
+    cid: 89,
+    time: new Date(),
+    smartContract: demoSmartContractJson1.address,
+    size: 2000
+  })
+
+  const missingFields = new Pin({
+    time: new Date()
+  })
+
+  const badCid2 = new Pin({
+    cid: 'fake cid'
+  })
+
+  const badSmartContract = new Pin({
+    smartContract: 'fake smartContract',
+    cid: cid1,
+    time: new Date(),
+    size: 2000
+  })
+
+  await expect(badSmartContract.save()).rejects.toThrow()
+  await expect(badCid.save()).rejects.toThrow()
+  await expect(badCid2.save()).rejects.toThrow()
+  await expect(missingFields.save()).rejects.toThrow()
+  expect(() => {
+    new Pin({
+      bad: 'field',
+      cid: cid1,
+      time: new Date(),
+      smartContract: demoSmartContractJson1.address,
+      size: 2000
+    })
+  }).toThrow()
 
   done()
 })
