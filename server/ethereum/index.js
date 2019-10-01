@@ -1,19 +1,7 @@
 const Web3 = require('web3')
-const ipfsWrapper = require('../ipfs')
+const ipfs = require('../ipfs')
 const smartContracts = require('../state')
 const storageJSON = require('../../build/contracts/Storage.json')
-
-const node = ipfsWrapper({
-  host: process.env.IPFS_NODE_HOST || 'localhost',
-  port: process.env.IPFS_NODE_PORT || '5002',
-  protocol: process.env.IPFS_NODE_PROTOCOL || 'http',
-  headers: process.env.IPFS_AUTH
-    ? {
-        Authorization: process.env.IPFS_AUTH
-      }
-    : null,
-  'api-path': process.env.IPFS_API_PATH || null
-})
 
 const web3 = new Web3(
   new Web3.providers.WebsocketProvider('ws://localhost:8545')
@@ -26,7 +14,7 @@ const getContract = smartContractObj => {
 const handlePinHashEvent = async (err, event) => {
   if (err) console.error('Error subscribing: ', err)
   try {
-    const result = await node.getAndPin(event.returnValues.cid)
+    const result = await ipfs.getAndPin(event.returnValues.cid)
     if (!result[0]) throw new Error('no result found')
     return result
   } catch (error) {

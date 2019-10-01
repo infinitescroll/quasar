@@ -8,7 +8,7 @@ const {
   getContract
 } = require('./')
 
-const ipfsWrapper = require('../ipfs')
+const ipfs = require('../ipfs')
 const smartContracts = require('../state')
 const {
   demoSmartContractJson1,
@@ -39,18 +39,7 @@ beforeAll(() => {
   registerStopListeningWatcher(listenerContract)
   registerListenWatcher(listenerContract)
 
-  const ipfsWrapped = ipfsWrapper({
-    host: process.env.IPFS_NODE_HOST || 'localhost',
-    port: process.env.IPFS_NODE_PORT || '5002',
-    protocol: process.env.IPFS_NODE_PROTOCOL || 'http',
-    headers: process.env.IPFS_AUTH
-      ? {
-          Authorization: process.env.IPFS_AUTH
-        }
-      : null,
-    'api-path': process.env.IPFS_API_PATH || null
-  })
-  node = ipfsWrapped.node
+  node = ipfs.node
 
   listenerUnsubscribe = () =>
     new Promise((resolve, reject) => {
