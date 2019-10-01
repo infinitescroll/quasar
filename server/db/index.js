@@ -1,11 +1,33 @@
 const mongoose = require('mongoose')
+const ipfs = require('../ipfs/')
 
-mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
-  useNewUrlParser: true
+const pinSchema = new mongoose.Schema({
+  size: Number,
+  cid: String,
+  smartContract: String,
+  time: Date
 })
 
-const db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'))
-db.once('open', () => {
-  console.log('connected!')
-})
+const Pin = new mongoose.model('Pin', pinSchema)
+
+const findandRemoveOldPins = async () => {
+  const ttl = process.env.TTL || 14
+  let cutoffDate = new Date()
+  cutoffDate.setDate(cutoffDate.getDate() - ttl)
+
+  const removeOldPins = pins => {
+    pins.map(async pin => {
+      await ipfs.node.pin.rm(pin.cid)
+    })
+  }
+
+  const oldPins = await Pin.find({ time: { $lt: cutoffDate } }).exec()
+  removeOldPins(oldPins)
+
+  await Pin.deleteMany({ time: { $lt: cutoffDate } }).exec()
+}
+
+module.exports = {
+  Pin,
+  findandRemoveOldPins
+}
