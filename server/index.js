@@ -52,4 +52,6 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-module.exports = { listenerContract, startListening }
+startListening()
+
+module.exports = { listenerContract, startListening, app }
