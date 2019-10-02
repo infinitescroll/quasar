@@ -8,28 +8,23 @@ beforeAll(() => {
   getAndPin = ipfs.getAndPin
 })
 
-beforeEach(async () => {
-  let pins = await node.pin.ls()
-  async function asyncForEach(array, callback) {
-    for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array)
-    }
-  }
-  await asyncForEach(pins, async item => {
-    try {
-      await node.pin.rm(item.hash)
-    } catch (error) {
-      console.error('Error removing pin: ', error)
-    }
-  })
-  pins = await node.pin.ls()
-  if (pins.length > 0) throw new Error("Pins weren't removed properly.")
-})
-
 test('getAndPin gets and pins object that was added by dag.put', async done => {
   const dag = { test: 'value' }
   const cid = await node.dag.put(dag)
+  let pins = await node.pin.ls()
+  let match = pins.find(item => item.hash === cid.toBaseEncodedString())
+  if (match) {
+    await node.pin.rm(cid.toBaseEncodedString())
+    pins = await node.pin.ls()
+    match = pins.find(item => item.hash === cid.toBaseEncodedString())
+  }
+  expect(match).toBeUndefined()
+
   const hashObj = await getAndPin(cid.toBaseEncodedString())
   expect(hashObj[0].hash).toBe(cid.toBaseEncodedString())
+  pins = await node.pin.ls()
+  match = pins.find(item => item.hash === cid.toBaseEncodedString())
+  expect(match).toBeDefined()
+
   done()
-})
+}, 20000)
