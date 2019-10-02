@@ -101,7 +101,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         done()
       }, 2500)
     })
-}, 7500)
+})
 
 // test('watcher pins file from registerData function', async done => {
 //   const testKey = web3.utils.fromAscii('testKey')
@@ -163,65 +163,65 @@ from pinning contract (without registering pinner) pins file`, async done => {
 //     })
 // })
 
-// test('handleListenEvent adds smart contract to state', async done => {
-//   const eventObj = {
-//     returnValues: { contractAddress: demoSmartContractJson1.address }
-//   }
+test('handleListenEvent adds smart contract to state', async done => {
+  const eventObj = {
+    returnValues: { contractAddress: demoSmartContractJson1.address }
+  }
 
-//   await handleListenEvent(null, eventObj)
-//   expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
-//   expect(smartContracts.get()[0]).toHaveProperty('listener')
-//   done()
-// })
+  await handleListenEvent(null, eventObj)
+  expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
+  expect(smartContracts.get()[0]).toHaveProperty('listener')
+  done()
+})
 
-// test('handleListenEvent throws error with empty params', async done => {
-//   await expect(handleListenEvent()).rejects.toThrow()
-//   done()
-// })
+test('handleListenEvent throws error with empty params', async done => {
+  await expect(handleListenEvent()).rejects.toThrow()
+  done()
+})
 
-// test('handlePinHashEvent pins file of cid it was passed', async done => {
-//   const dag = { secondTestKey: 'secondTestVal' }
-//   const cid = await node.dag.put(dag)
+test('handlePinHashEvent pins file of cid it was passed', async done => {
+  const dag = { secondTestKey: 'secondTestVal' }
+  const cid = await node.dag.put(dag)
 
-//   const eventObj = {
-//     returnValues: {
-//       cid: cid.toBaseEncodedString()
-//     }
-//   }
+  const eventObj = {
+    returnValues: {
+      cid: cid.toBaseEncodedString()
+    }
+  }
 
-//   const res = await handlePinHashEvent(null, eventObj)
+  const res = await handlePinHashEvent(null, eventObj)
 
-//   expect(res[0].hash).toBe(cid.toBaseEncodedString())
-//   done()
-// })
+  expect(res[0].hash).toBe(cid.toBaseEncodedString())
+  done()
+})
 
-// test('handlePinHashEvent throws error with empty params', async done => {
-//   await expect(handlePinHashEvent()).rejects.toThrow()
-//   done()
-// })
+test('handlePinHashEvent throws error with empty params', async done => {
+  await expect(handlePinHashEvent()).rejects.toThrow()
+  done()
+})
 
-// test('getContract returns a contract', async done => {
-//   const contract = getContract(
-//     demoSmartContractJson1,
-//     demoSmartContractJson1.address
-//   )
-//   expect(contract._address).toBe(demoSmartContractJson1.address)
-//   done()
-// })
+test('getContract returns a contract', async done => {
+  const contract = getContract(
+    demoSmartContractJson1,
+    demoSmartContractJson1.address
+  )
+  expect(contract._address).toBe(demoSmartContractJson1.address)
+  done()
+})
 
-// // this test must go last bc it mutates demoSmartContractJson1!!
-// test('getContract throws when an invalid contract is passed', async done => {
-//   demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
-//   const badCall = () => {
-//     return getContract(
-//       demoSmartContractJson1,
-//       '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
-//     )
-//   }
+// this test must go last bc it mutates demoSmartContractJson1!!
+test('getContract throws when an invalid contract is passed', async done => {
+  demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
+  const badCall = () => {
+    return getContract(
+      demoSmartContractJson1,
+      '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
+    )
+  }
 
-//   expect(badCall).toThrow()
-//   done()
-// })
+  expect(badCall).toThrow()
+  done()
+})
 
 // Uncomment this when timeout in ipfs.dag.get is working. Will need to adjust jest.setTimeout.Timeout past the dag.get timeout time.
 
