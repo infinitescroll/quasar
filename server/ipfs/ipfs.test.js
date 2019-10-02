@@ -18,10 +18,13 @@ test('getAndPin gets and pins object that was added by dag.put', async done => {
     pins = await node.pin.ls()
     match = pins.find(item => item.hash === cid.toBaseEncodedString())
   }
-
   expect(match).toBeUndefined()
 
   const hashObj = await getAndPin(cid.toBaseEncodedString())
   expect(hashObj[0].hash).toBe(cid.toBaseEncodedString())
+  pins = await node.pin.ls()
+  match = pins.find(item => item.hash === cid.toBaseEncodedString())
+  expect(match).toBeDefined()
+
   done()
 }, 20000)

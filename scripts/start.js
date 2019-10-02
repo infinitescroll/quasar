@@ -1,6 +1,5 @@
 const chalk = require('chalk')
 const { compileAndMigrate, startGanache } = require('.')
-const { startListening } = require('../server')
 
 const log = console.log
 
@@ -24,7 +23,11 @@ const start = async () => {
     )
   }
 
-  startListening()
+  log(
+    chalk.green(
+      'SUCCESS! NOW RUN NPM RUN START:DEV IN A SEPARATE TERMINAL WINDOW'
+    )
+  )
 }
 
 start()

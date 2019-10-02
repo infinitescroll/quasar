@@ -101,7 +101,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         emitPinEventAndCheck()
       }, 4000)
     })
-}, 30000)
+}, 20000)
 
 test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
@@ -131,7 +131,7 @@ test('watcher pins file from registerData function', async done => {
         done()
       }, 4000)
     })
-}, 30000)
+}, 20000)
 
 test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
   await new Promise(resolve => {
