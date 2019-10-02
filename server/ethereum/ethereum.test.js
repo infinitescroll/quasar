@@ -23,6 +23,12 @@ let listenerContract
 let node
 let listenerUnsubscribe
 
+const removeHashIfPinned = async cid => {
+  const pins = await node.pin.ls()
+  const match = pins.find(item => item.hash === cid)
+  if (match) await node.pin.rm(match.hash)
+}
+
 beforeAll(() => {
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
   contract = new web3.eth.Contract(
@@ -55,8 +61,6 @@ beforeAll(() => {
 
 beforeEach(async done => {
   smartContracts.clear()
-  const pins = await node.pin.ls({ recursive: true })
-  await Promise.all(pins.map(pin => node.pin.rm(pin.hash, { recursive: true })))
   done()
 })
 
@@ -69,9 +73,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
-  const pins = await node.pin.ls()
-  const match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  expect(match).toBeUndefined()
+  await removeHashIfPinned(hash.toBaseEncodedString())
 
   const emitListenToContractEvent = () =>
     new Promise(resolve => {
@@ -80,7 +82,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         .send({ from: accounts[0] }, () => {
           setTimeout(() => {
             resolve()
-          }, 500)
+          }, 1000)
         })
     })
 
@@ -105,9 +107,7 @@ test('watcher pins file from registerData function', async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
-  const pins = await node.pin.ls()
-  const match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  expect(match).toBeUndefined()
+  await removeHashIfPinned(hash.toBaseEncodedString())
 
   await listenerUnsubscribe()
   registerPinWatcher(contract)
