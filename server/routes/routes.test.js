@@ -7,7 +7,10 @@ const request = supertest(app)
 test('POST dag', done => {
   request
     .post('/api/v0/dag/put')
-    .send({ test: '123' })
+    .send({
+      dag: { test: '123' },
+      smartContract: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c'
+    })
     .expect(201, done)
 })
 
@@ -23,6 +26,6 @@ test('POST dag', done => {
 // request
 //   .post('/api/v0/add')
 //   .field('thing', 'thing')
-//   .attach('file', Buffer.from('a'.repeat(10000000)), 'filename')
+//   .attach('file', Buffer.from('aa'), 'filename')
 //   .expect(201, done)
 // })
