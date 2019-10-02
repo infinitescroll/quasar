@@ -26,7 +26,8 @@ let listenerUnsubscribe
 const removeHashIfPinned = async cid => {
   const pins = await node.pin.ls()
   const match = pins.find(item => item.hash === cid)
-  if (match) await node.pin.rm(match.hash)
+  if (match) return node.pin.rm(match.hash)
+  return
 }
 
 beforeAll(() => {
@@ -82,7 +83,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         .send({ from: accounts[0] }, () => {
           setTimeout(() => {
             resolve()
-          }, 1000)
+          }, 500)
         })
     })
 
@@ -99,7 +100,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         )
         expect(match).toBeDefined()
         done()
-      }, 2500)
+      }, 2200)
     })
 })
 
