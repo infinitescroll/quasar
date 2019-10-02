@@ -30,6 +30,7 @@ const createApp = async () => {
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
+  app.use('/api/v0', require('./routes'))
 
   app.use((req, _res, next) => {
     if (path.extname(req.path).length) {
