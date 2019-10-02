@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { Pin, findandRemoveOldPins } = require('./')
+const Pin = require('./pinSchema')
 const ipfs = require('../ipfs')
 const { demoSmartContractJson1 } = require('../../mockData')
 const ttl = process.env.TTL || 14
@@ -78,7 +78,7 @@ test('can add + remove old pins from db', async done => {
   await ipfs.node.pin.add(cid1)
   await ipfs.node.pin.add(cid2)
 
-  await findandRemoveOldPins()
+  await Pin.findandRemoveOldPins()
   const oldPins = await Pin.find({ time: { $lt: cuttoff } })
   expect(oldPins.length).toBe(0)
 
