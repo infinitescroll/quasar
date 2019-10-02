@@ -1,4 +1,4 @@
 const Pin = require('./pinSchema')
-const PinEventSourceSchema = require('./pinEventSourceSchema')
+const SmartContractToPoll = require('./smartContractToPollSchema')
 
-module.exports = { Pin, PinEventSourceSchema }
+module.exports = { Pin, SmartContractToPoll }

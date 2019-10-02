@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 const web3 = require('web3')
 
-const pinEventSourceSchema = new mongoose.Schema(
+const smartContractToPollSchema = new mongoose.Schema(
   {
     address: {
+      index: true,
       type: String,
       required: true,
       validate: contractAddress => web3.utils.isAddress(contractAddress)
@@ -20,4 +21,7 @@ const pinEventSourceSchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
-module.exports = new mongoose.model('PinEventSource', pinEventSourceSchema)
+module.exports = new mongoose.model(
+  'SmartContractToPoll',
+  smartContractToPollSchema
+)

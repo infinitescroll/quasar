@@ -10,12 +10,14 @@ beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
   })
-  await Pin.deleteMany({}).exec()
+  mongoose.connection.db.dropDatabase()
 
   cid1 = await ipfs.node.dag.put({ test: 'data1' })
   cid1 = cid1.toBaseEncodedString()
+  await ipfs.node.pin.add(cid1)
   cid2 = await ipfs.node.dag.put({ test: 'data2' })
   cid2 = cid2.toBaseEncodedString()
+  await ipfs.node.pin.add(cid2)
 
   await Pin.create({
     size: 2000,
@@ -54,17 +56,11 @@ test('can add and retrieve well-formed pins from db', async done => {
 })
 
 test('can add + remove old pins from db', async done => {
-  let cuttoff = new Date()
+  const cuttoff = new Date()
   cuttoff.setDate(cuttoff.getDate() - ttl)
 
-  const pins1 = await Pin.find({ cid: cid1, time: { $lt: cuttoff } }).exec()
-  expect(pins1.length > 0).toBe(true)
-
-  const pins2 = await Pin.find({ cid: cid2, time: { $lt: cuttoff } }).exec()
-  expect(pins2.length > 0).toBe(true)
-
-  await ipfs.node.pin.add(cid1)
-  await ipfs.node.pin.add(cid2)
+  const outdatedPins = await Pin.find({ time: { $lt: cuttoff } }).exec()
+  expect(outdatedPins.length).toBe(2)
 
   await Pin.findandRemoveOldPins()
   const oldPins = await Pin.find({ time: { $lt: cuttoff } })
