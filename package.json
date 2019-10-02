@@ -16,7 +16,7 @@
     "start": "node server",
     "start:dev": "nodemon server",
     "stop": "killall node && ipfs shutdown && killall mongod",
-    "test": "scripts/test.sh && jsipfs shutdown && killall mongod",
+    "test": "scripts/test.sh && jsipfs shutdown",
     "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown && killall mongod",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
