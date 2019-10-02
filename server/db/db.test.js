@@ -39,7 +39,7 @@ beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
   })
-  await Pin.deleteMany({})
+  await Pin.deleteMany({}).exec()
 
   cid1 = await ipfs.node.dag.put({ test: 'data1' })
   cid1 = cid1.toBaseEncodedString()
