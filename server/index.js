@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 const {
   registerListenWatcher,
   registerStopListeningWatcher
@@ -44,6 +45,10 @@ const createApp = async () => {
     console.error(err)
     console.error(err.stack)
     res.status(err.status || 500).send(err.message || 'Internal server error.')
+  })
+
+  mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
+    useNewUrlParser: true
   })
 }
 

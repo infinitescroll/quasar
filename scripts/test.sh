@@ -5,6 +5,7 @@ set - o ipfs shutdown kill
 
 echo "Running: "$0
 
+mongod --logpath /dev/null &
 jsipfs daemon &
 sleep 5 &
 jest --detectOpenHandles --forceExit

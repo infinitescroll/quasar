@@ -15,9 +15,9 @@
     "start:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby scripts/start.sh && jsipfs shutdown",
     "start": "node server",
     "start:dev": "nodemon server",
-    "stop": "killall node && ipfs shutdown",
+    "stop": "killall node && ipfs shutdown && killall mongod",
     "test": "scripts/test.sh && jsipfs shutdown",
-    "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown",
+    "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown && killall mongod",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
@@ -37,7 +37,10 @@
     "coverageDirectory": "./coverage/",
     "collectCoverage": true,
     "globalSetup": "./setup.js",
-    "setupFiles": ["dotenv/config"]
+    "setupFiles": [
+      "dotenv/config"
+    ],
+    "testEnvironment": "node"
   },
   "husky": {
     "hooks": {
@@ -64,7 +67,7 @@
   "homepage": "https://github.com/openworklabs/Quasar#readme",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.0.18",
-        "chalk": "^2.4.2",
+    "chalk": "^2.4.2",
     "cors": "^2.8.5",
     "cross-env": "^6.0.0",
     "dotenv": "^8.1.0",
@@ -72,6 +75,8 @@
     "form-data": "^2.5.1",
     "immutable": "^4.0.0-rc.12",
     "ipfs-http-client": "^35.1.0",
+    "is-ipfs": "^0.6.1",
+    "mongoose": "^5.7.3",
     "morgan": "^1.9.1",
     "path": "^0.12.7",
     "web3": "^1.2.1"
