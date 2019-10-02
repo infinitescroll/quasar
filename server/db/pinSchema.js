@@ -21,26 +21,18 @@ const pinSchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
-const Pin = new mongoose.model('Pin', pinSchema)
+class PinClass {
+  static async findandRemoveOldPins() {
+    const ttl = process.env.TTL || 14
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - ttl)
 
-const findandRemoveOldPins = async () => {
-  const ttl = process.env.TTL || 14
-  let cutoffDate = new Date()
-  cutoffDate.setDate(cutoffDate.getDate() - ttl)
+    const oldPins = await this.find({ time: { $lt: cutoffDate } }).exec()
+    await Promise.all(oldPins.map(async pin => await ipfs.node.pin.rm(pin.cid)))
 
-  const removeOldPins = pins => {
-    pins.map(async pin => {
-      await ipfs.node.pin.rm(pin.cid)
-    })
+    await this.deleteMany({ time: { $lt: cutoffDate } }).exec()
   }
-
-  const oldPins = await Pin.find({ time: { $lt: cutoffDate } }).exec()
-  removeOldPins(oldPins)
-
-  await Pin.deleteMany({ time: { $lt: cutoffDate } }).exec()
 }
 
-module.exports = {
-  Pin,
-  findandRemoveOldPins
-}
+pinSchema.loadClass(PinClass)
+module.exports = new mongoose.model('Pin', pinSchema)
