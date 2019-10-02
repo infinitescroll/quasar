@@ -127,42 +127,42 @@ test('watcher pins file from registerData function', async done => {
     })
 })
 
-// test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
-//   const registerContract = contract =>
-//     new Promise(resolve => {
-//       listenerContract.methods
-//         .listenToContract(contract.address)
-//         .send({ from: accounts[0] }, () => {
-//           setTimeout(() => {
-//             resolve()
-//           }, 500)
-//         })
-//     })
+test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
+  const registerContract = contract =>
+    new Promise(resolve => {
+      listenerContract.methods
+        .listenToContract(contract.address)
+        .send({ from: accounts[0] }, () => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+    })
 
-//   await Promise.all([
-//     await registerContract(demoSmartContractJson1),
-//     await registerContract(demoSmartContractJson2)
-//   ])
+  await Promise.all([
+    await registerContract(demoSmartContractJson1),
+    await registerContract(demoSmartContractJson2)
+  ])
 
-//   expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
-//   expect(smartContracts.get()[0]).toHaveProperty('listener')
+  expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
+  expect(smartContracts.get()[0]).toHaveProperty('listener')
 
-//   expect(smartContracts.get()[1].address).toBe(demoSmartContractJson2.address)
-//   expect(smartContracts.get()[1]).toHaveProperty('listener')
+  expect(smartContracts.get()[1].address).toBe(demoSmartContractJson2.address)
+  expect(smartContracts.get()[1]).toHaveProperty('listener')
 
-//   listenerContract.methods
-//     .unsubscribeContract(demoSmartContractJson1.address)
-//     .send({ from: accounts[0] }, () => {
-//       setTimeout(() => {
-//         expect(smartContracts.get().length).toBe(1)
-//         expect(smartContracts.get()[0].address).toBe(
-//           demoSmartContractJson2.address
-//         )
-//         expect(smartContracts.get()[0]).toHaveProperty('listener')
-//         done()
-//       }, 1000)
-//     })
-// })
+  listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(() => {
+        expect(smartContracts.get().length).toBe(1)
+        expect(smartContracts.get()[0].address).toBe(
+          demoSmartContractJson2.address
+        )
+        expect(smartContracts.get()[0]).toHaveProperty('listener')
+        done()
+      }, 1000)
+    })
+})
 
 test('handleListenEvent adds smart contract to state', async done => {
   const eventObj = {
