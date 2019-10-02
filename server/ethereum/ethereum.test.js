@@ -102,30 +102,30 @@ from pinning contract (without registering pinner) pins file`, async done => {
         done()
       }, 2200)
     })
+}, 7500)
+
+test('watcher pins file from registerData function', async done => {
+  const testKey = web3.utils.fromAscii('testKey')
+  const dag = { testKey: 'testVal' }
+  const hash = await node.dag.put(dag)
+  await removeHashIfPinned(hash.toBaseEncodedString())
+
+  await listenerUnsubscribe()
+  registerPinWatcher(contract)
+
+  contract.methods
+    .registerData(testKey, hash.toBaseEncodedString())
+    .send({ from: accounts[0] }, () => {
+      setTimeout(async () => {
+        const pins = await node.pin.ls()
+        const match = pins.find(
+          item => item.hash === hash.toBaseEncodedString()
+        )
+        expect(match).toBeDefined()
+        done()
+      }, 1000)
+    })
 })
-
-// test('watcher pins file from registerData function', async done => {
-//   const testKey = web3.utils.fromAscii('testKey')
-//   const dag = { testKey: 'testVal' }
-//   const hash = await node.dag.put(dag)
-//   await removeHashIfPinned(hash.toBaseEncodedString())
-
-//   await listenerUnsubscribe()
-//   registerPinWatcher(contract)
-
-//   contract.methods
-//     .registerData(testKey, hash.toBaseEncodedString())
-//     .send({ from: accounts[0] }, () => {
-//       setTimeout(async () => {
-//         const pins = await node.pin.ls()
-//         const match = pins.find(
-//           item => item.hash === hash.toBaseEncodedString()
-//         )
-//         expect(match).toBeDefined()
-//         done()
-//       }, 1000)
-//     })
-// })
 
 // test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
 //   const registerContract = contract =>
