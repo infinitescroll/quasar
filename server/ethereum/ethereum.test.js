@@ -97,7 +97,7 @@ from pinning contract (without registering pinner) pins file`, async done => {
         )
         expect(match).toBeDefined()
         done()
-      }, 1000)
+      }, 2500)
     })
 })
 
