@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const web3 = require('web3')
 const isIPFS = require('is-ipfs')
 const ipfs = require('../ipfs/')
 
@@ -10,11 +9,6 @@ const pinSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: cid => isIPFS.cid(cid)
-    },
-    smartContract: {
-      type: String,
-      required: true,
-      validate: smartContract => web3.utils.isAddress(smartContract)
     },
     time: { type: Date, required: true }
   },
