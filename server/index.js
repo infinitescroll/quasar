@@ -31,12 +31,6 @@ const createApp = async () => {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  app.use((req, res, next) => {
-    console.log('~~~~~~~~~~~~~~~~~~')
-    console.log(req.body, req.files, req.file)
-    console.log('~~~~~~~~~~~~~~~~~~')
-    next()
-  })
   app.use('/api/v0', require('./routes'))
 
   app.use((req, _res, next) => {
@@ -54,10 +48,6 @@ const createApp = async () => {
     console.error(err.stack)
     res.status(err.status || 500).send(err.message || 'Internal server error.')
   })
-
-  mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
-    useNewUrlParser: true
-  })
 }
 
 const startListening = async () => {
@@ -65,6 +55,26 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-startListening()
+const bootApp = () => {
+  mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
+    useNewUrlParser: true
+  })
+  const db = mongoose.connection
+  db.on('error', console.error.bind(console, 'connection error:'))
+  db.once('open', async () => {
+    await createApp()
+    await startListening()
+  })
+}
 
-module.exports = { listenerContract, startListening, app }
+// This evaluates as true when this file is run directly from the command line,
+// i.e. when we say 'node server/index.js' (or 'nodemon server/index.js', or 'nodemon server', etc)
+// It will evaluate false when this module is required by another module - for example,
+// if we wanted to require our app in a test spec
+if (require.main === module) {
+  bootApp()
+} else {
+  createApp()
+}
+
+module.exports = { bootApp, startListening, app }

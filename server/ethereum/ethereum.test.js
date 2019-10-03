@@ -1,14 +1,15 @@
+const mongoose = require('mongoose')
 const Web3 = require('web3')
 const {
   registerListenWatcher,
   registerPinWatcher,
   registerStopListeningWatcher,
   handleListenEvent,
-  handlePinHashEvent,
-  getContract
+  handleStopListeningEvent,
+  handlePinHashEvent
 } = require('./')
 
-const ipfs = require('../ipfs')
+const { node } = require('../ipfs')
 const smartContracts = require('../state')
 const {
   demoSmartContractJson1,
@@ -16,14 +17,35 @@ const {
 } = require('../../mockData')
 const accounts = require('../../accounts.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
+const { SmartContractToPoll } = require('../db')
 
 let web3
 let contract
 let listenerContract
-let node
-let listenerUnsubscribe
+const listenerUnsubscribe = () =>
+  new Promise((resolve, reject) => {
+    listenerContract.methods
+      .unsubscribeContract(demoSmartContractJson1.address)
+      .send({ from: accounts[0] }, err => {
+        if (err) reject(err)
+        setTimeout(() => {
+          resolve()
+        }, 1000)
+      })
+  })
 
-beforeAll(() => {
+const removeHashIfPinned = async cid => {
+  const pins = await node.pin.ls()
+  const match = pins.find(item => item.hash === cid)
+  if (match) return node.pin.rm(match.hash)
+  return
+}
+
+beforeAll(async done => {
+  await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
+    useNewUrlParser: true
+  })
+  mongoose.connection.db.dropDatabase()
   web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
   contract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
@@ -38,24 +60,11 @@ beforeAll(() => {
   registerStopListeningWatcher(listenerContract)
   registerListenWatcher(listenerContract)
 
-  node = ipfs.node
-
-  listenerUnsubscribe = () =>
-    new Promise((resolve, reject) => {
-      listenerContract.methods
-        .unsubscribeContract(demoSmartContractJson1.address)
-        .send({ from: accounts[0] }, err => {
-          if (err) reject(err)
-          setTimeout(() => {
-            resolve()
-          }, 1000)
-        })
-    })
+  done()
 })
 
 beforeEach(async done => {
   smartContracts.clear()
-
   done()
 })
 
@@ -68,57 +77,22 @@ from pinning contract (without registering pinner) pins file`, async done => {
   const testKey = web3.utils.fromAscii('testKey')
   const dag = { testKey: 'testVal' }
   const hash = await node.dag.put(dag)
-  let pins = await node.pin.ls()
-  let match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  if (match) {
-    await node.pin.rm(hash.toBaseEncodedString())
-    pins = await node.pin.ls()
-    match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  }
-  expect(match).toBeUndefined()
+  await removeHashIfPinned(hash.toBaseEncodedString())
 
-  const emitPinEventAndCheck = () => {
-    contract.methods
-      .registerData(testKey, hash.toBaseEncodedString())
-      .send({ from: accounts[0] }, () => {
-        setTimeout(async () => {
-          const pins = await node.pin.ls()
-          const match = pins.find(
-            item => item.hash === hash.toBaseEncodedString()
-          )
-          expect(match).toBeDefined()
-          done()
-        }, 4000)
-      })
-  }
-
-  await listenerUnsubscribe()
-
-  listenerContract.methods
-    .listenToContract(demoSmartContractJson1.address)
-    .send({ from: accounts[0] }, () => {
-      setTimeout(() => {
-        emitPinEventAndCheck()
-      }, 4000)
+  const emitListenToContractEvent = () =>
+    new Promise(resolve => {
+      listenerContract.methods
+        .listenToContract(demoSmartContractJson1.address)
+        .send({ from: accounts[0] }, () => {
+          setTimeout(() => {
+            resolve()
+          }, 500)
+        })
     })
-}, 20000)
-
-test('watcher pins file from registerData function', async done => {
-  const testKey = web3.utils.fromAscii('testKey')
-  const dag = { testKey: 'testVal' }
-  const hash = await node.dag.put(dag)
-  let pins = await node.pin.ls()
-  let match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  if (match) {
-    await node.pin.rm(hash.toBaseEncodedString())
-    pins = await node.pin.ls()
-    match = pins.find(item => item.hash === hash.toBaseEncodedString())
-  }
-  expect(match).toBeUndefined()
 
   await listenerUnsubscribe()
+  await emitListenToContractEvent()
 
-  registerPinWatcher(contract)
   contract.methods
     .registerData(testKey, hash.toBaseEncodedString())
     .send({ from: accounts[0] }, () => {
@@ -129,61 +103,108 @@ test('watcher pins file from registerData function', async done => {
         )
         expect(match).toBeDefined()
         done()
-      }, 4000)
+      }, 2200)
     })
-}, 20000)
+}, 7500)
 
-test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
-  await new Promise(resolve => {
-    listenerContract.methods
-      .listenToContract(demoSmartContractJson1.address)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          expect(smartContracts.get()[0].address).toBe(
-            demoSmartContractJson1.address
-          )
-          expect(smartContracts.get()[0]).toHaveProperty('listener')
-          resolve()
-        }, 1000)
-      })
-  })
+test('watcher pins file from registerData function', async done => {
+  const testKey = web3.utils.fromAscii('testKey')
+  const dag = { testKey: 'testVal' }
+  const hash = await node.dag.put(dag)
+  await removeHashIfPinned(hash.toBaseEncodedString())
 
-  await new Promise(resolve => {
-    listenerContract.methods
-      .listenToContract(demoSmartContractJson2.address)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          expect(smartContracts.get()[1].address).toBe(
-            demoSmartContractJson2.address
-          )
-          expect(smartContracts.get()[1]).toHaveProperty('listener')
-          resolve()
-        }, 1000)
-      })
-  })
+  await listenerUnsubscribe()
+  registerPinWatcher(contract)
 
-  listenerContract.methods
-    .unsubscribeContract(demoSmartContractJson1.address)
+  contract.methods
+    .registerData(testKey, hash.toBaseEncodedString())
     .send({ from: accounts[0] }, () => {
-      setTimeout(() => {
-        expect(smartContracts.get().length).toBe(1)
-        expect(smartContracts.get()[0].address).toBe(
-          demoSmartContractJson2.address
+      setTimeout(async () => {
+        const pins = await node.pin.ls()
+        const match = pins.find(
+          item => item.hash === hash.toBaseEncodedString()
         )
-        expect(smartContracts.get()[0]).toHaveProperty('listener')
+        expect(match).toBeDefined()
         done()
       }, 1000)
     })
 })
 
-test('handleListenEvent adds smart contract to state', async done => {
+test('firing a listen event adds a new contract to state + unsubscribing removes one', async done => {
+  const registerContract = contract =>
+    new Promise(resolve => {
+      listenerContract.methods
+        .listenToContract(contract.address)
+        .send({ from: accounts[0] }, () => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+    })
+
+  await Promise.all([
+    await registerContract(demoSmartContractJson1),
+    await registerContract(demoSmartContractJson2)
+  ])
+
+  const smartContractToPoll = await SmartContractToPoll.findOne({
+    address: demoSmartContractJson1.address
+  })
+  expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
+  expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
+  expect(smartContractToPoll.lastPolledBlock).toBe(0)
+
+  const secondSmartContractToPoll = await SmartContractToPoll.findOne({
+    address: demoSmartContractJson2.address
+  })
+  expect(secondSmartContractToPoll.address).toBe(demoSmartContractJson2.address)
+  expect(secondSmartContractToPoll.sizeOfPinnedData).toBe(0)
+  expect(secondSmartContractToPoll.lastPolledBlock).toBe(0)
+
+  listenerContract.methods
+    .unsubscribeContract(demoSmartContractJson1.address)
+    .send({ from: accounts[0] }, () => {
+      setTimeout(async () => {
+        const smartContractToPoll = await SmartContractToPoll.findOne({
+          address: demoSmartContractJson1.address
+        })
+        const secondSmartContractToPoll = await SmartContractToPoll.findOne({
+          address: demoSmartContractJson2.address
+        })
+        expect(smartContractToPoll).toBe(null)
+        expect(secondSmartContractToPoll.address).toBe(
+          demoSmartContractJson2.address
+        )
+        done()
+      }, 1000)
+    })
+})
+
+test('handleListenEvent adds smart contract to database', async done => {
   const eventObj = {
     returnValues: { contractAddress: demoSmartContractJson1.address }
   }
 
   await handleListenEvent(null, eventObj)
-  expect(smartContracts.get()[0].address).toBe(demoSmartContractJson1.address)
-  expect(smartContracts.get()[0]).toHaveProperty('listener')
+  const smartContractToPoll = await SmartContractToPoll.findOne({
+    address: demoSmartContractJson1.address
+  })
+  expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
+  expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
+  expect(smartContractToPoll.lastPolledBlock).toBe(0)
+  done()
+})
+
+test('handleStopListenEvent removes smart contract to database', async done => {
+  const eventObj = {
+    returnValues: { contractAddress: demoSmartContractJson1.address }
+  }
+
+  await handleStopListeningEvent(null, eventObj)
+  const smartContractToPoll = await SmartContractToPoll.findOne({
+    address: demoSmartContractJson1.address
+  })
+  expect(smartContractToPoll).toBe(null)
   done()
 })
 
@@ -191,6 +212,7 @@ test('handleListenEvent throws error with empty params', async done => {
   await expect(handleListenEvent()).rejects.toThrow()
   done()
 })
+
 test('handlePinHashEvent pins file of cid it was passed', async done => {
   const dag = { secondTestKey: 'secondTestVal' }
   const cid = await node.dag.put(dag)
@@ -205,33 +227,10 @@ test('handlePinHashEvent pins file of cid it was passed', async done => {
 
   expect(res[0].hash).toBe(cid.toBaseEncodedString())
   done()
-}, 20000)
+})
 
 test('handlePinHashEvent throws error with empty params', async done => {
   await expect(handlePinHashEvent()).rejects.toThrow()
-  done()
-})
-
-test('getContract returns a contract', async done => {
-  const contract = getContract(
-    demoSmartContractJson1,
-    demoSmartContractJson1.address
-  )
-  expect(contract._address).toBe(demoSmartContractJson1.address)
-  done()
-})
-
-// this test must go last bc it mutates demoSmartContractJson1!!
-test('getContract throws when an invalid contract is passed', async done => {
-  demoSmartContractJson1.address = '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
-  const badCall = () => {
-    return getContract(
-      demoSmartContractJson1,
-      '0x7505462c30102eBCDA555446c3807362AeFEfc8r'
-    )
-  }
-
-  expect(badCall).toThrow()
   done()
 })
 

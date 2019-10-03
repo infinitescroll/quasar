@@ -2,6 +2,7 @@ const Web3 = require('web3')
 const ipfs = require('../ipfs')
 const smartContracts = require('../state')
 const storageJSON = require('../../build/contracts/Storage.json')
+const { SmartContractToPoll } = require('../db')
 
 const { provider } = require('./provider')
 
@@ -31,11 +32,18 @@ const handleListenEvent = async (err, event) => {
 
   try {
     const listener = registerPinWatcher(contract)
+    // lines 36-40 will be removed
     const smartContractObj = {
       address: event.returnValues.contractAddress,
       listener
     }
     smartContracts.add(smartContractObj)
+
+    await SmartContractToPoll.create({
+      address: event.returnValues.contractAddress,
+      lastPolledBlock: 0,
+      sizeOfPinnedData: 0
+    })
   } catch (err) {
     throw new Error(err)
   }
@@ -43,7 +51,9 @@ const handleListenEvent = async (err, event) => {
 
 const handleStopListeningEvent = async (err, event) => {
   if (err) console.error('Error unsubcribing: ', err)
-  smartContracts.unsubscribe(event.returnValues.contractAddress)
+  await SmartContractToPoll.deleteOne({
+    address: event.returnValues.contractAddress
+  })
 }
 
 const registerPinWatcher = contract =>
@@ -62,5 +72,6 @@ module.exports = {
   getContract,
   handleListenEvent,
   handlePinHashEvent,
+  handleStopListeningEvent,
   web3
 }

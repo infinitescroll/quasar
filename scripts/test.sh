@@ -8,4 +8,4 @@ echo "Running: "$0
 mongod --logpath /dev/null &
 jsipfs daemon &
 sleep 5 &
-jest --detectOpenHandles --forceExit routes
+jest --detectOpenHandles --forceExit
