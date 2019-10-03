@@ -94,7 +94,6 @@
     "ipfs": "^0.37.1",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.5",
-    "node-fetch": "^2.6.0",
     "nodemon": "^1.19.2",
     "prettier": "^1.18.2",
     "supertest": "^4.0.2",
