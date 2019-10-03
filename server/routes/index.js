@@ -7,6 +7,14 @@ var sizeof = require('object-sizeof')
 module.exports = router
 
 router.post('/dag/put', async (req, res, _next) => {
+  if (!req.body.dag) {
+    res.status(400).send('Missing dag')
+    return
+  } else if (!req.body.smartContract) {
+    res.status(400).send('Missing smart contract address')
+    return
+  }
+
   try {
     const result = await ipfs.node.dag.put(req.body.dag)
     const size = sizeof(req.body.dag)
@@ -30,7 +38,15 @@ router.post('/dag/put', async (req, res, _next) => {
   }
 })
 
-router.post('/file/add', upload.single('entry'), async (req, res, _next) => {
+router.post('/add', upload.single('entry'), async (req, res, _next) => {
+  if (!req.file || !req.file.buffer) {
+    res.status(400).send('Missing file')
+    return
+  } else if (!req.body.smartContract) {
+    res.status(400).send('Missing smart contract address')
+    return
+  }
+
   try {
     const result = await ipfs.node.add(req.file.buffer)
     const pin = new Pin({
