@@ -21,7 +21,7 @@ router.post('/dag/put', async (req, res) => {
   }
 })
 
-router.post('/files/add', upload.single('entry'), async (req, res, _next) => {
+router.post('/files/add', upload.single('entry'), async (req, res) => {
   try {
     const result = await ipfs.node.add(req.file.buffer)
     await Pin.create({
