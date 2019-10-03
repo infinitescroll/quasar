@@ -30,13 +30,13 @@ router.post('/dag/put', async (req, res, _next) => {
   }
 })
 
-router.post('/file/add', upload.single('entry'), async (req, res, _next) => {
+router.post('/files/add', upload.single('entry'), async (req, res, _next) => {
+  console.log('REQ FILE', req.file)
   try {
     const result = await ipfs.node.add(req.file.buffer)
     const pin = new Pin({
       size: req.file.size,
       cid: result[0].hash,
-      smartContract: req.body.smartContract,
       time: new Date()
     })
 

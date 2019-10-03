@@ -11,11 +11,6 @@ const pinSchema = new mongoose.Schema(
       required: true,
       validate: cid => isIPFS.cid(cid)
     },
-    smartContract: {
-      type: String,
-      required: true,
-      validate: smartContract => web3.utils.isAddress(smartContract)
-    },
     time: { type: Date, required: true }
   },
   { strict: 'throw' }
