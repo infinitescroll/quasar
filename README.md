@@ -8,6 +8,11 @@ Quasar is smart contract based IPFS storage built for the Aragon Network but itâ
 
 Once your contract has been registered with Quasar, data can be saved to IPFS using a `PinHash`  event in the contract. When Quasar hears a `PinHash` event, it will attempt to pin the hash that was passed in the function. 
 
+### Motivation
+[Smart Contract Based IPFS Storage for DAOs](https://medium.com/open-work-labs/smart-contract-based-ipfs-storage-for-daos-39c145f3042d)
+
+[Aragon Grant Proposal](https://github.com/aragon/flock/blob/master/teams/Autark/2019_ANV-3.md#08---facilitating-smart-contract-based-ipfs-pinning)
+
 ## Flow
 1. Register contract with Quasar.
 2. Emit `PinHash` event from contract with IPFS hash passed as a parameter. User must make data associated with the hash available on the network for Quasar to retrieve. 
