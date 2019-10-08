@@ -20,7 +20,10 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 4. Quasar queries IPFS for data associated with the hash.
 5. Quasar pins data on IPFS.
 
-## Local dev setup
+## Dev setup
+
+Note: this is a WIP. We'll eventually have step by step instructions on self-hosting here.
+
 `npm run prepare:local:dev` boots up test chain, compiles & migrates contracts, and starts an IPFS daemon locally with js-ipfs.
 <br />
 
