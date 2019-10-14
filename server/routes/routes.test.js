@@ -64,6 +64,17 @@ test('POST dag should store pin in database for garbage collection', async done 
   done()
 })
 
+/*
+  This test is commented out because 2 things need to be fixed:
+
+  1. https://github.com/visionmedia/superagent/issues/1520
+  - sending multipart/form-data via supertest is not working with multer/busboy lib
+
+  2. https://github.com/trufflesuite/ganache-cli/issues/683
+  - using any fs module with ganache-cli && jest blows out ganache call stack
+
+  The post endpoint is working, verified by the scripts/sendFile.js
+*/
 // test('POST file', done => {
 //   const form = new FormData()
 //   form.append('entry', fs.createReadStream('./readme.md'))
