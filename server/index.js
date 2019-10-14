@@ -5,11 +5,12 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const {
   registerListenWatcher,
-  registerStopListeningWatcher
+  registerStopListeningWatcher,
+  web3
 } = require('./ethereum')
 const listenerJSON = require('../build/contracts/Listener.json')
-const { web3 } = require('./ethereum')
 const { networkId } = require('./ethereum/provider')
+const { Pin } = require('./db')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -55,6 +56,12 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
+const autoCleanDB = () => {
+  Pin.findandRemoveOldPins()
+  setInterval(() => {
+    Pin.findandRemoveOldPins()
+  }, 1209600000)
+}
 const bootApp = () => {
   mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
@@ -65,6 +72,8 @@ const bootApp = () => {
     await createApp()
     await startListening()
   })
+
+  autoCleanDB()
 }
 
 // This evaluates as true when this file is run directly from the command line,
