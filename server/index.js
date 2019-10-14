@@ -31,6 +31,8 @@ const createApp = async () => {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
+  app.use('/api/v0', require('./routes'))
+
   app.use((req, _res, next) => {
     if (path.extname(req.path).length) {
       const err = new Error('Not found')
@@ -75,4 +77,4 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { listenerContract, bootApp, startListening, app }
+module.exports = { bootApp, startListening, app }

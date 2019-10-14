@@ -9,7 +9,7 @@ const {
   handlePinHashEvent
 } = require('./')
 
-const ipfs = require('../ipfs')
+const { node } = require('../ipfs')
 const smartContracts = require('../state')
 const {
   demoSmartContractJson1,
@@ -22,7 +22,6 @@ const { SmartContractToPoll } = require('../db')
 let web3
 let contract
 let listenerContract
-let node
 const listenerUnsubscribe = () =>
   new Promise((resolve, reject) => {
     listenerContract.methods
@@ -60,8 +59,6 @@ beforeAll(async done => {
 
   registerStopListeningWatcher(listenerContract)
   registerListenWatcher(listenerContract)
-
-  node = ipfs.node
 
   done()
 })
