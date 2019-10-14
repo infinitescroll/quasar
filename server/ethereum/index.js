@@ -2,7 +2,7 @@ const Web3 = require('web3')
 const ipfs = require('../ipfs')
 const smartContracts = require('../state')
 const storageJSON = require('../../build/contracts/Storage.json')
-const { SmartContractToPoll } = require('../db')
+const { SmartContractToPoll, Pin } = require('../db')
 
 const { provider } = require('./provider')
 
@@ -17,6 +17,8 @@ const handlePinHashEvent = async (err, event) => {
   try {
     const result = await ipfs.getAndPin(event.returnValues.cid)
     if (!result[0]) throw new Error('no result found')
+    await Pin.deleteMany({ cid: event.returnValues.cid }).exec()
+
     return result
   } catch (error) {
     throw new Error(error)
@@ -32,7 +34,7 @@ const handleListenEvent = async (err, event) => {
 
   try {
     const listener = registerPinWatcher(contract)
-    // lines 36-40 will be removed
+    // lines 38-42 will be removed
     const smartContractObj = {
       address: event.returnValues.contractAddress,
       listener

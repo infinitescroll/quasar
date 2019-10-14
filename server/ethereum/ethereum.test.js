@@ -17,7 +17,7 @@ const {
 } = require('../../mockData')
 const accounts = require('../../accounts.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
-const { SmartContractToPoll } = require('../db')
+const { SmartContractToPoll, Pin } = require('../db')
 
 let web3
 let contract
@@ -63,9 +63,9 @@ beforeAll(async done => {
   done()
 })
 
-beforeEach(async done => {
+beforeEach(() => {
   smartContracts.clear()
-  done()
+  expect(smartContracts.get().length).toBe(0)
 })
 
 afterAll(() => {
@@ -213,7 +213,8 @@ test('handleListenEvent throws error with empty params', async done => {
   done()
 })
 
-test('handlePinHashEvent pins file of cid it was passed', async done => {
+test(`handlePinHashEvent pins file of cid it was
+      passed and removes it from database`, async done => {
   const dag = { secondTestKey: 'secondTestVal' }
   const cid = await node.dag.put(dag)
 
@@ -226,6 +227,8 @@ test('handlePinHashEvent pins file of cid it was passed', async done => {
   const res = await handlePinHashEvent(null, eventObj)
 
   expect(res[0].hash).toBe(cid.toBaseEncodedString())
+  const removedCid = await Pin.find({ cid: cid.toBaseEncodedString() }).exec()
+  expect(removedCid.length).toBe(0)
   done()
 })
 
