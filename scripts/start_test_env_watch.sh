@@ -6,6 +6,6 @@ set - o ipfs shutdown kill
 echo "Running: "$0
 
 mongod --logpath /dev/null &
-jsipfs daemon &
+node ./scripts/startIpfs &
 sleep 5 &
 jest --watch
