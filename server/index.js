@@ -56,12 +56,13 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-const autoCleanDB = () => {
-  Pin.findandRemoveOldPins()
-  setInterval(() => {
-    Pin.findandRemoveOldPins()
+const autoCleanDB = async () => {
+  await Pin.findandRemoveOldPins()
+  setInterval(async () => {
+    await Pin.findandRemoveOldPins()
   }, 1209600000)
 }
+
 const bootApp = () => {
   mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
