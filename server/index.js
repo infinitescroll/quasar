@@ -62,7 +62,6 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
-    await createApp()
     await startListening()
   })
 }
@@ -73,8 +72,10 @@ const bootApp = () => {
 // if we wanted to require our app in a test spec
 if (require.main === module) {
   bootApp()
+  console.log('YOOOO')
 } else {
   createApp()
+  console.log('hyeyyyy')
 }
 
 module.exports = { bootApp, startListening, app }

@@ -2,9 +2,7 @@ const mongoose = require('mongoose')
 const request = require('supertest')
 const Web3 = require('web3')
 const {
-  registerListenWatcher,
   registerPinWatcher,
-  registerStopListeningWatcher,
   handleListenEvent,
   handleStopListeningEvent,
   handlePinHashEvent
@@ -24,6 +22,7 @@ const { app } = require('../index')
 let web3
 let contract
 let listenerContract
+
 const listenerUnsubscribe = () =>
   new Promise((resolve, reject) => {
     listenerContract.methods
@@ -58,9 +57,6 @@ beforeAll(async done => {
     listenerJSON.abi,
     listenerJSON.networks['123'].address
   )
-
-  registerStopListeningWatcher(listenerContract)
-  registerListenWatcher(listenerContract)
 
   done()
 })
