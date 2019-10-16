@@ -72,10 +72,8 @@ const bootApp = () => {
 // if we wanted to require our app in a test spec
 if (require.main === module) {
   bootApp()
-  console.log('YOOOO')
 } else {
   createApp()
-  console.log('hyeyyyy')
 }
 
 module.exports = { bootApp, startListening, app }
