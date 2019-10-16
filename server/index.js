@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const {
   registerListenWatcher,
   registerStopListeningWatcher,
+  registerPinWatcher,
   web3
 } = require('./ethereum')
 const listenerJSON = require('../build/contracts/Listener.json')
@@ -26,6 +27,7 @@ const listenerContract = new web3.eth.Contract(
 const createApp = async () => {
   registerListenWatcher(listenerContract)
   registerStopListeningWatcher(listenerContract)
+  // registerPinWatcher()
 
   app.use(morgan('dev'))
   app.use(cors())
