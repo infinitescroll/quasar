@@ -3,14 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
-const {
-  registerListenWatcher,
-  registerStopListeningWatcher,
-  registerPinWatcher,
-  web3
-} = require('./ethereum')
-const listenerJSON = require('../build/contracts/Listener.json')
-const { networkId } = require('./ethereum/provider')
+const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
 const PORT = process.env.PORT || 3001
 const app = express()
@@ -19,15 +12,9 @@ if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
-const listenerContract = new web3.eth.Contract(
-  listenerJSON.abi,
-  listenerJSON.networks[networkId].address
-)
-
 const createApp = async () => {
-  registerListenWatcher(listenerContract)
-  registerStopListeningWatcher(listenerContract)
-  // registerPinWatcher()
+  registerListenWatcher()
+  registerPinWatcher()
 
   app.use(morgan('dev'))
   app.use(cors())

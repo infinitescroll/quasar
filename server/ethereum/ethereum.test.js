@@ -1,14 +1,19 @@
 const mongoose = require('mongoose')
-// const request = require('supertest')
 const {
   handleListenEvent,
-  handleStopListeningEvent,
-  handlePinHashEvent
+  handlePinHashEvent,
+  registerPinWatcher,
+  registerListenWatcher
 } = require('./')
 
 const { node } = require('../ipfs')
-const { demoSmartContractJson1 } = require('../../mockData')
-const { SmartContractToPoll, Pin } = require('../db')
+const {
+  demoListenerContractJson,
+  demoSmartContractJson1,
+  demoSmartContractJson2
+} = require('../../mockData')
+const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
+const Scheduler = require('../scheduler')
 
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
@@ -23,90 +28,133 @@ beforeEach(async () => {
 })
 
 describe('unit tests', () => {
-  test('registerPinWatcher returns an instance of the scheduler', () => {})
-
-  test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
-    /* begin tests here */
-    expect(true).toBe(true)
-    done()
-  })
-
-  test('handleListenEvent adds smart contract to database', async done => {
-    const eventObj = {
-      returnValues: { contractAddress: demoSmartContractJson1.address }
-    }
-
-    await handleListenEvent(null, eventObj)
-    const smartContractToPoll = await SmartContractToPoll.findOne({
-      address: demoSmartContractJson1.address
-    })
-    expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
-    expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
-    expect(smartContractToPoll.lastPolledBlock).toBe(0)
-    done()
-  })
-
-  test('handleStopListenEvent removes smart contract from database', async done => {
-    await SmartContractToPoll.create({
-      address: demoSmartContractJson1.address,
-      lastPolledBlock: 0,
-      sizeOfPinnedData: 0
+  describe('registerListenWatcher', () => {
+    test('registerListenWatcher returns an instance of the scheduler', () => {
+      const listenerWatcher = registerListenWatcher(() => {})
+      listenerWatcher.stop()
+      expect(listenerWatcher instanceof Scheduler).toBe(true)
     })
 
-    const eventObj = {
-      returnValues: { contractAddress: demoSmartContractJson1.address }
-    }
-
-    await handleStopListeningEvent(null, eventObj)
-    const smartContractToPoll = await SmartContractToPoll.findOne({
-      address: demoSmartContractJson1.address
+    test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
+      const listenerContract = await ListenerContractToPoll.create({
+        address: demoListenerContractJson.address,
+        lastPolledBlock: 0
+      })
+      registerListenWatcher()
+      setTimeout(async () => {
+        const updatedContract = await ListenerContractToPoll.findById(
+          listenerContract._id
+        )
+        expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
+        done()
+      }, 100)
     })
-    expect(smartContractToPoll).toBe(null)
-    done()
   })
 
-  test('handleListenEvent throws error with empty params', async done => {
-    await expect(handleListenEvent()).rejects.toThrow()
-    done()
+  describe('registerPinWatcher', () => {
+    test('registerPinWatcher returns an instance of the scheduler', () => {
+      const pinWatcher = registerPinWatcher(() => {})
+      pinWatcher.stop()
+      expect(pinWatcher instanceof Scheduler).toBe(true)
+    })
+
+    test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
+      const firstContractToPoll = await SmartContractToPoll.create({
+        address: demoSmartContractJson1.address,
+        lastPolledBlock: 0,
+        sizeOfPinnedData: 0
+      })
+
+      const secondContractToPoll = await SmartContractToPoll.create({
+        address: demoSmartContractJson2.address,
+        lastPolledBlock: 0,
+        sizeOfPinnedData: 0
+      })
+      registerPinWatcher()
+      setTimeout(async () => {
+        const updatedFirstContractInDB = await SmartContractToPoll.findById(
+          firstContractToPoll._id
+        )
+        const updatedSecondContractInDB = await SmartContractToPoll.findById(
+          secondContractToPoll._id
+        )
+        expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
+        expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
+        done()
+      }, 100)
+    })
   })
 
-  test('handlePinHashEvent removes file from database by cid', async done => {
-    const dagA = { firstTestKey: 'firstTestVal' }
-    const cidA = await node.dag.put(dagA)
-    const dagB = { secondTestKey: 'secondTestVal' }
-    const cidB = await node.dag.put(dagB)
-
-    const eventObj = {
-      returnValues: {
-        cid: cidA.toBaseEncodedString()
+  describe('handlers', () => {
+    test('handleListenEvent adds smart contract to database when event type is "Listen"', async done => {
+      const eventObj = {
+        event: 'Listen',
+        returnValues: { contractAddress: demoSmartContractJson1.address }
       }
-    }
 
-    await Pin.create({
-      size: 100,
-      cid: cidA.toBaseEncodedString(),
-      time: new Date()
+      await handleListenEvent(eventObj)
+      const smartContractToPoll = await SmartContractToPoll.findOne({
+        address: demoSmartContractJson1.address
+      })
+      expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
+      expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
+      expect(smartContractToPoll.lastPolledBlock).toBe(0)
+      done()
     })
 
-    await Pin.create({
-      size: 100,
-      cid: cidB.toBaseEncodedString(),
-      time: new Date()
+    test('handleListenEvent removes smart contract from database when event type is "StopListening"', async done => {
+      await SmartContractToPoll.create({
+        address: demoSmartContractJson1.address,
+        lastPolledBlock: 0,
+        sizeOfPinnedData: 0
+      })
+
+      const eventObj = {
+        event: 'StopListening',
+        returnValues: { contractAddress: demoSmartContractJson1.address }
+      }
+
+      await handleListenEvent(eventObj)
+      const smartContractToPoll = await SmartContractToPoll.findOne({
+        address: demoSmartContractJson1.address
+      })
+      expect(smartContractToPoll).toBe(null)
+      done()
     })
 
-    await handlePinHashEvent(null, eventObj)
+    test('handlePinHashEvent removes file from database by cid', async done => {
+      const dagA = { firstTestKey: 'firstTestVal' }
+      const cidA = await node.dag.put(dagA)
+      const dagB = { secondTestKey: 'secondTestVal' }
+      const cidB = await node.dag.put(dagB)
 
-    const removedCid = await Pin.find({
-      cid: cidA.toBaseEncodedString()
-    }).exec()
-    expect(removedCid.length).toBe(0)
-    const storedCid = await Pin.find({ cid: cidB.toBaseEncodedString() }).exec()
-    expect(storedCid.length).toBe(1)
-    done()
-  })
+      const eventObj = {
+        returnValues: {
+          cid: cidA.toBaseEncodedString()
+        }
+      }
 
-  test('handlePinHashEvent throws error with empty params', async done => {
-    await expect(handlePinHashEvent()).rejects.toThrow()
-    done()
+      await Pin.create({
+        size: 100,
+        cid: cidA.toBaseEncodedString(),
+        time: new Date()
+      })
+
+      await Pin.create({
+        size: 100,
+        cid: cidB.toBaseEncodedString(),
+        time: new Date()
+      })
+
+      await handlePinHashEvent(eventObj)
+
+      const removedCid = await Pin.find({
+        cid: cidA.toBaseEncodedString()
+      })
+      expect(removedCid.length).toBe(0)
+      const storedCid = await Pin.find({ cid: cidB.toBaseEncodedString() })
+      expect(storedCid.length).toBe(1)
+      done()
+    })
   })
 })

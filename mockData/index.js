@@ -1,4 +1,5 @@
 const { networks, abi } = require('../build/contracts/Storage.json')
+const listenerJSON = require('../build/contracts/Listener.json')
 
 const demoSmartContractJson1 = {
   address: networks['123'].address,
@@ -11,7 +12,13 @@ const demoSmartContractJson2 = {
   abi
 }
 
+const demoListenerContractJson = {
+  abi: listenerJSON.abi,
+  address: listenerJSON.networks['123'].address
+}
+
 module.exports = {
   demoSmartContractJson1,
-  demoSmartContractJson2
+  demoSmartContractJson2,
+  demoListenerContractJson
 }

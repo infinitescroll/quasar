@@ -1,65 +1,77 @@
 const Web3 = require('web3')
-const smartContracts = require('../state')
-const storageJSON = require('../../build/contracts/Storage.json')
-const { SmartContractToPoll, Pin } = require('../db')
+const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const { provider } = require('./provider')
+const Scheduler = require('../scheduler')
+const { LISTENER_CONTRACT_ABI, STORAGE_CONTRACT_ABI } = require('../constants')
 
-const web3 = new Web3(new Web3.providers.WebsocketProvider(provider))
+const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
 const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
 }
 
-const handlePinHashEvent = async (err, event) => {
-  if (err) console.error('Error handling pin event: ', err)
-  await Pin.deleteMany({ cid: event.returnValues.cid }).exec()
-}
+const handlePinHashEvent = event =>
+  Pin.deleteMany({ cid: event.returnValues.cid })
 
-const handleListenEvent = async (err, event) => {
-  if (err) console.error('Error subcribing: ', err)
-  const contract = new web3.eth.Contract(
-    storageJSON.abi,
-    event.returnValues.contractAddress
-  )
-
-  const listener = registerPinWatcher(contract)
-  // lines 38-42 will be removed
-  const smartContractObj = {
-    address: event.returnValues.contractAddress,
-    listener
+const handleListenEvent = async ({ event, returnValues }) => {
+  if (event === 'Listen') {
+    return SmartContractToPoll.create({
+      address: returnValues.contractAddress,
+      lastPolledBlock: 0,
+      sizeOfPinnedData: 0
+    })
+  } else if (event === 'StopListening') {
+    return SmartContractToPoll.deleteOne({
+      address: returnValues.contractAddress
+    })
   }
-  smartContracts.add(smartContractObj)
-
-  await SmartContractToPoll.create({
-    address: event.returnValues.contractAddress,
-    lastPolledBlock: 0,
-    sizeOfPinnedData: 0
-  })
 }
 
-const handleStopListeningEvent = async (err, event) => {
-  if (err) console.error('Error unsubcribing: ', err)
-  await SmartContractToPoll.deleteOne({
-    address: event.returnValues.contractAddress
-  })
-}
+const registerPinWatcher = () =>
+  new Scheduler(async () => {
+    const latestBlock = await web3.eth.getBlockNumber()
+    const contractsToPoll = await SmartContractToPoll.find({})
+    await Promise.all(
+      contractsToPoll.map(async contract => {
+        const web3Contract = new web3.eth.Contract(
+          STORAGE_CONTRACT_ABI,
+          contract.address
+        )
+        const events = await web3Contract.getPastEvents('PinHash', {
+          fromBlock: contract.lastPolledBlock,
+          toBlock: latestBlock
+        })
+        await Promise.all(events.map(handlePinHashEvent))
+        await contract.update({ lastPolledBlock: latestBlock })
+      })
+    )
+  }, 1000)
 
-const registerPinWatcher = contract =>
-  contract.events.PinHash({}, handlePinHashEvent)
-
-const registerListenWatcher = contract =>
-  contract.events.Listen({}, handleListenEvent)
-
-const registerStopListeningWatcher = contract =>
-  contract.events.StopListening({}, handleStopListeningEvent)
+const registerListenWatcher = () =>
+  new Scheduler(async () => {
+    const latestBlock = await web3.eth.getBlockNumber()
+    const contractsToPoll = await ListenerContractToPoll.find({})
+    await Promise.all(
+      contractsToPoll.map(async contract => {
+        const web3Contract = new web3.eth.Contract(
+          LISTENER_CONTRACT_ABI,
+          contract.address
+        )
+        const events = await web3Contract.getPastEvents('allEvents', {
+          fromBlock: contract.lastPolledBlock,
+          toBlock: latestBlock
+        })
+        await Promise.all(events.map(handleListenEvent))
+        await contract.update({ lastPolledBlock: latestBlock })
+      })
+    )
+  }, 1000)
 
 module.exports = {
   registerPinWatcher,
   registerListenWatcher,
-  registerStopListeningWatcher,
   getContract,
   handleListenEvent,
   handlePinHashEvent,
-  handleStopListeningEvent,
   web3
 }
