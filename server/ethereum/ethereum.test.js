@@ -1,9 +1,8 @@
 const mongoose = require('mongoose')
+const request = require('supertest')
 const Web3 = require('web3')
 const {
-  registerListenWatcher,
   registerPinWatcher,
-  registerStopListeningWatcher,
   handleListenEvent,
   handleStopListeningEvent,
   handlePinHashEvent
@@ -17,11 +16,13 @@ const {
 } = require('../../mockData')
 const accounts = require('../../accounts.json')
 const listenerJSON = require('../../build/contracts/Listener.json')
-const { SmartContractToPoll } = require('../db')
+const { SmartContractToPoll, Pin } = require('../db')
+const { app } = require('../index')
 
 let web3
 let contract
 let listenerContract
+
 const listenerUnsubscribe = () =>
   new Promise((resolve, reject) => {
     listenerContract.methods
@@ -57,15 +58,13 @@ beforeAll(async done => {
     listenerJSON.networks['123'].address
   )
 
-  registerStopListeningWatcher(listenerContract)
-  registerListenWatcher(listenerContract)
-
   done()
 })
 
-beforeEach(async done => {
+beforeEach(async () => {
   smartContracts.clear()
-  done()
+  await SmartContractToPoll.deleteMany({})
+  expect(smartContracts.get().length).toBe(0)
 })
 
 afterAll(() => {
@@ -213,19 +212,34 @@ test('handleListenEvent throws error with empty params', async done => {
   done()
 })
 
-test('handlePinHashEvent pins file of cid it was passed', async done => {
-  const dag = { secondTestKey: 'secondTestVal' }
-  const cid = await node.dag.put(dag)
+test('handlePinHashEvent removes file from database by cid', async done => {
+  const dagA = { firstTestKey: 'firstTestVal' }
+  const cidA = await node.dag.put(dagA)
+  const dagB = { secondTestKey: 'secondTestVal' }
+  const cidB = await node.dag.put(dagB)
 
   const eventObj = {
     returnValues: {
-      cid: cid.toBaseEncodedString()
+      cid: cidA.toBaseEncodedString()
     }
   }
 
-  const res = await handlePinHashEvent(null, eventObj)
+  await request(app)
+    .post('/api/v0/dag/put')
+    .send(dagA)
+    .expect(201)
+  await request(app)
+    .post('/api/v0/dag/put')
+    .send(dagB)
+    .expect(201)
 
-  expect(res[0].hash).toBe(cid.toBaseEncodedString())
+  await handlePinHashEvent(null, eventObj)
+
+  const removedCid = await Pin.find({ cid: cidA.toBaseEncodedString() }).exec()
+  expect(removedCid.length).toBe(0)
+  const storedCid = await Pin.find({ cid: cidB.toBaseEncodedString() }).exec()
+  expect(storedCid.length).toBe(1)
+
   done()
 })
 
