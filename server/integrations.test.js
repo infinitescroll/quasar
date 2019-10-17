@@ -119,8 +119,7 @@ describe('integration tests', () => {
       expect(nonRemovedSmartContractToPoll.address).toBe(
         demoSmartContractJson2.address
       )
-      await server.close()
-      done()
+      server.close(done)
     })
   })
 
@@ -145,7 +144,6 @@ describe('integration tests', () => {
     })
 
     expect(removedPinFile).toBe(null)
-    await server.close()
-    done()
+    server.close(done)
   })
 })
