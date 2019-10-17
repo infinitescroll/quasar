@@ -27,7 +27,7 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 Note: this is a WIP. We'll eventually have step by step instructions on self-hosting here.
 [ requires node 12 or higher ]
 
-example `.env` variables:
+example `.env` file (in root folder):
 
 ```
 # all of these are optional - quasar defaults to local ipfs node if not set
