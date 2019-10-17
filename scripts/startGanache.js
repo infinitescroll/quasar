@@ -8,7 +8,7 @@ const startGanache = () =>
   new Promise(async (resolve, reject) => {
     const blockchainRunning = await isPortTaken('8545')
     if (!blockchainRunning) {
-      const server = ganache.server({ network_id: 123, block_time: 3 })
+      const server = ganache.server({ network_id: 123 })
       server.listen(8545, (err, blockchain) => {
         if (err) return reject(err)
         fs.writeFile(

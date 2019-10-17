@@ -37,15 +37,20 @@ const registerPinWatcher = () =>
           STORAGE_CONTRACT_ABI,
           contract.address
         )
-        const events = await web3Contract.getPastEvents('PinHash', {
-          fromBlock: contract.lastPolledBlock,
-          toBlock: latestBlock
-        })
-        await Promise.all(events.map(handlePinHashEvent))
-        await contract.update({ lastPolledBlock: latestBlock })
+
+        // mostly for test suites - make sure we are gathering information from new blocks
+        if (latestBlock - contract.lastPolledBlock > 0) {
+          const events = await web3Contract.getPastEvents('PinHash', {
+            fromBlock:
+              contract.lastPolledBlock === 0 ? 0 : contract.lastPolledBlock + 1,
+            toBlock: latestBlock
+          })
+          await Promise.all(events.map(handlePinHashEvent))
+          await contract.update({ lastPolledBlock: latestBlock })
+        }
       })
     )
-  }, 1000)
+  }, 100)
 
 const registerListenWatcher = () =>
   new Scheduler(async () => {
@@ -57,15 +62,19 @@ const registerListenWatcher = () =>
           LISTENER_CONTRACT_ABI,
           contract.address
         )
-        const events = await web3Contract.getPastEvents('allEvents', {
-          fromBlock: contract.lastPolledBlock,
-          toBlock: latestBlock
-        })
-        await Promise.all(events.map(handleListenEvent))
-        await contract.update({ lastPolledBlock: latestBlock })
+        // mostly for test suites - make sure we are gathering information from new blocks
+        if (latestBlock - contract.lastPolledBlock > 0) {
+          const events = await web3Contract.getPastEvents('allEvents', {
+            fromBlock:
+              contract.lastPolledBlock === 0 ? 0 : contract.lastPolledBlock + 1,
+            toBlock: latestBlock
+          })
+          await Promise.all(events.map(handleListenEvent))
+          await contract.update({ lastPolledBlock: latestBlock })
+        }
       })
     )
-  }, 1000)
+  }, 100)
 
 module.exports = {
   registerPinWatcher,
