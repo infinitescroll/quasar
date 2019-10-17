@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { exec } = require('child_process')
 const {
   handleListenEvent,
   handlePinHashEvent,
@@ -29,25 +30,28 @@ beforeEach(async () => {
 
 describe('unit tests', () => {
   describe('registerListenWatcher', () => {
-    test('registerListenWatcher returns an instance of the scheduler', () => {
-      const listenerWatcher = registerListenWatcher(() => {})
-      listenerWatcher.stop()
-      expect(listenerWatcher instanceof Scheduler).toBe(true)
-    })
+    // test('registerListenWatcher returns an instance of the scheduler', () => {
+    //   const listenerWatcher = registerListenWatcher(() => {})
+    //   listenerWatcher.stop()
+    //   expect(listenerWatcher instanceof Scheduler).toBe(true)
+    // })
 
     test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
+      registerListenWatcher()
       const listenerContract = await ListenerContractToPoll.create({
         address: demoListenerContractJson.address,
         lastPolledBlock: 0
       })
-      registerListenWatcher()
-      setTimeout(async () => {
-        const updatedContract = await ListenerContractToPoll.findById(
-          listenerContract._id
-        )
-        expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
-        done()
-      }, 1000)
+
+      exec('npm run mine 10', () => {
+        setTimeout(async () => {
+          const updatedContract = await ListenerContractToPoll.findById(
+            listenerContract._id
+          )
+          expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
+          done()
+        }, 1000)
+      })
     })
   })
 
@@ -59,6 +63,7 @@ describe('unit tests', () => {
     })
 
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
+      registerPinWatcher()
       const firstContractToPoll = await SmartContractToPoll.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
@@ -70,18 +75,19 @@ describe('unit tests', () => {
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
-      registerPinWatcher()
-      setTimeout(async () => {
-        const updatedFirstContractInDB = await SmartContractToPoll.findById(
-          firstContractToPoll._id
-        )
-        const updatedSecondContractInDB = await SmartContractToPoll.findById(
-          secondContractToPoll._id
-        )
-        expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
-        expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
-        done()
-      }, 100)
+      exec('npm run mine 10', () => {
+        setTimeout(async () => {
+          const updatedFirstContractInDB = await SmartContractToPoll.findById(
+            firstContractToPoll._id
+          )
+          const updatedSecondContractInDB = await SmartContractToPoll.findById(
+            secondContractToPoll._id
+          )
+          expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
+          expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
+          done()
+        }, 100)
+      })
     })
   })
 
