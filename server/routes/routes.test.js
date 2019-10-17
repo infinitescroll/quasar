@@ -27,41 +27,43 @@ beforeAll(async done => {
   done()
 })
 
-test('POST dag should return a 201 when a dag is passed', () => {
-  return request(app)
-    .post('/api/v0/dag/put')
-    .send({ test: '123' })
-    .expect(201)
-})
+describe('dag endpoints', () => {
+  test('POST dag should return a 201 when a dag is passed', () => {
+    return request(app)
+      .post('/api/v0/dag/put')
+      .send({ test: '123' })
+      .expect(201)
+  })
 
-test('POST dag should optimistically pin the dag passed', async done => {
-  const dag = { test: '456' }
-  const hash = await createHashFromDag(dag)
-  await request(app)
-    .post('/api/v0/dag/put')
-    .send(dag)
-    .expect(201)
-    .expect(res => expect(res.text).toEqual(hash))
+  test('POST dag should optimistically pin the dag passed', async done => {
+    const dag = { test: '456' }
+    const hash = await createHashFromDag(dag)
+    await request(app)
+      .post('/api/v0/dag/put')
+      .send(dag)
+      .expect(201)
+      .expect(res => expect(res.text).toEqual(hash))
 
-  const pins = await node.pin.ls()
-  const match = pins.find(item => item.hash === hash)
-  expect(match).toBeDefined()
-  done()
-})
+    const pins = await node.pin.ls()
+    const match = pins.find(item => item.hash === hash)
+    expect(match).toBeDefined()
+    done()
+  })
 
-test('POST dag should store pin in database for garbage collection', async done => {
-  const dag = { test: '789' }
-  const hash = await createHashFromDag(dag)
-  await request(app)
-    .post('/api/v0/dag/put')
-    .send(dag)
-    .expect(201)
-    .expect(res => expect(res.text).toEqual(hash))
+  test('POST dag should store pin in database for garbage collection', async done => {
+    const dag = { test: '789' }
+    const hash = await createHashFromDag(dag)
+    await request(app)
+      .post('/api/v0/dag/put')
+      .send(dag)
+      .expect(201)
+      .expect(res => expect(res.text).toEqual(hash))
 
-  const pin = await Pin.findOne({ cid: hash })
-  expect(pin).toBeTruthy()
-  expect(pin.size).toBeGreaterThan(0)
-  done()
+    const pin = await Pin.findOne({ cid: hash })
+    expect(pin).toBeTruthy()
+    expect(pin.size).toBeGreaterThan(0)
+    done()
+  })
 })
 
 /*

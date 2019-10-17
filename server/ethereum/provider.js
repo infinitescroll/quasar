@@ -9,7 +9,7 @@ if (providerNetwork === 'rinkeby') {
   provider = rinkebyInfuraWsUrl
 } else if (providerNetwork === 'local') {
   networkId = '123'
-  provider = 'ws://localhost:8545'
+  provider = 'http://localhost:8545'
 }
 
 module.exports = { provider, networkId }
