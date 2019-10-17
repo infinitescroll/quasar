@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
-const request = require('supertest')
+// const request = require('supertest')
 const Web3 = require('web3')
 const {
-  registerPinWatcher,
-  registerListenWatcher,
-  handleListenEvent,
-  handleStopListeningEvent,
-  handlePinHashEvent
+  // registerPinWatcher,
+  registerListenWatcher
+  // handleListenEvent,
+  // handleStopListeningEvent,
+  // handlePinHashEvent
 } = require('./ethereum')
 
 const { node } = require('./ipfs')
@@ -18,7 +18,7 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app } = require('./index')
+// const { app } = require('./index')
 
 let web3
 let storageContract
@@ -47,12 +47,23 @@ const emitListenToContractEvent = contractAddress =>
       })
   })
 
-const removeHashIfPinned = async cid => {
-  const pins = await node.pin.ls()
-  const match = pins.find(item => item.hash === cid)
-  if (match) return node.pin.rm(match.hash)
-  return
-}
+const emitPinHashEvent = (key, hash) =>
+  new Promise(resolve => {
+    storageContract.methods
+      .registerData(key, hash)
+      .send({ from: accounts[0] }, () => {
+        setTimeout(() => {
+          resolve()
+        }, 1000)
+      })
+  })
+
+// const removeHashIfPinned = async cid => {
+//   const pins = await node.pin.ls()
+//   const match = pins.find(item => item.hash === cid)
+//   if (match) return node.pin.rm(match.hash)
+//   return
+// }
 
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
@@ -92,7 +103,7 @@ afterAll(() => {
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
     test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
-      const listenWatcher = registerListenWatcher()
+      const watcher = registerListenWatcher()
       await Promise.all([
         await emitListenToContractEvent(demoSmartContractJson1.address),
         await emitListenToContractEvent(demoSmartContractJson2.address)
@@ -123,85 +134,32 @@ describe('integration tests', () => {
       expect(nonRemovedSmartContractToPoll.address).toBe(
         demoSmartContractJson2.address
       )
-      listenWatcher.stop()
+      watcher.stop()
       done()
     })
   })
-  // test(`emitting listen event from listener, then emittting pin event
-  // from pinning contract keeps file pinned`, async done => {
-  //   const testKey = web3.utils.fromAscii('testKey')
-  //   const dag = { testKey: 'testVal' }
-  //   const hash = await node.dag.put(dag)
-  //   await removeHashIfPinned(hash.toBaseEncodedString())
-  //   await emitListenToContractEvent(demoSmartContractJson1.address)
-  //   contract.methods
-  //     .registerData(testKey, hash.toBaseEncodedString())
-  //     .send({ from: accounts[0] }, () => {
-  //       setTimeout(async () => {
-  //         const pins = await node.pin.ls()
-  //         const match = pins.find(
-  //           item => item.hash === hash.toBaseEncodedString()
-  //         )
-  //         expect(match).toBeDefined()
-  //         done()
-  //       }, 2200)
-  //     })
-  // }, 7500)
+  test(`emitting listen event to listener contractt, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
+    // set up smart contract
+    const watcher = registerListenWatcher()
+    await emitListenToContractEvent(demoSmartContractJson1.address)
 
-  // test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
-  //   const firstContractToPoll = await SmartContractToPoll.create({
-  //     address: demoSmartContractJson1.address,
-  //     lastPolledBlock: 0,
-  //     sizeOfPinnedData: 0
-  //   })
+    const testKey = web3.utils.fromAscii('testKey')
+    const dag = { testKey: 'testVal' }
+    const hash = await node.dag.put(dag)
 
-  //   const secondContractToPoll = await SmartContractToPoll.create({
-  //     address: demoSmartContractJson2.address,
-  //     lastPolledBlock: 0,
-  //     sizeOfPinnedData: 0
-  //   })
+    // manually add pin to db, to be removed later
+    await Pin.create({
+      size: 100,
+      cid: hash.toBaseEncodedString(),
+      time: new Date()
+    })
+    await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+    const removedPinFile = await Pin.findOne({
+      cid: hash.toBaseEncodedString()
+    })
 
-  //   const testKey = web3.utils.fromAscii('testKey')
-  //   const dag = { testKey: 'testVal' }
-  //   const hash = await node.dag.put(dag)
-  //   storageContract.methods
-  //     .registerData(testKey, hash.toBaseEncodedString())
-  //     .send({ from: accounts[0] }, () => {
-  //       registerPinWatcher()
-
-  //       setTimeout(async () => {
-  //         const updatedFirstContractInDB = await SmartContractToPoll.findById(
-  //           firstContractToPoll._id
-  //         )
-  //         const updatedSecondContractInDB = await SmartContractToPoll.findById(
-  //           secondContractToPoll._id
-  //         )
-  //         expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
-  //         expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
-  //         done()
-  //       }, 100)
-  //     })
-  // })
-
-  // test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
-  //   await ListenerContractToPoll.create({
-  //     address: demoListenerContractJson.address,
-  //     lastPolledBlock: 0
-  //   })
-  //   listenerContract.methods
-  //     .listenToContract(demoSmartContractJson1.address)
-  //     .send({ from: accounts[0] }, () => {
-  //       listenerContract.methods
-  //         .unsubscribeContract(demoSmartContractJson1.address)
-  //         .send({ from: accounts[0] }, () => {
-  //           registerListenWatcher()
-  //           done()
-  //         })
-  //     })
-  // })
-
-  test('a file that outlives its TTL is eventually unpinned and removed from the DB and', () => {
-    /* test will go here */
-    expect(true).toBe(true)
+    expect(removedPinFile).toBe(null)
+    watcher.stop()
+    done()
   })
 })
