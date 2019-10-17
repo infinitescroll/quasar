@@ -1,14 +1,6 @@
 const mongoose = require('mongoose')
 // const request = require('supertest')
 const Web3 = require('web3')
-const {
-  registerPinWatcher,
-  registerListenWatcher
-  // handleListenEvent,
-  // handleStopListeningEvent,
-  // handlePinHashEvent
-} = require('./ethereum')
-
 const { node } = require('./ipfs')
 const {
   demoListenerContractJson,
@@ -18,7 +10,7 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-// const { app } = require('./index')
+const { app } = require('./index')
 
 let web3
 let storageContract
@@ -58,13 +50,6 @@ const emitPinHashEvent = (key, hash) =>
       })
   })
 
-// const removeHashIfPinned = async cid => {
-//   const pins = await node.pin.ls()
-//   const match = pins.find(item => item.hash === cid)
-//   if (match) return node.pin.rm(match.hash)
-//   return
-// }
-
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
@@ -103,8 +88,7 @@ afterAll(() => {
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
     test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
-      const listenWatcher = registerListenWatcher()
-      const pinWatcher = registerPinWatcher()
+      const server = app.listen('9090')
       await Promise.all([
         await emitListenToContractEvent(demoSmartContractJson1.address),
         await emitListenToContractEvent(demoSmartContractJson2.address)
@@ -135,16 +119,14 @@ describe('integration tests', () => {
       expect(nonRemovedSmartContractToPoll.address).toBe(
         demoSmartContractJson2.address
       )
-      listenWatcher.stop()
-      pinWatcher.stop()
+      server.close()
       done()
     })
   })
 
   test(`emitting listen event to listener contractt, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
+    const server = app.listen('9090')
     // set up smart contract
-    const listenWatcher = registerListenWatcher()
-    const pinWatcher = registerPinWatcher()
     await emitListenToContractEvent(demoSmartContractJson1.address)
 
     const testKey = web3.utils.fromAscii('testKey')
@@ -163,8 +145,7 @@ describe('integration tests', () => {
     })
 
     expect(removedPinFile).toBe(null)
-    listenWatcher.stop()
-    pinWatcher.stop()
+    server.close()
     done()
   })
 })
