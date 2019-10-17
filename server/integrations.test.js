@@ -88,7 +88,7 @@ afterAll(() => {
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
     test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
-      const server = app.listen('9090')
+      const server = app.listen('9091')
       await Promise.all([
         await emitListenToContractEvent(demoSmartContractJson1.address),
         await emitListenToContractEvent(demoSmartContractJson2.address)
@@ -124,7 +124,7 @@ describe('integration tests', () => {
   })
 
   test(`emitting listen event to listener contractt, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
-    const server = app.listen('9090')
+    const server = app.listen('9091')
     // set up smart contract
     await emitListenToContractEvent(demoSmartContractJson1.address)
 
