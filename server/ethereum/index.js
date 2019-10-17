@@ -2,7 +2,12 @@ const Web3 = require('web3')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const { provider } = require('./provider')
 const Scheduler = require('../scheduler')
-const { LISTENER_CONTRACT_ABI, STORAGE_CONTRACT_ABI } = require('../constants')
+const {
+  LISTENER_CONTRACT_ABI,
+  STORAGE_CONTRACT_ABI,
+  DB_POLL_INTERVAL,
+  CONTRACT_POLL_INTERVAL
+} = require('../constants')
 
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
@@ -50,7 +55,7 @@ const registerPinWatcher = () =>
         }
       })
     )
-  }, 100)
+  }, DB_POLL_INTERVAL)
 
 const registerListenWatcher = () =>
   new Scheduler(async () => {
@@ -74,7 +79,7 @@ const registerListenWatcher = () =>
         }
       })
     )
-  }, 100)
+  }, CONTRACT_POLL_INTERVAL)
 
 module.exports = {
   registerPinWatcher,
