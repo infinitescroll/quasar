@@ -47,7 +47,7 @@ describe('unit tests', () => {
         )
         expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
         done()
-      }, 100)
+      }, 1000)
     })
   })
 

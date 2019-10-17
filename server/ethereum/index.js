@@ -5,7 +5,6 @@ const Scheduler = require('../scheduler')
 const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
-  DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL
 } = require('../constants')
 
@@ -55,7 +54,7 @@ const registerPinWatcher = () =>
         }
       })
     )
-  }, DB_POLL_INTERVAL)
+  }, CONTRACT_POLL_INTERVAL)
 
 const registerListenWatcher = () =>
   new Scheduler(async () => {

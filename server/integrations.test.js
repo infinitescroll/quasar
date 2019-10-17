@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 // const request = require('supertest')
 const Web3 = require('web3')
 const {
-  // registerPinWatcher,
+  registerPinWatcher,
   registerListenWatcher
   // handleListenEvent,
   // handleStopListeningEvent,
@@ -103,7 +103,8 @@ afterAll(() => {
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
     test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
-      const watcher = registerListenWatcher()
+      const listenWatcher = registerListenWatcher()
+      const pinWatcher = registerPinWatcher()
       await Promise.all([
         await emitListenToContractEvent(demoSmartContractJson1.address),
         await emitListenToContractEvent(demoSmartContractJson2.address)
@@ -134,13 +135,16 @@ describe('integration tests', () => {
       expect(nonRemovedSmartContractToPoll.address).toBe(
         demoSmartContractJson2.address
       )
-      watcher.stop()
+      listenWatcher.stop()
+      pinWatcher.stop()
       done()
     })
   })
+
   test(`emitting listen event to listener contractt, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
     // set up smart contract
-    const watcher = registerListenWatcher()
+    const listenWatcher = registerListenWatcher()
+    const pinWatcher = registerPinWatcher()
     await emitListenToContractEvent(demoSmartContractJson1.address)
 
     const testKey = web3.utils.fromAscii('testKey')
@@ -159,7 +163,8 @@ describe('integration tests', () => {
     })
 
     expect(removedPinFile).toBe(null)
-    watcher.stop()
+    listenWatcher.stop()
+    pinWatcher.stop()
     done()
   })
 })
