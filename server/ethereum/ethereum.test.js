@@ -21,6 +21,8 @@ const mineBlocks = numBlocks =>
     exec(`npm run mine ${numBlocks}`, resolve)
   })
 
+const sleep = time => new Promise(resolve => setTimeout(resolve, time))
+
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
@@ -79,7 +81,8 @@ describe('unit tests', () => {
         sizeOfPinnedData: 0
       })
 
-      await mineBlocks(10)
+      await mineBlocks(500)
+      await sleep(200)
       const updatedFirstContractInDB = await SmartContractToPoll.findById(
         firstContractToPoll._id
       )
