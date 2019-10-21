@@ -64,6 +64,37 @@ describe('dag endpoints', () => {
     expect(pin.size).toBeGreaterThan(0)
     done()
   })
+
+  test('POST contract should store contract in database', async done => {
+    const body = {
+      contractAddress: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c'
+    }
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(201)
+
+    done()
+  })
+
+  test('DELETE contract should delete contract from database', async done => {
+    const body = {
+      contractAddress: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d18c'
+    }
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(201)
+
+    await request(app)
+      .delete('/api/v0/contracts')
+      .send(body)
+      .expect(202)
+
+    done()
+  })
 })
 
 /*
