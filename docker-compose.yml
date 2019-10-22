@@ -38,6 +38,12 @@ services:
     env_file: .env
     environment:
       WAIT_HOSTS: mongo:27017, ipfs:5001
+      BLOCKCHAIN_NETWORK: rinkeby
+      RINKEBY_PROVIDER_HTTP_URL: ${RINKEBY_PROVIDER_HTTP_URL}
+      IPFS_NODE_HOST: ipfs
+      IPFS_NODE_PORT: 5001
+      MNEMONIC: ${MNEMONIC}
+      DB_URL: mongodb://mongo:27017/test
 
 volumes:
   dbdata:

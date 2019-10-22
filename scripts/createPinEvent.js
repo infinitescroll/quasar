@@ -2,12 +2,15 @@ const Web3 = require('web3')
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 const storageJSON = require('../build/contracts/Storage.json')
 const accounts = require('../accounts.json')
-const { mnemonic, rinkebyProviderHTTPUrl } = require('../secrets')
 const { provider, networkId } = require('../server/ethereum/provider')
 
 const web3Provider =
   provider === 'rinkeby'
-    ? new HDWalletProvider(mnemonic, rinkebyProviderHTTPUrl, 1)
+    ? new HDWalletProvider(
+        process.env.MNEMONIC,
+        process.env.RINKEBY_PROVIDER_HTTP_URL,
+        1
+      )
     : new Web3.providers.WebsocketProvider('ws://localhost:8545')
 
 const createPinEvent = () =>
