@@ -2,7 +2,7 @@ const router = require('express').Router()
 const ipfs = require('../ipfs')
 var sizeof = require('object-sizeof')
 const multer = require('multer')
-const { Pin } = require('../db')
+const { Pin, SmartContractToPoll } = require('../db')
 const upload = multer()
 module.exports = router
 
@@ -30,6 +30,19 @@ router.post('/files/add', upload.single('entry'), async (req, res) => {
       time: new Date()
     })
     res.status(200).send(result[0].hash)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
+
+router.post('/contracts', async (req, res) => {
+  try {
+    await SmartContractToPoll.create({
+      address: req.body.contractAddress,
+      lastPolledBlock: 0,
+      sizeOfPinnedData: 0
+    })
+    res.status(201).send()
   } catch (error) {
     res.status(400).send(error)
   }
