@@ -73,14 +73,14 @@
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "immutable": "^4.0.0-rc.12",
-    "ipfs-http-client": "^35.1.0",
+    "ipfs-http-client": "^39.0.1",
     "is-ipfs": "^0.6.1",
     "mongoose": "^5.7.3",
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
     "object-sizeof": "^1.5.1",
     "path": "^0.12.7",
-    "web3": "^1.2.1"
+    "web3": "^2.0.0-alpha.1"
   },
   "devDependencies": {
     "axios": "^0.19.0",
