@@ -1,13 +1,17 @@
 const providerNetwork = process.env.BLOCKCHAIN_NETWORK || 'local'
-const rinkebyInfuraWsUrl = process.env.RINKEBY_PROVIDER_WS_URL || ''
+const rinkebyInfuraHttpUrl = process.env.RINKEBY_PROVIDER_HTTP_URL || ''
+const mainnetInfuraHttpUrl = process.env.MAINNET_PROVIDER_HTTP_URL || ''
 
-let provider = 'ws://localhost:8545'
-let networkId = '123'
+let provider
+let networkId
 
 if (providerNetwork === 'rinkeby') {
   networkId = '4'
-  provider = rinkebyInfuraWsUrl
-} else if (providerNetwork === 'local') {
+  provider = rinkebyInfuraHttpUrl
+} else if (providerNetwork === 'mainnet') {
+  networkId = '1'
+  provider = mainnetInfuraHttpUrl
+} else {
   networkId = '123'
   provider = 'http://localhost:8545'
 }
