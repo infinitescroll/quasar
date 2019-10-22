@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 // const fs = require('fs')
 const { app } = require('../index')
 const { node } = require('../ipfs')
-const { Pin } = require('../db')
+const { Pin, SmartContractToPoll } = require('../db')
 
 const removeHashIfPinned = async cid => {
   const pins = await node.pin.ls()
@@ -75,6 +75,25 @@ describe('dag endpoints', () => {
       .send(body)
       .expect(201)
 
+    const doc = await SmartContractToPoll.findOne({
+      address: body.contractAddress
+    })
+
+    expect(doc.address).toBe(body.contractAddress)
+
+    done()
+  })
+
+  test('POST contract with invalid key should respond with an error', async done => {
+    const body = {
+      invalidKey: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c'
+    }
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(400)
+
     done()
   })
 
@@ -92,6 +111,11 @@ describe('dag endpoints', () => {
       .delete('/api/v0/contracts')
       .send(body)
       .expect(202)
+
+    await request(app)
+      .delete('/api/v0/contracts')
+      .send(body)
+      .expect(204)
 
     done()
   })
