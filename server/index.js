@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
 const PORT = process.env.PORT || 3001
@@ -20,6 +21,12 @@ const createApp = async () => {
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
+  app.use(
+    rateLimit({
+      windowMs: process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
+      max: process.env.RATE_LIMIT_MAX || 100
+    })
+  )
 
   app.use('/api/v0', require('./routes'))
 

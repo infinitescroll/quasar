@@ -72,6 +72,7 @@
     "cross-env": "^6.0.0",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "express-rate-limit": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
     "ipfs-http-client": "^35.1.0",
     "is-ipfs": "^0.6.1",
