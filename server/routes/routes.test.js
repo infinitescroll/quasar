@@ -107,10 +107,22 @@ describe('dag endpoints', () => {
       .send(body)
       .expect(201)
 
+    let doc = await SmartContractToPoll.findOne({
+      address: body.contractAddress
+    })
+
+    expect(doc.address).toBe(body.contractAddress)
+
     await request(app)
       .delete('/api/v0/contracts')
       .send(body)
       .expect(202)
+
+    doc = await SmartContractToPoll.findOne({
+      address: body.contractAddress
+    })
+
+    expect(doc).toBeNull()
 
     await request(app)
       .delete('/api/v0/contracts')
