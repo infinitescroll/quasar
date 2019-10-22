@@ -47,21 +47,3 @@ router.post('/contracts', async (req, res) => {
     res.status(400).send(error)
   }
 })
-
-router.delete('/contracts', async (req, res) => {
-  if (!req.body.contractAddress) {
-    return res.status(400).send('No contratAddress in request body.')
-  }
-
-  const dbResult = await SmartContractToPoll.deleteOne({
-    address: req.body.contractAddress
-  })
-
-  if (dbResult.deletedCount === 1) {
-    return res.status(202).send()
-  } else if (dbResult.ok && dbResult.deletedCount === 0) {
-    return res.status(204).send()
-  } else {
-    return res.status(500).send()
-  }
-})

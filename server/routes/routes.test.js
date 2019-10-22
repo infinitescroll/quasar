@@ -96,41 +96,6 @@ describe('dag endpoints', () => {
 
     done()
   })
-
-  test('DELETE contract should delete contract from database', async done => {
-    const body = {
-      contractAddress: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d18c'
-    }
-
-    await request(app)
-      .post('/api/v0/contracts')
-      .send(body)
-      .expect(201)
-
-    let doc = await SmartContractToPoll.findOne({
-      address: body.contractAddress
-    })
-
-    expect(doc.address).toBe(body.contractAddress)
-
-    await request(app)
-      .delete('/api/v0/contracts')
-      .send(body)
-      .expect(202)
-
-    doc = await SmartContractToPoll.findOne({
-      address: body.contractAddress
-    })
-
-    expect(doc).toBeNull()
-
-    await request(app)
-      .delete('/api/v0/contracts')
-      .send(body)
-      .expect(204)
-
-    done()
-  })
 })
 
 /*
