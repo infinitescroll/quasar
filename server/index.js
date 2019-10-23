@@ -13,20 +13,9 @@ if (!process.env['NODE_ENV']) {
   require('dotenv').config({ path: __dirname + '/.env' })
 }
 
-const registerOldPinRemover = async () => {
-  const testInterval = process.env.NODE_ENV === 'test' ? 2000 : null
-  console.log('testInterval', testInterval)
-  await Pin.findandRemoveOldPins()
-  setInterval(async () => {
-    console.log('REMOVING')
-    await Pin.findandRemoveOldPins()
-  }, testInterval || 1209600000)
-}
-
 const createApp = async () => {
   registerListenWatcher()
   registerPinWatcher()
-  registerOldPinRemover()
 
   app.use(morgan('dev'))
   app.use(cors())
@@ -63,6 +52,16 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
+const registerOldPinRemover = async () => {
+  const testInterval = process.env.NODE_ENV === 'test' ? 2000 : null
+  console.log('testInterval', testInterval)
+  await Pin.findandRemoveOldPins()
+  setInterval(async () => {
+    console.log('REMOVING')
+    await Pin.findandRemoveOldPins()
+  }, testInterval || 1209600000)
+}
+
 const bootApp = () => {
   mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
@@ -71,6 +70,7 @@ const bootApp = () => {
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
     await startListening()
+    registerOldPinRemover()
   })
 }
 
@@ -84,4 +84,4 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, app }
+module.exports = { bootApp, startListening, registerOldPinRemover, app }

@@ -10,7 +10,7 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app } = require('./index')
+const { app, registerOldPinRemover } = require('./index')
 
 let web3
 let storageContract
@@ -149,22 +149,25 @@ describe('integration tests', () => {
 
   test(`registerOldPinRemover removes `, async done => {
     const server = app.listen('9091', async () => {
-      process.env.pinRemoverInterval = 3000
       const dagRequest = await request(app)
         .post('/api/v0/dag/put')
         .send({ test: '123' })
 
-      // expect(dagRequest.res.statusCode).toBe(201)
+      expect(dagRequest.res.statusCode).toBe(201)
 
-      setTimeout(async () => {
-        const removedPinFile = await Pin.findOne({
-          cid: dagRequest.res.text
-        })
+      // registerOldPinRemover()
 
-        console.log('removedPinFile', removedPinFile)
-        expect(removedPinFile).toBe(null)
-        server.close(done)
-      }, 4000)
+      // setTimeout(async () => {
+      //   const removedPinFile = await Pin.findOne({
+      //     cid: dagRequest.res.text
+      //   })
+
+      //   console.log('removedPinFile', removedPinFile)
+      //   expect(removedPinFile).toBe(null)
+      //   server.close(done)
+      // }, 4000)
+
+      server.close(done)
     })
   })
 })
