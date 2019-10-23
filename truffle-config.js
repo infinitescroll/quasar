@@ -1,7 +1,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 require('dotenv').config()
 const mnemonic = process.env.MNEMONIC || ''
-const rinkebyProviderHTTPUrl = process.env.RINKEBY_PROVIDER_HTTP_URL || ''
+const rinkebyProviderHTTPUrl = process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
 
 module.exports = {
   networks: {

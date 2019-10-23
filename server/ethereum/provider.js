@@ -1,5 +1,5 @@
 const providerNetwork = process.env.BLOCKCHAIN_NETWORK || 'local'
-const rinkebyInfuraHttpUrl = process.env.RINKEBY_PROVIDER_HTTP_URL || ''
+const rinkebyInfuraHttpUrl = process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
 
 let provider = 'ws://localhost:8545'
 let networkId = '123'

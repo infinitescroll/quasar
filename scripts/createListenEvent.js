@@ -10,7 +10,7 @@ const web3Provider =
   network === 'rinkeby'
     ? new HDWalletProvider(
         process.env.MNEMONIC,
-        process.env.RINKEBY_PROVIDER_HTTP_URL,
+        process.env.BLOCKCHAIN_PROVIDER_HTTP_URL,
         1
       )
     : new Web3.providers.WebsocketProvider('ws://localhost:8545')
