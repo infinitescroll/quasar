@@ -54,8 +54,6 @@ const startListening = async () => {
 }
 
 const autoCleanDB = async (ttl, interval = 1209600000) => {
-  console.log('interval', interval)
-  console.log('ttl', ttl)
   await Pin.findandRemoveOldPins(ttl)
   return new Scheduler(async () => {
     await Pin.findandRemoveOldPins(ttl)
