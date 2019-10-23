@@ -21,7 +21,6 @@ services:
     restart: unless-stopped
     links:
       - mongo
-      - ipfs
     ports:
       - "3001:3001"
     volumes:
@@ -30,8 +29,7 @@ services:
     env_file: .env
     environment:
       WAIT_HOSTS: mongo:27017
-      BLOCKCHAIN_NETWORK: rinkeby
-      DB_URL: mongodb://mongo:27017/test
+      DB_URL: mongodb://mongo:27017/quasar
 
 volumes:
   dbdata:
