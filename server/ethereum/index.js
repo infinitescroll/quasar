@@ -14,17 +14,28 @@ const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
 }
 
-const handlePinHashEvent = event =>
+const handlePinHashEvent = event => {
+  console.log(
+    `Request to pin ${event.returnValues.cid} received from contract ${event.address}`
+  )
   Pin.deleteMany({ cid: event.returnValues.cid })
+}
 
 const handleListenEvent = async ({ event, returnValues }) => {
   if (event === 'Listen') {
+    console.log(
+      `Request to poll ${returnValues.contractAddress} received from ${event.address}`
+    )
     return SmartContractToPoll.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
     })
   } else if (event === 'StopListening') {
+    console.log(
+      'No longer listening to smart contract at ',
+      returnValues.contract
+    )
     return SmartContractToPoll.deleteOne({
       address: returnValues.contractAddress
     })
