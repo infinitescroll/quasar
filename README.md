@@ -22,6 +22,28 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 4. Quasar queries IPFS for data associated with the hash.
 5. Quasar pins data on IPFS.
 
+## Deployment [with docker + nodejs >= 12]
+
+1. run `git clone http://github.com/openworklabs/quasar`
+2. Add `.env` file in project root and make sure you include: `DB_POLL_INTERVAL` (number of ms), `CONTRACT_POLL_INTERVAL` (number of ms), `BLOCKCHAIN_NETWORK` (rinkeby, mainnet, etc), `BLOCKCHAIN_PROVIDER_HTTP_URL`, `MNEMONIC` (you're seed phrase). If you are using an external ipfs provider, include `IPFS_NODE_HOST`, `IPFS_NODE_PROTOCOL`, `IPFS_AUTH`, `IPFS_NODE_PORT`, and `IPFS_API_PATH`.
+3. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
+
+#### demo .env file
+
+```
+IPFS_NODE_HOST=ipfs.autark.xyz
+IPFS_NODE_PROTOCOL=https
+IPFS_AUTH=Basic [auth_key_here]
+IPFS_NODE_PORT=5001
+IPFS_API_PATH=/ipfs/api/v0/
+DB_POLL_INTERVAL=100
+CONTRACT_POLL_INTERVAL=100
+BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/9c2e43c9asdfadfad34ysdafcc3d52
+MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball bernie twentytwenty
+BLOCKCHAIN_NETWORK=rinkeby
+LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
+```
+
 ## Dev setup
 
 Note: this is a WIP. We'll eventually have step by step instructions on self-hosting here.
