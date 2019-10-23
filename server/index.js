@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
+const Scheduler = require('./scheduler')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -54,7 +55,7 @@ const startListening = async () => {
 
 const autoCleanDB = async (ttl, interval = 1209600000) => {
   await Pin.findandRemoveOldPins(ttl)
-  setInterval(async () => {
+  return new Scheduler(async () => {
     await Pin.findandRemoveOldPins(ttl)
   }, interval)
 }
