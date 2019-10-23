@@ -1,6 +1,14 @@
 version: "3"
 
 services:
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    ports:
+      - "4001:4001"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:5001:5001"
+
   mongo:
     image: mongo
     hostname: mongo
@@ -29,8 +37,10 @@ services:
       - node_modules:/home/node/quasar/node_modules
     env_file: .env
     environment:
-      WAIT_HOSTS: mongo:27017
+      WAIT_HOSTS: mongo:27017, ipfs:5001
       BLOCKCHAIN_NETWORK: rinkeby
+      IPFS_NODE_HOST: ipfs
+      IPFS_NODE_PORT: 5001
       DB_URL: mongodb://mongo:27017/test
 
 volumes:
