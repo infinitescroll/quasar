@@ -149,7 +149,7 @@ describe('integration tests', () => {
 
   test(`registerOldPinRemover removes old pins`, async done => {
     const server = app.listen('9091', async () => {
-      const scheduler = await autoCleanDB(0, 2000)
+      const scheduler = await autoCleanDB(0, 500)
       const dagRequest = await request(app)
         .post('/api/v0/dag/put')
         .send({ test: '123' })
