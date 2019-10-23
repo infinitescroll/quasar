@@ -52,11 +52,11 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-const autoCleanDB = async () => {
-  await Pin.findandRemoveOldPins()
+const autoCleanDB = async (ttl, interval = 1209600000) => {
+  await Pin.findandRemoveOldPins(ttl)
   setInterval(async () => {
-    await Pin.findandRemoveOldPins()
-  }, 1209600000)
+    await Pin.findandRemoveOldPins(ttl)
+  }, interval)
 }
 
 const bootApp = () => {
@@ -82,4 +82,4 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, app }
+module.exports = { bootApp, startListening, autoCleanDB, app }

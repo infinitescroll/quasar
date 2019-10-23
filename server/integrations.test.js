@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-// const request = require('supertest')
+const request = require('supertest')
 const Web3 = require('web3')
 const { node } = require('./ipfs')
 const {
@@ -10,7 +10,7 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app } = require('./index')
+const { app, autoCleanDB } = require('./index')
 
 let web3
 let storageContract
@@ -144,6 +144,26 @@ describe('integration tests', () => {
 
       expect(removedPinFile).toBe(null)
       server.close(done)
+    })
+  })
+
+  test(`registerOldPinRemover removes old pins`, async done => {
+    const server = app.listen('9091', async () => {
+      autoCleanDB(0, 2000)
+      const dagRequest = await request(app)
+        .post('/api/v0/dag/put')
+        .send({ test: '123' })
+
+      expect(dagRequest.res.statusCode).toBe(201)
+
+      setTimeout(async () => {
+        const removedPinFile = await Pin.findOne({
+          cid: dagRequest.res.text
+        })
+
+        expect(removedPinFile).toBeNull()
+        server.close(done)
+      }, 4000)
     })
   })
 })
