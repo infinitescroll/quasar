@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-// const request = require('supertest')
+const request = require('supertest')
 const Web3 = require('web3')
 const { node } = require('./ipfs')
 const {
@@ -144,6 +144,27 @@ describe('integration tests', () => {
 
       expect(removedPinFile).toBe(null)
       server.close(done)
+    })
+  })
+
+  test(`registerOldPinRemover removes `, async done => {
+    const server = app.listen('9091', async () => {
+      process.env.pinRemoverInterval = 3000
+      const dagRequest = await request(app)
+        .post('/api/v0/dag/put')
+        .send({ test: '123' })
+
+      // expect(dagRequest.res.statusCode).toBe(201)
+
+      setTimeout(async () => {
+        const removedPinFile = await Pin.findOne({
+          cid: dagRequest.res.text
+        })
+
+        console.log('removedPinFile', removedPinFile)
+        expect(removedPinFile).toBe(null)
+        server.close(done)
+      }, 4000)
     })
   })
 })

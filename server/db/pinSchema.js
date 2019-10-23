@@ -17,7 +17,7 @@ const pinSchema = new mongoose.Schema(
 
 class PinClass {
   static async findandRemoveOldPins() {
-    const ttl = process.env.TTL || 14
+    let ttl = process.env.NODE_ENV === 'test' ? 0 : process.env.TTL || 14
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - ttl)
 
