@@ -8,6 +8,7 @@ const {
   CONTRACT_POLL_INTERVAL
 } = require('../constants')
 
+require('dotenv').config()
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
 const getContract = smartContractObj => {
@@ -23,9 +24,7 @@ const handlePinHashEvent = event => {
 
 const handleListenEvent = async ({ event, returnValues }) => {
   if (event === 'Listen') {
-    console.log(
-      `Request to poll ${returnValues.contractAddress} received from ${event.address}`
-    )
+    console.log(`Added contract ${returnValues.contractAddress} to listen to`)
     return SmartContractToPoll.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
@@ -67,7 +66,12 @@ const registerPinWatcher = () =>
     )
   }, CONTRACT_POLL_INTERVAL)
 
-const registerListenWatcher = () =>
+const registerListenWatcher = () => {
+  ListenerContractToPoll.create({
+    address: process.env.LISTENER_CONTRACT_ADDRESS,
+    lastPolledBlock: 0
+  })
+
   new Scheduler(async () => {
     const latestBlock = await web3.eth.getBlockNumber()
     const contractsToPoll = await ListenerContractToPoll.find({})
@@ -90,6 +94,7 @@ const registerListenWatcher = () =>
       })
     )
   }, CONTRACT_POLL_INTERVAL)
+}
 
 module.exports = {
   registerPinWatcher,

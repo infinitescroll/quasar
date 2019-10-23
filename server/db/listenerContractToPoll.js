@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const web3 = require('web3')
+const { utils } = require('web3')
 
 const listenerContractToPollSchema = new mongoose.Schema(
   {
@@ -7,7 +7,7 @@ const listenerContractToPollSchema = new mongoose.Schema(
       index: true,
       type: String,
       required: true,
-      validate: contractAddress => web3.utils.isAddress(contractAddress)
+      validate: contractAddress => utils.isAddress(contractAddress)
     },
     lastPolledBlock: {
       type: Number,
