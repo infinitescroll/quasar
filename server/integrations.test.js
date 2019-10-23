@@ -162,11 +162,9 @@ describe('integration tests', () => {
         })
 
         expect(removedPinFile).toBeNull()
+        scheduler.stop()
         server.close(done)
       }, 4000)
-
-      scheduler.stop()
-      server.close(done)
     })
   })
 })
