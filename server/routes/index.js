@@ -47,3 +47,12 @@ router.post('/contracts', async (req, res) => {
     res.status(400).send(error)
   }
 })
+
+router.get('/contracts', async (_, res) => {
+  try {
+    const contracts = await SmartContractToPoll.find()
+    res.status(200).send(contracts)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
