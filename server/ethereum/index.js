@@ -5,7 +5,8 @@ const Scheduler = require('../scheduler')
 const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
-  CONTRACT_POLL_INTERVAL
+  CONTRACT_POLL_INTERVAL,
+  LISTENER_CONTRACT_ADDRESS
 } = require('../constants')
 
 require('dotenv').config()
@@ -68,7 +69,7 @@ const registerPinWatcher = () =>
 
 const registerListenWatcher = () => {
   ListenerContractToPoll.create({
-    address: process.env.LISTENER_CONTRACT_ADDRESS,
+    address: LISTENER_CONTRACT_ADDRESS,
     lastPolledBlock: 0
   })
 
