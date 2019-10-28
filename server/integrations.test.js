@@ -55,7 +55,7 @@ beforeAll(async done => {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()
-  web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
+  web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
   storageContract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
     demoSmartContractJson1.address
@@ -79,10 +79,6 @@ beforeEach(async () => {
 afterEach(async () => {
   await ListenerContractToPoll.deleteMany({})
   await SmartContractToPoll.deleteMany({})
-})
-
-afterAll(() => {
-  web3.currentProvider.connection.close()
 })
 
 describe('integration tests', () => {
