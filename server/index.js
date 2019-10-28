@@ -54,7 +54,6 @@ const startListening = async () => {
 }
 
 const autoCleanDB = async (ttl, interval = 1209600000) => {
-  await Pin.findandRemoveOldPins(ttl)
   return new Scheduler(async () => {
     await Pin.findandRemoveOldPins(ttl)
   }, interval)
@@ -68,9 +67,8 @@ const bootApp = () => {
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
     await startListening()
+    autoCleanDB()
   })
-
-  autoCleanDB()
 }
 
 // This evaluates as true when this file is run directly from the command line,
