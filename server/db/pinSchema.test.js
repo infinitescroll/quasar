@@ -7,7 +7,7 @@ oldDate.setDate(oldDate.getDate() - ttl - 1)
 
 let cid1, cid2
 beforeAll(async done => {
-  await mongoose.connect(process.env.DB_URL || 'http://localhost:27017/test', {
+  await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()
