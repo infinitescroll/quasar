@@ -19,7 +19,7 @@ const handlePinHashEvent = event => {
   console.log(
     `Request to pin ${event.returnValues.cid} received from contract ${event.address}`
   )
-  Pin.deleteMany({ cid: event.returnValues.cid })
+  return Pin.deleteMany({ cid: event.returnValues.cid })
 }
 
 const handleListenEvent = async ({ event, returnValues }) => {
