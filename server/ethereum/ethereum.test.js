@@ -17,7 +17,7 @@ const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 
 beforeAll(async done => {
-  await mongoose.connect(process.env.DB_URL || 'http://localhost:27017/test', {
+  await mongoose.connect(process.env.DB_URL || 'http://localhost/test', {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()

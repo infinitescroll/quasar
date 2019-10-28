@@ -53,7 +53,7 @@ const autoCleanDB = async () => {
 }
 
 const bootApp = () => {
-  mongoose.connect(process.env.DB_URL || 'http://localhost:27017/test', {
+  mongoose.connect(process.env.DB_URL || 'http://localhost/test', {
     useNewUrlParser: true
   })
   const db = mongoose.connection
