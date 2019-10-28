@@ -72,7 +72,7 @@ const registerListenWatcher = () => {
     lastPolledBlock: 0
   })
 
-  new Scheduler(async () => {
+  return new Scheduler(async () => {
     const latestBlock = await web3.eth.getBlockNumber()
     const contractsToPoll = await ListenerContractToPoll.find({})
     await Promise.all(
