@@ -17,4 +17,4 @@ COPY --chown=node:node . .
 EXPOSE 3001
 
 # wait for ipfs / mongo and run tests
-CMD /wait && npm run test:docker
+CMD /wait && npm run test:docker -- --testPathIgnorePatterns integrations.test.js
