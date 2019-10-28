@@ -84,6 +84,36 @@ describe('dag endpoints', () => {
     done()
   })
 
+  test('POST contract should not store duplicate contracts in database', async done => {
+    const body = {
+      contractAddress: '0xaaad933a0bc612844eaf0c6fe3e5b8e9b6c1d19c'
+    }
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(201)
+
+    let docs = await SmartContractToPoll.find({
+      address: body.contractAddress
+    })
+
+    expect(docs.length).toBe(1)
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(200)
+
+    docs = await SmartContractToPoll.find({
+      address: body.contractAddress
+    })
+
+    expect(docs.length).toBe(1)
+
+    done()
+  })
+
   test('POST contract with invalid key should respond with an error', async done => {
     const body = {
       invalidKey: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19c'
