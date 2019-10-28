@@ -17,6 +17,7 @@ const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 
 beforeAll(async done => {
+  console.log(demoListenerContractJson)
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
   })
