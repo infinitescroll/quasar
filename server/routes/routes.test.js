@@ -20,7 +20,7 @@ const createHashFromDag = async dag => {
 }
 
 beforeAll(async done => {
-  await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
+  await mongoose.connect(process.env.DB_URL || 'http://localhost:27017/test', {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()
