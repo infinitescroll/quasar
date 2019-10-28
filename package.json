@@ -18,6 +18,7 @@
     "stop": "killall node && ipfs shutdown && killall mongod",
     "test": "scripts/test.sh && jsipfs shutdown",
     "test:watch": "scripts/start_test_env_watch.sh && jsipfs shutdown && killall mongod",
+    "test:docker": "jest --silent",
     "lint": "eslint ./ --ignore-path .gitignore",
     "lint-fix": "npm run lint -- --fix",
     "prettify": "prettier --write \"**/*.{js,jsx,json,md}\""
