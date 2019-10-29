@@ -112,6 +112,17 @@ describe('dag endpoints', () => {
       .send()
       .expect(200)
       .expect(res => expect(res.body.length).toBeGreaterThan(0))
+      .expect(res =>
+        expect(res.body[0]).toEqual(
+          expect.objectContaining({
+            __v: expect.any(Number),
+            _id: expect.any(String),
+            address: expect.any(String),
+            lastPolledBlock: expect.any(Number),
+            sizeOfPinnedData: expect.any(Number)
+          })
+        )
+      )
 
     done()
   })
