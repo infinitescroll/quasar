@@ -22,6 +22,9 @@ router.post('/dag/put', async (req, res) => {
 })
 
 router.post('/files/add', upload.single('entry'), async (req, res) => {
+  if (req.file.size > 1073741824)
+    return res.status(413).send("File is bigger than 1GB. That's too big.")
+
   try {
     const result = await ipfs.node.add(req.file.buffer)
     await Pin.create({
