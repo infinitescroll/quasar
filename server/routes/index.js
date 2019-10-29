@@ -53,3 +53,12 @@ router.post('/contracts', async (req, res) => {
     res.status(400).send(error)
   }
 })
+
+router.get('/ipfs-provider', (_, res) => {
+  return res.status(200).send({
+    alias: process.env.ALIAS || 'aragon_association',
+    host: process.env.IPFS_NODE_HOST || 'localhost',
+    port: process.env.IPFS_NODE_PORT || '5002',
+    protocol: process.env.IPFS_NODE_PROTOCOL || 'http'
+  })
+})
