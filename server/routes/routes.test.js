@@ -126,6 +126,36 @@ describe('dag endpoints', () => {
 
     done()
   })
+
+  test('GET contracts returns list of contracts', async done => {
+    const body = {
+      contractAddress: '0xfffd933a0bc612844eaf0c6fe3e5b8e9b6c1d19f'
+    }
+
+    await request(app)
+      .post('/api/v0/contracts')
+      .send(body)
+      .expect(201)
+
+    await request(app)
+      .get('/api/v0/contracts')
+      .send()
+      .expect(200)
+      .expect(res => expect(res.body.length).toBeGreaterThan(0))
+      .expect(res =>
+        expect(res.body[0]).toEqual(
+          expect.objectContaining({
+            __v: expect.any(Number),
+            _id: expect.any(String),
+            address: expect.any(String),
+            lastPolledBlock: expect.any(Number),
+            sizeOfPinnedData: expect.any(Number)
+          })
+        )
+      )
+
+    done()
+  })
 })
 
 /*
