@@ -122,8 +122,8 @@ describe('integration tests', () => {
     })
   })
 
-  test(`emitting listen event to listener contractt, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
-    const server = app.listen('9091', async () => {
+  test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
+    const server = app.listen('9092', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
 

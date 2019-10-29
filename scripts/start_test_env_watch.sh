@@ -8,4 +8,4 @@ echo "Running: "$0
 mongod --logpath /dev/null &
 node ./scripts/startIpfs &
 sleep 5 &
-jest --watch
+jest --watch --silent

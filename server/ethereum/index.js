@@ -5,26 +5,37 @@ const Scheduler = require('../scheduler')
 const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
-  CONTRACT_POLL_INTERVAL
+  CONTRACT_POLL_INTERVAL,
+  LISTENER_CONTRACT_ADDRESS
 } = require('../constants')
 
+require('dotenv').config()
 const web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
 const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
 }
 
-const handlePinHashEvent = event =>
-  Pin.deleteMany({ cid: event.returnValues.cid })
+const handlePinHashEvent = event => {
+  console.log(
+    `Request to pin ${event.returnValues.cid} received from contract ${event.address}`
+  )
+  return Pin.deleteMany({ cid: event.returnValues.cid })
+}
 
 const handleListenEvent = async ({ event, returnValues }) => {
   if (event === 'Listen') {
+    console.log(`Added contract ${returnValues.contractAddress} to listen to`)
     return SmartContractToPoll.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
     })
   } else if (event === 'StopListening') {
+    console.log(
+      'No longer listening to smart contract at ',
+      returnValues.contract
+    )
     return SmartContractToPoll.deleteOne({
       address: returnValues.contractAddress
     })
@@ -56,8 +67,13 @@ const registerPinWatcher = () =>
     )
   }, CONTRACT_POLL_INTERVAL)
 
-const registerListenWatcher = () =>
-  new Scheduler(async () => {
+const registerListenWatcher = () => {
+  ListenerContractToPoll.create({
+    address: LISTENER_CONTRACT_ADDRESS,
+    lastPolledBlock: 0
+  })
+
+  return new Scheduler(async () => {
     const latestBlock = await web3.eth.getBlockNumber()
     const contractsToPoll = await ListenerContractToPoll.find({})
     await Promise.all(
@@ -79,6 +95,7 @@ const registerListenWatcher = () =>
       })
     )
   }, CONTRACT_POLL_INTERVAL)
+}
 
 module.exports = {
   registerPinWatcher,
