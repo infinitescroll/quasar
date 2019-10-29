@@ -37,6 +37,12 @@ router.post('/files/add', upload.single('entry'), async (req, res) => {
 
 router.post('/contracts', async (req, res) => {
   try {
+    const count = await SmartContractToPoll.count({
+      address: req.body.contractAddress
+    })
+
+    if (count > 0) return res.status(200).send()
+
     await SmartContractToPoll.create({
       address: req.body.contractAddress,
       lastPolledBlock: 0,
