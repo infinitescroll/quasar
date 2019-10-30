@@ -34,9 +34,9 @@ In this repo you’ll see that there are two contracts—one that defines which 
 
 This event listening server is a Node app that connects to the Ethereum blockchain as well an IPFS node provider. Right now Ganache and Rinkeby chains are supported and any IPFS node can be used by setting the `IPFS_NODE_HOST`, `IPFS_NODE_PORT`, and `IPFS_NODE_PROTOCOL` environment variables in a .env file in the server directory.
 
-In general, here’s what’s happening—the server is constantly listening to events on the Ethereum blockchain. Upon hearing `PinHash` events, it decodes the events logs, and attempts to pin that data.
+The server has endpoints for adding pins: `/dag/put` and `/files/add`. It will temporarily pin dags or files passed to these endpoints for the length of time specified in `.env/DB_POLL_INTERVAL`. It also has an endpoint for adding a storage contract (`/contracts`) like the one in this repo. When this storage contract emits a pin event with a CID, quasar removes the CID from a garbage-collection list, ensuring that the file/dag will be pinned permanently. If a pin event is never emitted, the pin will be removed within `DB_POLL_INTERVAL` ms.
 
-![](https://miro.medium.com/max/2880/1*nxldVNAwwSPRUBqPyEyE7A.png)
+This approach allows DAOs to store their pinning permissions in smart contracts, without worrying about mainnet delays preventing their files from being pinned.
 
 ## Example usage:
 
