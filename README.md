@@ -16,11 +16,11 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 
 ## Flow
 
-1. Register contract with Quasar.
-2. Emit `PinHash` event from contract with IPFS hash passed as a parameter. User must make data associated with the hash available on the network for Quasar to retrieve.
-3. Quasar hears `PinHash` event.
-4. Quasar queries IPFS for data associated with the hash.
-5. Quasar pins data on IPFS.
+1. Register contract with Quasar via `POST` request to `/contracts`
+2. Pin dag or file via `POST` request to `/dag/put` or `/files/add` respectively
+3. Quasar returns IPFS hash in http response, pins the file/dag, and adds the file/dag to a list to be garbage collected if no `PinHash` event is ever received.
+4. Emit `PinHash` event from contract with IPFS hash passed as a parameter.
+5. Quasar hears `PinHash` event and removes dag or file from list of unconfirmed pins
 
 ## Architecture
 
@@ -37,6 +37,61 @@ This event listening server is a Node app that connects to the Ethereum blockcha
 In general, here’s what’s happening—the server is constantly listening to events on the Ethereum blockchain. Upon hearing `PinHash` events, it decodes the events logs, and attempts to pin that data.
 
 ![](https://miro.medium.com/max/2880/1*nxldVNAwwSPRUBqPyEyE7A.png)
+
+## Example usage:
+
+```javascript
+const quasarUrl = 'http://quasar.yourdomain.com' // wherever you are hosting the server
+
+// tell quasar to listen for pin events from a smart contract at contractAddress
+async function addStorageContract(contractAddress) {
+  return await fetch(`${quasarUrl}/api/v0/contracts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ contractAddress })
+  })
+}
+
+// get a list of storage contracts that quasar is listening to for pin events
+async function getStorageContracts() {
+  const response = await fetch(`${quasarUrl}/api/v0/contracts`, {
+    method: 'GET'
+  })
+  return await response.json()
+}
+
+// quasar optimistically pins your dag, then returns a hash for you to pass to a storage contract
+// if the storage contract is registered with quasar, the pin is confirmed
+// if the pin is never confirmed, quasar removes it after a week
+async function dagPut(dag) {
+  const response = await fetch(`${quasarUrl}/api/v0/dag/put`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dag)
+  })
+  const hash = await response.text()
+  storageContract.invokePinMethod(hash)
+  return hash
+}
+
+// same as above, but files instead of dags
+async function addFile(file) {
+  const response = await fetch(`${quasarUrl}/api/v0/files/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    file
+  })
+  const hash = await response.text()
+  storageContract.invokePinMethod(hash)
+  return hash
+}
+```
 
 ## Deployment [with docker]
 
