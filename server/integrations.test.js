@@ -150,18 +150,28 @@ describe('integration tests', () => {
   test(`registerOldPinRemover removes old pins`, async done => {
     const server = app.listen('9091', async () => {
       const scheduler = await autoCleanDB(0, 500)
+      const dagVal = { test: '12345' }
       const dagRequest = await request(app)
         .post('/api/v0/dag/put')
-        .send({ test: '123' })
+        .send(dagVal)
 
       expect(dagRequest.res.statusCode).toBe(201)
 
+      const dag = await node.dag.get(dagRequest.res.text)
+      expect(dag.value).toStrictEqual(dagVal)
+
       setTimeout(async () => {
-        const removedPinFile = await Pin.findOne({
+        const removedPinnedDag = await Pin.findOne({
           cid: dagRequest.res.text
         })
+        expect(removedPinnedDag).toBeNull()
 
-        expect(removedPinFile).toBeNull()
+        const pins = await node.pin.ls()
+        const removedPinnedDagOnNode = pins.find(item => {
+          return item.hash === dagRequest.res.text
+        })
+        expect(removedPinnedDagOnNode).toBe(undefined)
+
         scheduler.stop()
         server.close(done)
       }, 4000)
