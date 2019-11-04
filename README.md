@@ -95,11 +95,11 @@ async function addFile(file) {
 
 ## Deployment [with docker]
 
+This assumes you have a docker instance with ssh access already running. [Digital Ocean](https://marketplace.digitalocean.com/apps/docker) provides a one-click Ubuntu-docker setup, and there are plenty of [tutorials](https://www.linux.com/tutorials/how-install-and-use-docker-linux/) to get you start if you want to _really_ self-host.
+
 1. run `git clone http://github.com/openworklabs/quasar`
 2. Add `.env` file in project root and make sure you include:
 
-- `DB_POLL_INTERVAL` (number of ms)
-- `CONTRACT_POLL_INTERVAL` (number of ms)
 - `BLOCKCHAIN_NETWORK` (rinkeby, mainnet, etc)
 - `BLOCKCHAIN_PROVIDER_HTTP_URL`,
 - `MNEMONIC` (you're seed phrase)
@@ -110,7 +110,8 @@ async function addFile(file) {
 - `IPFS_AUTH` (if there's auth)
 - `IPFS_API_PATH` (if not using ipfs default)
 
-3. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
+3. make sure docker is running `systemctl start docker`
+4. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
 
 #### demo `.env` file (in root folder):
 
