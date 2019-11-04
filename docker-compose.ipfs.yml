@@ -3,6 +3,7 @@ version: "3"
 services:
   ipfs:
     image: ipfs/go-ipfs:latest
+    restart: unless-stopped
     ports:
       - "4001:4001"
       - "127.0.0.1:8080:8080"
