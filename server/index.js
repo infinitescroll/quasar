@@ -56,7 +56,7 @@ const autoCleanDB = async () => {
   await Pin.findandRemoveOldPins()
   setInterval(async () => {
     await Pin.findandRemoveOldPins()
-  }, 1209600000)
+  }, process.env.DB_POLL_INTERVAL || 86400000)
 }
 
 const bootApp = () => {

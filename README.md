@@ -124,9 +124,10 @@ IPFS_AUTH=Basic [auth_key_here]
 IPFS_NODE_PORT=5001
 IPFS_API_PATH=/ipfs/api/v0/
 
-# polling interval variables (both optional)
-DB_POLL_INTERVAL=604800000 # 1 week
+# polling interval variables (all optional)
+DB_POLL_INTERVAL=86400000 # 1 day
 CONTRACT_POLL_INTERVAL=1800000 # 30 min
+TTL=14 # how many days pins will remain before confirmed
 
 # blockchain variables - if using Docker all REQUIRED
 BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/9c2e43c9asdfadfad34ysdafcc3d52
