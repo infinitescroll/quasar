@@ -11,8 +11,10 @@ const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
 const { app } = require('./index')
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const mineBlocks = require('../utils/mineBlock')(web3)
+const sleep = require('../utils/sleep')
 
-let web3
 let storageContract
 let listenerContract
 
@@ -20,33 +22,29 @@ const listenerUnsubscribe = contractAddress =>
   new Promise((resolve, reject) => {
     listenerContract.methods
       .unsubscribeContract(contractAddress)
-      .send({ from: accounts[0] }, err => {
+      .send({ from: accounts[0] }, async err => {
         if (err) reject(err)
-        setTimeout(() => {
-          resolve()
-        }, 1000)
+        resolve()
       })
   })
 
 const emitListenToContractEvent = contractAddress =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     listenerContract.methods
       .listenToContract(contractAddress)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          resolve()
-        }, 1000)
+      .send({ from: accounts[0] }, async err => {
+        if (err) reject(err)
+        resolve()
       })
   })
 
 const emitPinHashEvent = (key, hash) =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     storageContract.methods
       .registerData(key, hash)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          resolve()
-        }, 1000)
+      .send({ from: accounts[0] }, async err => {
+        if (err) reject(err)
+        resolve()
       })
   })
 
@@ -55,7 +53,6 @@ beforeAll(async done => {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()
-  web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
   storageContract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
     demoSmartContractJson1.address
@@ -89,6 +86,9 @@ describe('integration tests', () => {
           await emitListenToContractEvent(demoSmartContractJson1.address),
           await emitListenToContractEvent(demoSmartContractJson2.address)
         ])
+        await mineBlocks(20)
+        await sleep(1000)
+
         const smartContractToPoll = await SmartContractToPoll.findOne({
           address: demoSmartContractJson1.address
         })
@@ -104,6 +104,8 @@ describe('integration tests', () => {
         expect(secondSmartContractToPoll.sizeOfPinnedData).toBe(0)
         expect(secondSmartContractToPoll.lastPolledBlock).toBeGreaterThan(0)
         await listenerUnsubscribe(demoSmartContractJson1.address)
+        await mineBlocks(20)
+        await sleep(1000)
 
         const removedSmartContractToPoll = await SmartContractToPoll.findOne({
           address: demoSmartContractJson1.address
@@ -138,6 +140,9 @@ describe('integration tests', () => {
         time: new Date()
       })
       await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+      await mineBlocks(20)
+      await sleep(500)
+
       const removedPinFile = await Pin.findOne({
         cid: hash.toBaseEncodedString()
       })

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const { exec } = require('child_process')
 const {
   handleListenEvent,
   handlePinHashEvent,
@@ -15,6 +14,9 @@ const {
 } = require('../../mockData')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const Scheduler = require('../scheduler')
+const Web3 = require('web3')
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const mineBlocks = require('../../utils/mineBlock')(web3)
 
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
@@ -30,11 +32,11 @@ beforeEach(async () => {
 
 describe('unit tests', () => {
   describe('registerListenWatcher', () => {
-    // test('registerListenWatcher returns an instance of the scheduler', () => {
-    //   const listenerWatcher = registerListenWatcher(() => {})
-    //   listenerWatcher.stop()
-    //   expect(listenerWatcher instanceof Scheduler).toBe(true)
-    // })
+    test('registerListenWatcher returns an instance of the scheduler', () => {
+      const listenerWatcher = registerListenWatcher(() => {})
+      listenerWatcher.stop()
+      expect(listenerWatcher instanceof Scheduler).toBe(true)
+    })
 
     test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
       registerListenWatcher()
@@ -43,15 +45,15 @@ describe('unit tests', () => {
         lastPolledBlock: 0
       })
 
-      exec('npm run mine 10', () => {
-        setTimeout(async () => {
-          const updatedContract = await ListenerContractToPoll.findById(
-            listenerContract._id
-          )
-          expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
-          done()
-        }, 1000)
-      })
+      await mineBlocks(1)
+      setTimeout(async () => {
+        const updatedContract = await ListenerContractToPoll.findById(
+          listenerContract._id
+        )
+
+        expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
+        done()
+      }, 1000)
     })
   })
 
@@ -75,19 +77,19 @@ describe('unit tests', () => {
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
-      exec('npm run mine 10', () => {
-        setTimeout(async () => {
-          const updatedFirstContractInDB = await SmartContractToPoll.findById(
-            firstContractToPoll._id
-          )
-          const updatedSecondContractInDB = await SmartContractToPoll.findById(
-            secondContractToPoll._id
-          )
-          expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
-          expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
-          done()
-        }, 100)
-      })
+
+      await mineBlocks(1)
+      setTimeout(async () => {
+        const updatedFirstContractInDB = await SmartContractToPoll.findById(
+          firstContractToPoll._id
+        )
+        const updatedSecondContractInDB = await SmartContractToPoll.findById(
+          secondContractToPoll._id
+        )
+        expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
+        expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
+        done()
+      }, 500)
     })
   })
 
