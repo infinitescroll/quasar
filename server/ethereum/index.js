@@ -2,11 +2,12 @@ const Web3 = require('web3')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const { provider } = require('./provider')
 const Scheduler = require('../scheduler')
+const emptyScheduler = require('../scheduler/emptyScheduler')
 const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   CONTRACT_POLL_INTERVAL,
-  LISTENER_CONTRACT_ADDRESS
+  BLOCK_PADDING
 } = require('../constants')
 
 require('dotenv').config()
@@ -44,7 +45,7 @@ const handleListenEvent = async ({ event, returnValues }) => {
 
 const registerPinWatcher = () =>
   new Scheduler(async () => {
-    const latestBlock = await web3.eth.getBlockNumber()
+    const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
     const contractsToPoll = await SmartContractToPoll.find({})
     await Promise.all(
       contractsToPoll.map(async contract => {
@@ -67,34 +68,40 @@ const registerPinWatcher = () =>
     )
   }, CONTRACT_POLL_INTERVAL)
 
-const registerListenWatcher = () => {
-  ListenerContractToPoll.create({
-    address: LISTENER_CONTRACT_ADDRESS,
-    lastPolledBlock: 0
-  })
+const registerListenWatcher = address => {
+  if (address) {
+    ListenerContractToPoll.create({
+      address,
+      lastPolledBlock: 0
+    })
 
-  return new Scheduler(async () => {
-    const latestBlock = await web3.eth.getBlockNumber()
-    const contractsToPoll = await ListenerContractToPoll.find({})
-    await Promise.all(
-      contractsToPoll.map(async contract => {
-        const web3Contract = new web3.eth.Contract(
-          LISTENER_CONTRACT_ABI,
-          contract.address
-        )
-        // mostly for test suites - make sure we are gathering information from new blocks
-        if (latestBlock - contract.lastPolledBlock > 0) {
-          const events = await web3Contract.getPastEvents('allEvents', {
-            fromBlock:
-              contract.lastPolledBlock === 0 ? 0 : contract.lastPolledBlock + 1,
-            toBlock: latestBlock
-          })
-          await Promise.all(events.map(handleListenEvent))
-          await contract.update({ lastPolledBlock: latestBlock })
-        }
-      })
-    )
-  }, CONTRACT_POLL_INTERVAL)
+    return new Scheduler(async () => {
+      const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
+      const contractsToPoll = await ListenerContractToPoll.find({})
+      await Promise.all(
+        contractsToPoll.map(async contract => {
+          const web3Contract = new web3.eth.Contract(
+            LISTENER_CONTRACT_ABI,
+            contract.address
+          )
+          // mostly for test suites - make sure we are gathering information from new blocks
+          if (latestBlock - contract.lastPolledBlock > 0) {
+            const events = await web3Contract.getPastEvents('allEvents', {
+              fromBlock:
+                contract.lastPolledBlock === 0
+                  ? 0
+                  : contract.lastPolledBlock + 1,
+              toBlock: latestBlock
+            })
+            await Promise.all(events.map(handleListenEvent))
+            await contract.update({ lastPolledBlock: latestBlock })
+          }
+        })
+      )
+    }, CONTRACT_POLL_INTERVAL)
+  }
+
+  return emptyScheduler
 }
 
 module.exports = {

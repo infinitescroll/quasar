@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
 const Scheduler = require('./scheduler')
+const { LISTENER_CONTRACT_ADDRESS } = require('./constants')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -15,9 +16,6 @@ if (!process.env['NODE_ENV']) {
 }
 
 const createApp = async () => {
-  registerListenWatcher()
-  registerPinWatcher()
-
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
@@ -66,8 +64,10 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
-    await startListening()
+    registerListenWatcher(LISTENER_CONTRACT_ADDRESS)
+    registerPinWatcher()
     autoCleanDB()
+    await startListening()
   })
 }
 
@@ -81,4 +81,11 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, autoCleanDB, app }
+module.exports = {
+  bootApp,
+  startListening,
+  autoCleanDB,
+  app,
+  registerListenWatcher,
+  registerPinWatcher
+}
