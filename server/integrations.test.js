@@ -97,7 +97,7 @@ afterEach(async () => {
 
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
-    test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
+    test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', done => {
       const server = app.listen('9091', async () => {
         await Promise.all([
           await emitListenToContractEvent(demoSmartContractJson1.address),
@@ -175,7 +175,7 @@ describe('integration tests', () => {
     })
   }, 10000)
 
-  test(`registerOldPinRemover removes old pins`, async done => {
+  test(`registerOldPinRemover removes old pins`, done => {
     const server = app.listen('9093', async () => {
       const scheduler = await autoCleanDB(0, 500)
       const dagVal = { test: '12345' }
@@ -208,7 +208,7 @@ describe('integration tests', () => {
     })
   }, 10000)
 
-  test(`events within BLOCK_PADDING should be ignored`, async done => {
+  test(`events within BLOCK_PADDING should be ignored`, done => {
     const server = app.listen('9094', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
