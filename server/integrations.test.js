@@ -140,11 +140,11 @@ describe('integration tests', () => {
         listenWatcher.stop()
         server.close(done)
       })
-    })
+    }, 10000)
   })
 
   test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, done => {
-    const server = app.listen('9091', async () => {
+    const server = app.listen('9092', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
       await mineBlocks(BLOCK_PADDING + 1)
@@ -173,10 +173,10 @@ describe('integration tests', () => {
       listenWatcher.stop()
       server.close(done)
     })
-  })
+  }, 10000)
 
   test(`registerOldPinRemover removes old pins`, async done => {
-    const server = app.listen('9091', async () => {
+    const server = app.listen('9093', async () => {
       const scheduler = await autoCleanDB(0, 500)
       const dagVal = { test: '12345' }
       const dagRequest = await request(app)
@@ -206,10 +206,10 @@ describe('integration tests', () => {
       listenWatcher.stop()
       server.close(done)
     })
-  })
+  }, 10000)
 
   test(`events within BLOCK_PADDING should be ignored`, async done => {
-    const server = app.listen('9091', async () => {
+    const server = app.listen('9094', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
       await mineBlocks(BLOCK_PADDING + 1)
@@ -238,5 +238,5 @@ describe('integration tests', () => {
       listenWatcher.stop()
       server.close(done)
     })
-  })
+  }, 10000)
 })
