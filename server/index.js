@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
 const Scheduler = require('./scheduler')
+const { LISTENER_CONTRACT_ADDRESS } = require('./constants')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -45,12 +46,6 @@ const createApp = async () => {
   })
 }
 
-const registerEventListeners = () => {
-  const listenWatcher = registerListenWatcher()
-  const pinWatcher = registerPinWatcher()
-  return { listenWatcher, pinWatcher }
-}
-
 const startListening = async () => {
   await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
@@ -69,7 +64,8 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
-    registerEventListeners()
+    registerListenWatcher(LISTENER_CONTRACT_ADDRESS)
+    registerPinWatcher()
     autoCleanDB()
     await startListening()
   })
@@ -90,5 +86,6 @@ module.exports = {
   startListening,
   autoCleanDB,
   app,
-  registerEventListeners
+  registerListenWatcher,
+  registerPinWatcher
 }

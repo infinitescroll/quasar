@@ -10,7 +10,12 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app, autoCleanDB, registerEventListeners } = require('./index')
+const {
+  app,
+  autoCleanDB,
+  registerListenWatcher,
+  registerPinWatcher
+} = require('./index')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlocks = require('../utils/mineBlocks')(web3)
 const sleep = require('../utils/sleep')
@@ -77,9 +82,8 @@ beforeAll(async done => {
 })
 
 beforeEach(async () => {
-  const listeners = registerEventListeners()
-  pinWatcher = listeners.pinWatcher
-  listenWatcher = listeners.listenWatcher
+  pinWatcher = registerPinWatcher()
+  listenWatcher = registerListenWatcher(listenerJSON.networks['123'].address)
   await ListenerContractToPoll.create({
     address: demoListenerContractJson.address,
     lastPolledBlock: 0

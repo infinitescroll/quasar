@@ -34,13 +34,17 @@ beforeEach(async () => {
 describe('unit tests', () => {
   describe('registerListenWatcher', () => {
     test('registerListenWatcher returns an instance of the scheduler', () => {
-      const listenerWatcher = registerListenWatcher()
+      const listenerWatcher = registerListenWatcher(
+        demoListenerContractJson.address
+      )
       listenerWatcher.stop()
       expect(listenerWatcher instanceof Scheduler).toBe(true)
     })
 
     test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
-      const listenWatcher = registerListenWatcher()
+      const listenWatcher = registerListenWatcher(
+        demoListenerContractJson.address
+      )
       const listenerContract = await ListenerContractToPoll.create({
         address: demoListenerContractJson.address,
         lastPolledBlock: 0
