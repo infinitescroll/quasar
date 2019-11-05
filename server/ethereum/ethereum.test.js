@@ -17,6 +17,7 @@ const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlocks = require('../../utils/mineBlock')(web3)
+const sleep = require('../../utils/sleep')
 
 beforeAll(async done => {
   await mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
@@ -46,14 +47,14 @@ describe('unit tests', () => {
       })
 
       await mineBlocks(1)
-      setTimeout(async () => {
-        const updatedContract = await ListenerContractToPoll.findById(
-          listenerContract._id
-        )
+      await sleep(500)
 
-        expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
-        done()
-      }, 1000)
+      const updatedContract = await ListenerContractToPoll.findById(
+        listenerContract._id
+      )
+
+      expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
+      done()
     })
   })
 
@@ -79,17 +80,17 @@ describe('unit tests', () => {
       })
 
       await mineBlocks(1)
-      setTimeout(async () => {
-        const updatedFirstContractInDB = await SmartContractToPoll.findById(
-          firstContractToPoll._id
-        )
-        const updatedSecondContractInDB = await SmartContractToPoll.findById(
-          secondContractToPoll._id
-        )
-        expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
-        expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
-        done()
-      }, 500)
+      await sleep(500)
+
+      const updatedFirstContractInDB = await SmartContractToPoll.findById(
+        firstContractToPoll._id
+      )
+      const updatedSecondContractInDB = await SmartContractToPoll.findById(
+        secondContractToPoll._id
+      )
+      expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
+      expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
+      done()
     })
   })
 

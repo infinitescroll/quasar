@@ -54,6 +54,7 @@ In general, here’s what’s happening—the server is constantly listening to 
 - `IPFS_NODE_PORT`
 - `IPFS_AUTH` (if there's auth)
 - `IPFS_API_PATH` (if not using ipfs default)
+- `BLOCK_PADDING` (buffer of eth blocks ignored from HEAD)
 
 3. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
 

@@ -1,6 +1,7 @@
 const listenerJSON = require('../build/contracts/Listener.json')
 const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
+const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
 const STORAGE_CONTRACT_ABI = [
   {
     anonymous: false,
@@ -172,5 +173,6 @@ module.exports = {
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL,
-  LISTENER_CONTRACT_ADDRESS
+  LISTENER_CONTRACT_ADDRESS,
+  BLOCK_PADDING
 }

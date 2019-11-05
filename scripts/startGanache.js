@@ -6,6 +6,7 @@ const log = console.log
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlock = require('../utils/mineBlock')(web3)
+const { BLOCK_PADDING } = require('../server/constants')
 
 const startGanache = () =>
   new Promise(async (resolve, reject) => {
@@ -14,7 +15,7 @@ const startGanache = () =>
       const server = ganache.server({ network_id: 123 })
       server.listen(8545, async (err, blockchain) => {
         if (err) return reject(err)
-        await mineBlock(20)
+        await mineBlock(BLOCK_PADDING + 1)
         fs.writeFile(
           './accounts.json',
           JSON.stringify(Object.keys(blockchain.accounts)),

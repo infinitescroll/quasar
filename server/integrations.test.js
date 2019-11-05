@@ -14,6 +14,7 @@ const { app, autoCleanDB } = require('./index')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlocks = require('../utils/mineBlock')(web3)
 const sleep = require('../utils/sleep')
+const { BLOCK_PADDING } = require('./constants')
 
 let storageContract
 let listenerContract
@@ -86,7 +87,7 @@ describe('integration tests', () => {
           await emitListenToContractEvent(demoSmartContractJson1.address),
           await emitListenToContractEvent(demoSmartContractJson2.address)
         ])
-        await mineBlocks(20)
+        await mineBlocks(BLOCK_PADDING + 1)
         await sleep(1000)
 
         const smartContractToPoll = await SmartContractToPoll.findOne({
@@ -104,7 +105,7 @@ describe('integration tests', () => {
         expect(secondSmartContractToPoll.sizeOfPinnedData).toBe(0)
         expect(secondSmartContractToPoll.lastPolledBlock).toBeGreaterThan(0)
         await listenerUnsubscribe(demoSmartContractJson1.address)
-        await mineBlocks(20)
+        await mineBlocks(BLOCK_PADDING + 1)
         await sleep(1000)
 
         const removedSmartContractToPoll = await SmartContractToPoll.findOne({
@@ -140,7 +141,7 @@ describe('integration tests', () => {
         time: new Date()
       })
       await emitPinHashEvent(testKey, hash.toBaseEncodedString())
-      await mineBlocks(20)
+      await mineBlocks(BLOCK_PADDING + 1)
       await sleep(500)
 
       const removedPinFile = await Pin.findOne({

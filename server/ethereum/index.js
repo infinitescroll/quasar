@@ -6,7 +6,8 @@ const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   CONTRACT_POLL_INTERVAL,
-  LISTENER_CONTRACT_ADDRESS
+  LISTENER_CONTRACT_ADDRESS,
+  BLOCK_PADDING
 } = require('../constants')
 
 require('dotenv').config()
@@ -44,7 +45,7 @@ const handleListenEvent = async ({ event, returnValues }) => {
 
 const registerPinWatcher = () =>
   new Scheduler(async () => {
-    const latestBlock = (await web3.eth.getBlockNumber()) - 15
+    const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
     const contractsToPoll = await SmartContractToPoll.find({})
     await Promise.all(
       contractsToPoll.map(async contract => {
@@ -74,7 +75,7 @@ const registerListenWatcher = () => {
   })
 
   return new Scheduler(async () => {
-    const latestBlock = (await web3.eth.getBlockNumber()) - 15
+    const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
     const contractsToPoll = await ListenerContractToPoll.find({})
     await Promise.all(
       contractsToPoll.map(async contract => {
