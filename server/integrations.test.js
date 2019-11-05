@@ -12,7 +12,7 @@ const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
 const { app, autoCleanDB } = require('./index')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-const mineBlocks = require('../utils/mineBlock')(web3)
+const mineBlocks = require('../utils/mineBlocks')(web3)
 const sleep = require('../utils/sleep')
 const { BLOCK_PADDING } = require('./constants')
 

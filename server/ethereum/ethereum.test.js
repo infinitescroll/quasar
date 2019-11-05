@@ -16,7 +16,7 @@ const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-const mineBlocks = require('../../utils/mineBlock')(web3)
+const mineBlocks = require('../../utils/mineBlocks')(web3)
 const sleep = require('../../utils/sleep')
 
 beforeAll(async done => {

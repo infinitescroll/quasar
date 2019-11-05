@@ -5,7 +5,7 @@ const chalk = require('chalk')
 const log = console.log
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-const mineBlock = require('../utils/mineBlock')(web3)
+const mineBlock = require('../utils/mineBlocks')(web3)
 const { BLOCK_PADDING } = require('../server/constants')
 
 const startGanache = () =>
