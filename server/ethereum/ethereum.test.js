@@ -57,7 +57,7 @@ describe('unit tests', () => {
       })
 
       await mineBlocks(1)
-      await sleep(500)
+      await sleep(1000)
 
       const updatedContract = await ListenerContractToPoll.findById(
         listenerContract._id
@@ -91,7 +91,7 @@ describe('unit tests', () => {
       })
 
       await mineBlocks(1)
-      await sleep(500)
+      await sleep(1000)
 
       const updatedFirstContractInDB = await SmartContractToPoll.findById(
         firstContractToPoll._id
