@@ -140,7 +140,7 @@ describe('integration tests', () => {
         listenWatcher.stop()
         server.close(done)
       })
-    })
+    }, 7500)
   })
 
   test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
