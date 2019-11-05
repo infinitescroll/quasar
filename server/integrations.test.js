@@ -184,23 +184,23 @@ describe('integration tests', () => {
       const dag = await node.dag.get(dagRequest.res.text)
       expect(dag.value).toStrictEqual(dagVal)
 
-      setTimeout(async () => {
-        const removedPinnedDag = await Pin.findOne({
-          cid: dagRequest.res.text
-        })
-        expect(removedPinnedDag).toBeNull()
+      await sleep(1000)
 
-        const pins = await node.pin.ls()
-        const removedPinnedDagOnNode = pins.find(item => {
-          return item.hash === dagRequest.res.text
-        })
-        expect(removedPinnedDagOnNode).toBe(undefined)
+      const removedPinnedDag = await Pin.findOne({
+        cid: dagRequest.res.text
+      })
+      expect(removedPinnedDag).toBeNull()
 
-        scheduler.stop()
-        pinWatcher.stop()
-        listenWatcher.stop()
-        server.close(done)
-      }, 4000)
+      const pins = await node.pin.ls()
+      const removedPinnedDagOnNode = pins.find(item => {
+        return item.hash === dagRequest.res.text
+      })
+      expect(removedPinnedDagOnNode).toBe(undefined)
+
+      scheduler.stop()
+      pinWatcher.stop()
+      listenWatcher.stop()
+      server.close(done)
     })
   })
 
