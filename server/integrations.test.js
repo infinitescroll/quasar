@@ -10,7 +10,7 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app, autoCleanDB } = require('./index')
+const { app, autoCleanDB, registerEventListeners } = require('./index')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlocks = require('../utils/mineBlocks')(web3)
 const sleep = require('../utils/sleep')
@@ -18,6 +18,9 @@ const { BLOCK_PADDING } = require('./constants')
 
 let storageContract
 let listenerContract
+
+let pinWatcher
+let listenWatcher
 
 const listenerUnsubscribe = contractAddress =>
   new Promise((resolve, reject) => {
@@ -31,22 +34,28 @@ const listenerUnsubscribe = contractAddress =>
 
 const emitListenToContractEvent = contractAddress =>
   new Promise((resolve, reject) => {
-    listenerContract.methods
-      .listenToContract(contractAddress)
-      .send({ from: accounts[0] }, async err => {
+    listenerContract.methods.listenToContract(contractAddress).send(
+      {
+        from: accounts[0]
+      },
+      async err => {
         if (err) reject(err)
         resolve()
-      })
+      }
+    )
   })
 
 const emitPinHashEvent = (key, hash) =>
   new Promise((resolve, reject) => {
-    storageContract.methods
-      .registerData(key, hash)
-      .send({ from: accounts[0] }, async err => {
+    storageContract.methods.registerData(key, hash).send(
+      {
+        from: accounts[0]
+      },
+      async err => {
         if (err) reject(err)
         resolve()
-      })
+      }
+    )
   })
 
 beforeAll(async done => {
@@ -68,6 +77,9 @@ beforeAll(async done => {
 })
 
 beforeEach(async () => {
+  const listeners = registerEventListeners()
+  pinWatcher = listeners.pinWatcher
+  listenWatcher = listeners.listenWatcher
   await ListenerContractToPoll.create({
     address: demoListenerContractJson.address,
     lastPolledBlock: 0
@@ -120,15 +132,19 @@ describe('integration tests', () => {
         expect(nonRemovedSmartContractToPoll.address).toBe(
           demoSmartContractJson2.address
         )
+        pinWatcher.stop()
+        listenWatcher.stop()
         server.close(done)
       })
     })
   })
 
   test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
-    const server = app.listen('9092', async () => {
+    const server = app.listen('9091', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
+      await mineBlocks(BLOCK_PADDING + 1)
+      await sleep(500)
 
       const testKey = web3.utils.fromAscii('testKey')
       const dag = { testKey: 'testVal' }
@@ -149,6 +165,8 @@ describe('integration tests', () => {
       })
 
       expect(removedPinFile).toBe(null)
+      pinWatcher.stop()
+      listenWatcher.stop()
       server.close(done)
     })
   })
@@ -179,8 +197,42 @@ describe('integration tests', () => {
         expect(removedPinnedDagOnNode).toBe(undefined)
 
         scheduler.stop()
+        pinWatcher.stop()
+        listenWatcher.stop()
         server.close(done)
       }, 4000)
+    })
+  })
+
+  test(`events within BLOCK_PADDING should be ignored`, async done => {
+    const server = app.listen('9091', async () => {
+      // set up smart contract
+      await emitListenToContractEvent(demoSmartContractJson1.address)
+      await mineBlocks(BLOCK_PADDING + 1)
+      await sleep(500)
+
+      const testKey = web3.utils.fromAscii('testKey1')
+      const dag = { testKey: 'testVal1' }
+      const hash = await node.dag.put(dag)
+
+      await Pin.create({
+        size: 100,
+        cid: hash.toBaseEncodedString(),
+        time: new Date()
+      })
+
+      await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+      await mineBlocks(1)
+      await sleep(500)
+
+      const optimisticallyPinnedFile = await Pin.findOne({
+        cid: hash.toBaseEncodedString()
+      })
+
+      expect(optimisticallyPinnedFile).toBeTruthy()
+      pinWatcher.stop()
+      listenWatcher.stop()
+      server.close(done)
     })
   })
 })

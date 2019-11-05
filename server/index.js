@@ -15,9 +15,6 @@ if (!process.env['NODE_ENV']) {
 }
 
 const createApp = async () => {
-  registerListenWatcher()
-  registerPinWatcher()
-
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
@@ -48,6 +45,12 @@ const createApp = async () => {
   })
 }
 
+const registerEventListeners = () => {
+  const listenWatcher = registerListenWatcher()
+  const pinWatcher = registerPinWatcher()
+  return { listenWatcher, pinWatcher }
+}
+
 const startListening = async () => {
   await createApp()
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
@@ -66,8 +69,9 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
-    await startListening()
+    registerEventListeners()
     autoCleanDB()
+    await startListening()
   })
 }
 
@@ -81,4 +85,10 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, autoCleanDB, app }
+module.exports = {
+  bootApp,
+  startListening,
+  autoCleanDB,
+  app,
+  registerEventListeners
+}

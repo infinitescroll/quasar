@@ -34,13 +34,13 @@ beforeEach(async () => {
 describe('unit tests', () => {
   describe('registerListenWatcher', () => {
     test('registerListenWatcher returns an instance of the scheduler', () => {
-      const listenerWatcher = registerListenWatcher(() => {})
+      const listenerWatcher = registerListenWatcher()
       listenerWatcher.stop()
       expect(listenerWatcher instanceof Scheduler).toBe(true)
     })
 
     test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
-      registerListenWatcher()
+      const listenWatcher = registerListenWatcher()
       const listenerContract = await ListenerContractToPoll.create({
         address: demoListenerContractJson.address,
         lastPolledBlock: 0
@@ -54,19 +54,20 @@ describe('unit tests', () => {
       )
 
       expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
+      listenWatcher.stop()
       done()
     })
   })
 
   describe('registerPinWatcher', () => {
     test('registerPinWatcher returns an instance of the scheduler', () => {
-      const pinWatcher = registerPinWatcher(() => {})
+      const pinWatcher = registerPinWatcher()
       pinWatcher.stop()
       expect(pinWatcher instanceof Scheduler).toBe(true)
     })
 
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
-      registerPinWatcher()
+      const pinWatcher = registerPinWatcher()
       const firstContractToPoll = await SmartContractToPoll.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
@@ -90,6 +91,7 @@ describe('unit tests', () => {
       )
       expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
       expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
+      pinWatcher.stop()
       done()
     })
   })
