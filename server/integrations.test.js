@@ -31,8 +31,8 @@ const listenerUnsubscribe = contractAddress =>
   new Promise((resolve, reject) => {
     listenerContract.methods
       .unsubscribeContract(contractAddress)
-      .send({ from: accounts[0] }, async err => {
-        if (err) reject(err)
+      .send({ from: accounts[0] }, err => {
+        if (err) return reject(err)
         resolve()
       })
   })
@@ -43,8 +43,8 @@ const emitListenToContractEvent = contractAddress =>
       {
         from: accounts[0]
       },
-      async err => {
-        if (err) reject(err)
+      err => {
+        if (err) return reject(err)
         resolve()
       }
     )
@@ -56,8 +56,8 @@ const emitPinHashEvent = (key, hash) =>
       {
         from: accounts[0]
       },
-      async err => {
-        if (err) reject(err)
+      err => {
+        if (err) return reject(err)
         resolve()
       }
     )
@@ -140,10 +140,10 @@ describe('integration tests', () => {
         listenWatcher.stop()
         server.close(done)
       })
-    }, 7500)
+    })
   })
 
-  test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
+  test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, done => {
     const server = app.listen('9091', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
