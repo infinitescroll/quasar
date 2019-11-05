@@ -48,7 +48,7 @@ describe('dag endpoints', () => {
     const match = pins.find(item => item.hash === hash)
     expect(match).toBeDefined()
     done()
-  })
+  }, 10000)
 
   test('POST dag should store pin in database for garbage collection', async done => {
     const dag = { test: '789' }
