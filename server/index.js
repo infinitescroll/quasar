@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
+const Scheduler = require('./scheduler')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -52,11 +53,10 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-const autoCleanDB = async () => {
-  await Pin.findandRemoveOldPins()
-  setInterval(async () => {
-    await Pin.findandRemoveOldPins()
-  }, 1209600000)
+const autoCleanDB = async (ttl, interval = 1209600000) => {
+  return new Scheduler(async () => {
+    await Pin.findandRemoveOldPins(ttl)
+  }, interval)
 }
 
 const bootApp = () => {
@@ -67,9 +67,8 @@ const bootApp = () => {
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
     await startListening()
+    autoCleanDB()
   })
-
-  autoCleanDB()
 }
 
 // This evaluates as true when this file is run directly from the command line,
@@ -82,4 +81,4 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, app }
+module.exports = { bootApp, startListening, autoCleanDB, app }
