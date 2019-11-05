@@ -41,6 +41,12 @@ describe('unit tests', () => {
       expect(listenerWatcher instanceof Scheduler).toBe(true)
     })
 
+    test('registerListenWatcher does not return an instance of the scheduler when no address is passed', () => {
+      const listenerWatcher = registerListenWatcher()
+      listenerWatcher.stop()
+      expect(listenerWatcher instanceof Scheduler).toBe(false)
+    })
+
     test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
       const listenWatcher = registerListenWatcher(
         demoListenerContractJson.address
