@@ -145,5 +145,7 @@ LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
 
 ## Testing
 
+set `NODE_ENV` to 'test'
+<br />
 `npm run test` and `npm run test:watch` do what you'd expect
 `docker-compose -f docker-compose.test.yml up` runs all tests besides integrations within a docker container (docker is always deployed to rinkeby or mainnet so it is hard to test chain integrations)

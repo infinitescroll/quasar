@@ -1,4 +1,3 @@
-const listenerJSON = require('../build/contracts/Listener.json')
 const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const STORAGE_CONTRACT_ABI = [
@@ -165,9 +164,13 @@ const LISTENER_CONTRACT_ABI = [
     type: 'function'
   }
 ]
-const LISTENER_CONTRACT_ADDRESS =
-  process.env.LISTENER_CONTRACT_ADDRESS || listenerJSON.networks['123'].address
+const LISTENER_CONTRACT_ADDRESS = process.env.LISTENER_CONTRACT_ADDRESS
+
+let docker_log = () => {}
+if (process.env.NODE_ENV !== 'test') docker_log = console.log
+
 module.exports = {
+  docker_log,
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,

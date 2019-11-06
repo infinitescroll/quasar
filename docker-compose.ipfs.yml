@@ -42,6 +42,7 @@ services:
       IPFS_NODE_HOST: ipfs
       IPFS_NODE_PORT: 5001
       DB_URL: mongodb://mongo:27017/test
+      NODE_ENV: production
 
 volumes:
   dbdata:
