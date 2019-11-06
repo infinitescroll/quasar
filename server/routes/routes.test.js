@@ -126,6 +126,21 @@ describe('dag endpoints', () => {
 
     done()
   })
+
+  test('GET /ipfs-provider should return information about the ipfs provider quasar is connected to', () => {
+    return request(app)
+      .get('/api/v0/ipfs-provider')
+      .expect(200)
+      .expect(res => {
+        // res.json() dne on supertest response obj
+        const jsonResponse = JSON.parse(res.text)
+        expect(jsonResponse.alias).toBeDefined()
+        expect(jsonResponse.host).toBeDefined()
+        expect(jsonResponse.protocol).toBeDefined()
+        expect(jsonResponse.port).toBeDefined()
+        expect(Object.keys(jsonResponse).length).toBe(4)
+      })
+  })
 })
 
 /*
