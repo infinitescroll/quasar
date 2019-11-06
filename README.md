@@ -103,6 +103,8 @@ This assumes you have a docker instance with ssh access already running. [Digita
 - `BLOCKCHAIN_NETWORK` (rinkeby, mainnet, etc)
 - `BLOCKCHAIN_PROVIDER_HTTP_URL`,
 - `MNEMONIC` (you're seed phrase)
+- `MONGO_INITDB_ROOT_USERNAME`
+- `MONGO_INITDB_ROOT_PASSWORD`
   <br /><br /> If you are using an external ipfs provider, include:
 - `IPFS_NODE_HOST`
 - `IPFS_NODE_PROTOCOL` (if not using ipfs default)
@@ -111,7 +113,7 @@ This assumes you have a docker instance with ssh access already running. [Digita
 - `IPFS_API_PATH` (if not using ipfs default)
 
 3. make sure docker is running `systemctl start docker`
-4. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
+4. run `docker-compose up -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up -d` (runs and uses local ipfs node)
 
 #### demo `.env` file (in root folder):
 
@@ -123,6 +125,10 @@ IPFS_NODE_PROTOCOL=https
 IPFS_AUTH=Basic [auth_key_here]
 IPFS_NODE_PORT=5001
 IPFS_API_PATH=/ipfs/api/v0/
+
+# mongodb auth
+MONGO_INITDB_ROOT_USERNAME=<username>
+MONGO_INITDB_ROOT_PASSWORD=<password>
 
 # polling interval variables (all optional)
 DB_POLL_INTERVAL=86400000 # 1 day

@@ -14,6 +14,10 @@ services:
     image: mongo
     hostname: mongo
     restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - dbdata:/data/db
     expose:
@@ -41,7 +45,7 @@ services:
       WAIT_HOSTS: mongo:27017, ipfs:5001
       IPFS_NODE_HOST: ipfs
       IPFS_NODE_PORT: 5001
-      DB_URL: mongodb://mongo:27017/test
+      DB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/quasar?authSource=admin
       NODE_ENV: production
 
 volumes:
