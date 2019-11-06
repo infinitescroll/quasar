@@ -62,3 +62,12 @@ router.get('/ipfs-provider', (_, res) => {
     protocol: process.env.IPFS_NODE_PROTOCOL || 'http'
   })
 })
+
+router.get('/contracts', async (_, res) => {
+  try {
+    const contracts = await SmartContractToPoll.find()
+    res.status(200).send(contracts)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})

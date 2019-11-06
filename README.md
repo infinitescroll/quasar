@@ -22,33 +22,6 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 4. Quasar queries IPFS for data associated with the hash.
 5. Quasar pins data on IPFS.
 
-## Dev setup
-
-Note: this is a WIP. We'll eventually have step by step instructions on self-hosting here.
-[ requires node 12 or higher ]
-
-example `.env` file (in root folder):
-
-```
-# all of these are optional - quasar defaults to local ipfs node if not set
-# variables for setting up ipfs connection
-IPFS_NODE_HOST=ipfs.autark.xyz
-IPFS_NODE_PROTOCOL=https
-IPFS_AUTH=your_auth_here
-IPFS_NODE_PORT=5001
-IPFS_API_PATH=/ipfs/api/v0/
-
-# intervals for polling contracts (in ms)
-# change to something way higher for production
-DB_POLL_INTERVAL=100
-CONTRACT_POLL_INTERVAL=100
-```
-
-`npm run prepare:local:dev` boots up test chain, compiles & migrates contracts, and starts an IPFS daemon locally with js-ipfs.
-<br />
-
-`npm run start:dev` starts the node server.
-
 ## Architecture
 
 The two central pieces to this system are the smart contracts and the event listening server.
@@ -64,3 +37,57 @@ This event listening server is a Node app that connects to the Ethereum blockcha
 In general, here’s what’s happening—the server is constantly listening to events on the Ethereum blockchain. Upon hearing `PinHash` events, it decodes the events logs, and attempts to pin that data.
 
 ![](https://miro.medium.com/max/2880/1*nxldVNAwwSPRUBqPyEyE7A.png)
+
+## Deployment [with docker]
+
+1. run `git clone http://github.com/openworklabs/quasar`
+2. Add `.env` file in project root and make sure you include:
+
+- `DB_POLL_INTERVAL` (number of ms)
+- `CONTRACT_POLL_INTERVAL` (number of ms)
+- `BLOCKCHAIN_NETWORK` (rinkeby, mainnet, etc)
+- `BLOCKCHAIN_PROVIDER_HTTP_URL`,
+- `MNEMONIC` (you're seed phrase)
+  <br /><br /> If you are using an external ipfs provider, include:
+- `IPFS_NODE_HOST`
+- `IPFS_NODE_PROTOCOL` (if not using ipfs default)
+- `IPFS_NODE_PORT`
+- `IPFS_AUTH` (if there's auth)
+- `IPFS_API_PATH` (if not using ipfs default)
+- `BLOCK_PADDING` (buffer of eth blocks ignored from HEAD)
+
+3. run `docker-compose up --build -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up --build -d` (runs and uses local ipfs node)
+
+#### demo `.env` file (in root folder):
+
+```
+# variables for setting up ipfs connection
+# these are all optional - quasar defaults to local ipfs node if not set
+IPFS_NODE_HOST=ipfs.autark.xyz
+IPFS_NODE_PROTOCOL=https
+IPFS_AUTH=Basic [auth_key_here]
+IPFS_NODE_PORT=5001
+IPFS_API_PATH=/ipfs/api/v0/
+
+# polling interval variables (both optional)
+DB_POLL_INTERVAL=604800000 # 1 week
+CONTRACT_POLL_INTERVAL=1800000 # 30 min
+
+# blockchain variables - if using Docker all REQUIRED
+BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/9c2e43c9asdfadfad34ysdafcc3d52
+MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball bernie twentytwenty
+BLOCKCHAIN_NETWORK=rinkeby
+LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
+```
+
+## Dev setup
+
+`npm run prepare:local:dev` boots up test chain, compiles & migrates contracts, and starts an IPFS daemon locally with js-ipfs.
+<br />
+
+`npm run start:dev` starts the node server.
+
+## Testing
+
+`npm run test` and `npm run test:watch` do what you'd expect
+`docker-compose -f docker-compose.test.yml up` runs all tests besides integrations within a docker container (docker is always deployed to rinkeby or mainnet so it is hard to test chain integrations)
