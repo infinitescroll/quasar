@@ -3,6 +3,10 @@ const ipfs = require('../ipfs')
 var sizeof = require('object-sizeof')
 const multer = require('multer')
 const { Pin, SmartContractToPoll } = require('../db')
+const {
+  BASE_IPFS_GATEWAY_URL,
+  DAG_GET_IPFS_GATEWAY_URL
+} = require('../constants')
 const upload = multer()
 module.exports = router
 
@@ -56,10 +60,8 @@ router.post('/contracts', async (req, res) => {
 
 router.get('/ipfs-provider', (_, res) => {
   return res.status(200).send({
-    alias: process.env.ALIAS || 'aragon_association',
-    host: process.env.IPFS_NODE_HOST || 'localhost',
-    port: process.env.IPFS_NODE_PORT || '5002',
-    protocol: process.env.IPFS_NODE_PROTOCOL || 'http'
+    baseUrl: BASE_IPFS_GATEWAY_URL,
+    dagGetUrl: DAG_GET_IPFS_GATEWAY_URL
   })
 })
 

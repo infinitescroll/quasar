@@ -1,6 +1,22 @@
 const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
+
+const ipfsProviderBaseUrls = {
+  pinata: 'https://gateway.pinata.cloud/api/v0/',
+  infura: 'https://ipfs.infura.io:5001/api/v0/',
+  aragon_association: 'https://aragon-1.pinata.cloud:443/ipfs/api/v0'
+}
+const alias = process.env.ALIAS || 'aragon_association'
+const BASE_IPFS_GATEWAY_URL = ipfsProviderBaseUrls[alias]
+
+const ipfsProviderDagGetUrls = {
+  pinata: 'object/get?arg=/ipfs/',
+  infura: 'dag/get?arg=',
+  aragon_association: '/dag/get?arg='
+}
+const DAG_GET_IPFS_GATEWAY_URL = ipfsProviderDagGetUrls[alias]
+
 const STORAGE_CONTRACT_ABI = [
   {
     anonymous: false,
@@ -173,5 +189,7 @@ module.exports = {
   DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL,
   LISTENER_CONTRACT_ADDRESS,
-  BLOCK_PADDING
+  BLOCK_PADDING,
+  BASE_IPFS_GATEWAY_URL,
+  DAG_GET_IPFS_GATEWAY_URL
 }
