@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-// const request = require('supertest')
+const request = require('supertest')
 const Web3 = require('web3')
 const { node } = require('./ipfs')
 const {
@@ -10,44 +10,57 @@ const {
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
 const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
-const { app } = require('./index')
+const {
+  app,
+  autoCleanDB,
+  registerListenWatcher,
+  registerPinWatcher
+} = require('./index')
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const mineBlocks = require('../utils/mineBlocks')(web3)
+const sleep = require('../utils/sleep')
+const { BLOCK_PADDING } = require('./constants')
 
-let web3
 let storageContract
 let listenerContract
+
+let pinWatcher
+let listenWatcher
 
 const listenerUnsubscribe = contractAddress =>
   new Promise((resolve, reject) => {
     listenerContract.methods
       .unsubscribeContract(contractAddress)
       .send({ from: accounts[0] }, err => {
-        if (err) reject(err)
-        setTimeout(() => {
-          resolve()
-        }, 1000)
+        if (err) return reject(err)
+        resolve()
       })
   })
 
 const emitListenToContractEvent = contractAddress =>
-  new Promise(resolve => {
-    listenerContract.methods
-      .listenToContract(contractAddress)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          resolve()
-        }, 1000)
-      })
+  new Promise((resolve, reject) => {
+    listenerContract.methods.listenToContract(contractAddress).send(
+      {
+        from: accounts[0]
+      },
+      err => {
+        if (err) return reject(err)
+        resolve()
+      }
+    )
   })
 
 const emitPinHashEvent = (key, hash) =>
-  new Promise(resolve => {
-    storageContract.methods
-      .registerData(key, hash)
-      .send({ from: accounts[0] }, () => {
-        setTimeout(() => {
-          resolve()
-        }, 1000)
-      })
+  new Promise((resolve, reject) => {
+    storageContract.methods.registerData(key, hash).send(
+      {
+        from: accounts[0]
+      },
+      err => {
+        if (err) return reject(err)
+        resolve()
+      }
+    )
   })
 
 beforeAll(async done => {
@@ -55,7 +68,6 @@ beforeAll(async done => {
     useNewUrlParser: true
   })
   mongoose.connection.db.dropDatabase()
-  web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
   storageContract = new web3.eth.Contract(
     demoSmartContractJson1.abi,
     demoSmartContractJson1.address
@@ -70,6 +82,8 @@ beforeAll(async done => {
 })
 
 beforeEach(async () => {
+  pinWatcher = registerPinWatcher()
+  listenWatcher = registerListenWatcher(listenerJSON.networks['123'].address)
   await ListenerContractToPoll.create({
     address: demoListenerContractJson.address,
     lastPolledBlock: 0
@@ -83,12 +97,15 @@ afterEach(async () => {
 
 describe('integration tests', () => {
   describe('polling mechanisms', () => {
-    test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', async done => {
+    test('firing listen event adds contract to db and begins polling, unsubscribing removes contract from db', done => {
       const server = app.listen('9091', async () => {
         await Promise.all([
           await emitListenToContractEvent(demoSmartContractJson1.address),
           await emitListenToContractEvent(demoSmartContractJson2.address)
         ])
+        await mineBlocks(BLOCK_PADDING + 1)
+        await sleep(1000)
+
         const smartContractToPoll = await SmartContractToPoll.findOne({
           address: demoSmartContractJson1.address
         })
@@ -104,6 +121,8 @@ describe('integration tests', () => {
         expect(secondSmartContractToPoll.sizeOfPinnedData).toBe(0)
         expect(secondSmartContractToPoll.lastPolledBlock).toBeGreaterThan(0)
         await listenerUnsubscribe(demoSmartContractJson1.address)
+        await mineBlocks(BLOCK_PADDING + 1)
+        await sleep(1000)
 
         const removedSmartContractToPoll = await SmartContractToPoll.findOne({
           address: demoSmartContractJson1.address
@@ -117,15 +136,19 @@ describe('integration tests', () => {
         expect(nonRemovedSmartContractToPoll.address).toBe(
           demoSmartContractJson2.address
         )
+        pinWatcher.stop()
+        listenWatcher.stop()
         server.close(done)
       })
-    })
+    }, 10000)
   })
 
-  test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, async done => {
+  test(`emitting listen event to listener contract, then emittting pinHash event to storage contract, removes associated document from database`, done => {
     const server = app.listen('9092', async () => {
       // set up smart contract
       await emitListenToContractEvent(demoSmartContractJson1.address)
+      await mineBlocks(BLOCK_PADDING + 1)
+      await sleep(500)
 
       const testKey = web3.utils.fromAscii('testKey')
       const dag = { testKey: 'testVal' }
@@ -138,12 +161,82 @@ describe('integration tests', () => {
         time: new Date()
       })
       await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+      await mineBlocks(BLOCK_PADDING + 1)
+      await sleep(500)
+
       const removedPinFile = await Pin.findOne({
         cid: hash.toBaseEncodedString()
       })
 
       expect(removedPinFile).toBe(null)
+      pinWatcher.stop()
+      listenWatcher.stop()
       server.close(done)
     })
-  })
+  }, 10000)
+
+  test(`registerOldPinRemover removes old pins`, done => {
+    const server = app.listen('9093', async () => {
+      const scheduler = await autoCleanDB(0, 500)
+      const dagVal = { test: '12345' }
+      const dagRequest = await request(app)
+        .post('/api/v0/dag/put')
+        .send(dagVal)
+
+      expect(dagRequest.res.statusCode).toBe(201)
+
+      const dag = await node.dag.get(dagRequest.res.text)
+      expect(dag.value).toStrictEqual(dagVal)
+
+      await sleep(1000)
+
+      const removedPinnedDag = await Pin.findOne({
+        cid: dagRequest.res.text
+      })
+      expect(removedPinnedDag).toBeNull()
+
+      const pins = await node.pin.ls()
+      const removedPinnedDagOnNode = pins.find(item => {
+        return item.hash === dagRequest.res.text
+      })
+      expect(removedPinnedDagOnNode).toBe(undefined)
+
+      scheduler.stop()
+      pinWatcher.stop()
+      listenWatcher.stop()
+      server.close(done)
+    })
+  }, 10000)
+
+  test(`events within BLOCK_PADDING should be ignored`, done => {
+    const server = app.listen('9094', async () => {
+      // set up smart contract
+      await emitListenToContractEvent(demoSmartContractJson1.address)
+      await mineBlocks(BLOCK_PADDING + 1)
+      await sleep(500)
+
+      const testKey = web3.utils.fromAscii('testKey1')
+      const dag = { testKey: 'testVal1' }
+      const hash = await node.dag.put(dag)
+
+      await Pin.create({
+        size: 100,
+        cid: hash.toBaseEncodedString(),
+        time: new Date()
+      })
+
+      await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+      await mineBlocks(1)
+      await sleep(500)
+
+      const optimisticallyPinnedFile = await Pin.findOne({
+        cid: hash.toBaseEncodedString()
+      })
+
+      expect(optimisticallyPinnedFile).toBeTruthy()
+      pinWatcher.stop()
+      listenWatcher.stop()
+      server.close(done)
+    })
+  }, 10000)
 })

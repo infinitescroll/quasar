@@ -111,6 +111,7 @@ This assumes you have a docker instance with ssh access already running. [Digita
 - `IPFS_NODE_PORT`
 - `IPFS_AUTH` (if there's auth)
 - `IPFS_API_PATH` (if not using ipfs default)
+- `BLOCK_PADDING` (buffer of eth blocks ignored from HEAD)
 
 3. make sure docker is running `systemctl start docker`
 4. run `docker-compose up -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up -d` (runs and uses local ipfs node)
