@@ -3,7 +3,7 @@ const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
 
 const ipfsProviderBaseUrls = {
-  pinata: 'https://gateway.pinata.cloud/api/v0/',
+  // pinata: 'https://gateway.pinata.cloud/api/v0/',
   infura: 'https://ipfs.infura.io:5001/api/v0/',
   aragon_association: 'https://aragon-1.pinata.cloud:443/ipfs/api/v0'
 }
@@ -11,7 +11,7 @@ const alias = process.env.ALIAS || 'aragon_association'
 const BASE_IPFS_GATEWAY_URL = ipfsProviderBaseUrls[alias]
 
 const ipfsProviderDagGetUrls = {
-  pinata: 'object/get?arg=/ipfs/',
+  // pinata: 'object/get?arg=/ipfs/',
   infura: 'dag/get?arg=',
   aragon_association: '/dag/get?arg='
 }
