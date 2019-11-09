@@ -105,18 +105,18 @@ This assumes you have a docker instance with ssh access already running. [Digita
 #### Demo `.env` file (in root folder):
 
 ```
-# These ipfs variables are optional - Quasar defaults to local ipfs node values.
+# IPFS variables are optional - Quasar defaults to local IPFS node values
 IPFS_NODE_HOST=ipfs.autark.xyz
 IPFS_NODE_PROTOCOL=https
 IPFS_AUTH=Basic [auth_key_here]
 IPFS_NODE_PORT=5001
 IPFS_API_PATH=/ipfs/api/v0/
 
-# mongodb auth
+# MongoDB auth — REQUIRED
 MONGO_INITDB_ROOT_USERNAME=<username>
 MONGO_INITDB_ROOT_PASSWORD=<password>
 
-# polling interval variables (all optional)
+# Polling interval variables — all optional
 DB_POLL_INTERVAL=86400000 # 1 day
 CONTRACT_POLL_INTERVAL=1800000 # 30 min
 TTL=14 # How many days pins will remain before confirmed
