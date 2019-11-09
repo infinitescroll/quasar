@@ -41,9 +41,9 @@ This approach allows DAOs to store their pinning permissions in smart contracts,
 ## Example usage:
 
 ```javascript
-const quasarUrl = 'http://quasar.yourdomain.com' // wherever you are hosting the server
+const quasarUrl = 'http://quasar.yourdomain.com' // Wherever you are hosting the server.
 
-// tell quasar to listen for pin events from a smart contract at contractAddress
+// Tell quasar to listen for pin events from a smart contract at contractAddress.
 async function addStorageContract(contractAddress) {
   return await fetch(`${quasarUrl}/api/v0/contracts`, {
     method: 'POST',
@@ -54,7 +54,7 @@ async function addStorageContract(contractAddress) {
   })
 }
 
-// get a list of storage contracts that quasar is listening to for pin events
+// Get a list of storage contracts that quasar is listening to for pin events.
 async function getStorageContracts() {
   const response = await fetch(`${quasarUrl}/api/v0/contracts`, {
     method: 'GET'
@@ -62,9 +62,9 @@ async function getStorageContracts() {
   return await response.json()
 }
 
-// quasar optimistically pins your dag, then returns a hash for you to pass to a storage contract
-// if the storage contract is registered with quasar, the pin is confirmed
-// if the pin is never confirmed, quasar removes it after a week
+// Quasar optimistically pins your dag then returns a hash for you to pass to a storage contract.
+// If the storage contract is registered with quasar, the pin is confirmed.
+// If the pin is never confirmed, quasar removes it after days defined in TTL envirionment variable.
 async function dagPut(dag) {
   const response = await fetch(`${quasarUrl}/api/v0/dag/put`, {
     method: 'POST',
@@ -78,7 +78,7 @@ async function dagPut(dag) {
   return hash
 }
 
-// same as above, but files instead of dags
+// Same as above, but files instead of dags.
 async function addFile(file) {
   const response = await fetch(`${quasarUrl}/api/v0/files/add`, {
     method: 'POST',
@@ -95,32 +95,17 @@ async function addFile(file) {
 
 ## Deployment [with docker]
 
-This assumes you have a docker instance with ssh access already running. [Digital Ocean](https://marketplace.digitalocean.com/apps/docker) provides a one-click Ubuntu-docker setup, and there are plenty of [tutorials](https://www.linux.com/tutorials/how-install-and-use-docker-linux/) to get you start if you want to _really_ self-host.
+This assumes you have a docker instance with ssh access already running. [Digital Ocean](https://marketplace.digitalocean.com/apps/docker) provides a one-click Ubuntu-docker setup, and there are plenty of [tutorials](https://www.linux.com/tutorials/how-install-and-use-docker-linux/) to get you started if you want to _really_ self-host.
 
-1. run `git clone http://github.com/openworklabs/quasar`
-2. Add `.env` file in project root and make sure you include:
+1. Run `git clone http://github.com/openworklabs/quasar`.
+2. Add `.env` file in project root (see example below).
+3. Make sure docker is running `systemctl start docker`.
+4. Run `docker-compose up -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up -d` (with local ipfs node).
 
-- `BLOCKCHAIN_NETWORK` (rinkeby, mainnet, etc)
-- `BLOCKCHAIN_PROVIDER_HTTP_URL`,
-- `MNEMONIC` (you're seed phrase)
-- `MONGO_INITDB_ROOT_USERNAME`
-- `MONGO_INITDB_ROOT_PASSWORD`
-  <br /><br /> If you are using an external ipfs provider, include:
-- `IPFS_NODE_HOST`
-- `IPFS_NODE_PROTOCOL` (if not using ipfs default)
-- `IPFS_NODE_PORT`
-- `IPFS_AUTH` (if there's auth)
-- `IPFS_API_PATH` (if not using ipfs default)
-- `BLOCK_PADDING` (buffer of eth blocks ignored from HEAD)
-
-3. make sure docker is running `systemctl start docker`
-4. run `docker-compose up -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up -d` (runs and uses local ipfs node)
-
-#### demo `.env` file (in root folder):
+#### Demo `.env` file (in root folder):
 
 ```
-# variables for setting up ipfs connection
-# these are all optional - quasar defaults to local ipfs node if not set
+# These ipfs variables are optional - Quasar defaults to local ipfs node values.
 IPFS_NODE_HOST=ipfs.autark.xyz
 IPFS_NODE_PROTOCOL=https
 IPFS_AUTH=Basic [auth_key_here]
@@ -134,10 +119,11 @@ MONGO_INITDB_ROOT_PASSWORD=<password>
 # polling interval variables (all optional)
 DB_POLL_INTERVAL=86400000 # 1 day
 CONTRACT_POLL_INTERVAL=1800000 # 30 min
-TTL=14 # how many days pins will remain before confirmed
+TTL=14 # How many days pins will remain before confirmed
+BLOCK_PADDING=20 # Buffer of eth blocks ignored from HEAD
 
-# blockchain variables - if using Docker all REQUIRED
-BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/9c2e43c9asdfadfad34ysdafcc3d52
+# Blockchain variables - REQUIRED when using Docker
+BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/<project-id>
 MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball bernie twentytwenty
 BLOCKCHAIN_NETWORK=rinkeby
 LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
@@ -152,7 +138,7 @@ LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
 
 ## Testing
 
-set `NODE_ENV` to 'test'
+Set `NODE_ENV` to 'test'.
 <br />
-`npm run test` and `npm run test:watch` do what you'd expect
-`docker-compose -f docker-compose.test.yml up` runs all tests besides integrations within a docker container (docker is always deployed to rinkeby or mainnet so it is hard to test chain integrations)
+`npm run test` and `npm run test:watch` do what you'd expect.
+`docker-compose -f docker-compose.test.yml up` runs all tests besides integrations within a docker container (Docker is always deployed to rinkeby or mainnet so it is hard to test chain integrations).
