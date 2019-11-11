@@ -2,20 +2,13 @@ const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
 
-const ipfsProviderBaseUrls = {
-  // pinata: 'https://gateway.pinata.cloud/api/v0/',
-  infura: 'https://ipfs.infura.io:5001/api/v0/',
-  aragon_association: 'https://aragon-1.pinata.cloud:443/ipfs/api/v0'
-}
-const alias = process.env.ALIAS || 'aragon_association'
-const BASE_IPFS_GATEWAY_URL = ipfsProviderBaseUrls[alias]
+const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
+const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'https'
+const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
+const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
+const BASE_IPFS_GATEWAY_URL = `${IPFS_NODE_PROTOCOL}://${IPFS_NODE_HOST}:${IPFS_NODE_PORT}${IPFS_API_PATH}`
 
-const ipfsProviderDagGetUrls = {
-  // pinata: 'object/get?arg=/ipfs/',
-  infura: 'dag/get?arg=',
-  aragon_association: '/dag/get?arg='
-}
-const DAG_GET_IPFS_GATEWAY_URL = ipfsProviderDagGetUrls[alias]
+const DAG_GET_IPFS_GATEWAY_URL = 'dag/get?arg='
 
 const STORAGE_CONTRACT_ABI = [
   {
