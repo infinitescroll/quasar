@@ -7,6 +7,7 @@ const {
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   CONTRACT_POLL_INTERVAL,
+  docker_log,
   BLOCK_PADDING
 } = require('../constants')
 
@@ -18,7 +19,7 @@ const getContract = smartContractObj => {
 }
 
 const handlePinHashEvent = event => {
-  console.log(
+  docker_log(
     `Request to pin ${event.returnValues.cid} received from contract ${event.address}`
   )
   return Pin.deleteMany({ cid: event.returnValues.cid })
@@ -26,14 +27,14 @@ const handlePinHashEvent = event => {
 
 const handleListenEvent = async ({ event, returnValues }) => {
   if (event === 'Listen') {
-    console.log(`Added contract ${returnValues.contractAddress} to listen to`)
+    docker_log(`Added contract ${returnValues.contractAddress} to listen to`)
     return SmartContractToPoll.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
     })
   } else if (event === 'StopListening') {
-    console.log(
+    docker_log(
       'No longer listening to smart contract at ',
       returnValues.contract
     )

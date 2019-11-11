@@ -167,7 +167,11 @@ const LISTENER_CONTRACT_ABI = [
 ]
 const LISTENER_CONTRACT_ADDRESS = process.env.LISTENER_CONTRACT_ADDRESS
 
+let docker_log = () => {}
+if (process.env.NODE_ENV !== 'test') docker_log = console.log
+
 module.exports = {
+  docker_log,
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,
