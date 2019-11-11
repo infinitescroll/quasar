@@ -19,8 +19,71 @@ Once your contract has been registered with Quasar, data can be saved to IPFS us
 1. Register contract with Quasar via `POST` request to `/contracts`
 2. Pin dag or file via `POST` request to `/dag/put` or `/files/add` respectively
 3. Quasar returns IPFS hash in http response, pins the file/dag, and adds the file/dag to a list to be garbage collected if no `PinHash` event is ever received.
-4. Emit `PinHash` event from contract with IPFS hash passed as a parameter.
+4. Emit `PinHash` event from contract with IPFS hash passed as a parameter
 5. Quasar hears `PinHash` event and removes dag or file from list of unconfirmed pins
+
+```
+            +---------+            +----------+       +----------------+
+            | Quasar  |            | Your     |       | Storage Smart  |
+            +---------+            | Frontend |       | Contract 'abc' |
+                  |                +----------+       +----------------+
+                  |                         |                |
+                  |   Listen to the storage |                |
+                  |   smart contract 'abc'  |                |
+                  |<------------------------|                |
+                  |                         |                |
+     /-----------------------\              |                |
+     | now polling storage   |              |                |
+     | contract 'abc'        |              |                |
+     \-----------------------/              |                |
+                  |                         |                |
+                  | Any new events?         |                |
+                  |----------------------------------------->|
+                  |                         |                |
+                  |                                  NOOOPE  |
+                  |<-----------------------------------------|
+                  |                         |                |
+                  |                         |                |
+                  |    Pin this dag or file |                |
+                  |<------------------------|                |
+                  |                         |                |
+     /-----------------------\              |                |
+     | dag or file pinned,   |              |                |
+     | awaiting confirmation |              |                |
+     \-----------------------/              |                |
+                  |                         |                |
+                  | The CID for that dag or |                |
+                  | file is 'xyz' boss      |                |
+                  |------------------------>|                |
+                  |                         |                |
+                  |                         | Confirm pin @  |
+                  |                         | the CID 'xyz'  |
+                  |                         |--------------->|
+                  |                         |                |
+                  |                         |      /----------------\
+                  |                         |      | NEW EVENT: Pin |
+                  |                         |      | the CID 'xyz'  |
+                  |                         |      \----------------/
+                  |                         |                |
+                  | Any new events?         |                |
+                  |----------------------------------------->|
+                  |                         |                |
+                  |           confirm pinning the CID 'xyz'  |
+                  |<-----------------------------------------|
+                  |                         |                |
+/----------------------------\              |                |
+| remove CID 'xyz' from list |              |                |
+| of unconfirmed pins, so it |              |                |
+| is not garbage collected   |              |                |
+\----------------------------/              |                |
+                  |                         |                |
+```
+
+1. Register contract with Quasar.
+2. Emit `PinHash` event from contract with IPFS hash passed as a parameter. User must make data associated with the hash available on the network for Quasar to retrieve.
+3. Quasar hears `PinHash` event.
+4. Quasar queries IPFS for data associated with the hash.
+5. Quasar pins data on IPFS.
 
 ## Architecture
 
