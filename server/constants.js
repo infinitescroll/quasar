@@ -8,7 +8,7 @@ const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
 const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
 
 const baseUrlConstructor = (protocol, host, port, path) =>
-  `${protocol}://${host}:${port}` + path ? `/${path}` : ''
+  `${protocol}://${host}:${port}` + (path ? `/${path}` : '')
 
 const BASE_IPFS_GATEWAY_URL = baseUrlConstructor(
   IPFS_NODE_PROTOCOL,
