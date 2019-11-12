@@ -1,6 +1,24 @@
 const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
+
+const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
+const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'https'
+const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
+const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
+
+const baseUrlConstructor = (protocol, host, port, path) =>
+  `${protocol}://${host}:${port}${path}`
+
+const BASE_IPFS_GATEWAY_URL = baseUrlConstructor(
+  IPFS_NODE_PROTOCOL,
+  IPFS_NODE_HOST,
+  IPFS_NODE_PORT,
+  IPFS_API_PATH
+)
+
+const DAG_GET_IPFS_GATEWAY_URL = 'dag/get?arg='
+
 const STORAGE_CONTRACT_ABI = [
   {
     anonymous: false,
@@ -177,5 +195,8 @@ module.exports = {
   DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL,
   LISTENER_CONTRACT_ADDRESS,
-  BLOCK_PADDING
+  BLOCK_PADDING,
+  BASE_IPFS_GATEWAY_URL,
+  DAG_GET_IPFS_GATEWAY_URL,
+  baseUrlConstructor
 }
