@@ -8,7 +8,7 @@ const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
 const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
 
 const baseUrlConstructor = (protocol, host, port, path) =>
-  `${protocol}://${host}:${port}${path}`
+  `${protocol}://${host}:${port}` + path ? `/${path}` : ''
 
 const BASE_IPFS_GATEWAY_URL = baseUrlConstructor(
   IPFS_NODE_PROTOCOL,
@@ -17,7 +17,8 @@ const BASE_IPFS_GATEWAY_URL = baseUrlConstructor(
   IPFS_API_PATH
 )
 
-const DAG_GET_IPFS_GATEWAY_URL = 'dag/get?arg='
+const DAG_GET_IPFS_ENDPOINT = 'dag/get?arg='
+const DAG_PUT_IPFS_ENDPOINT = 'dag/put'
 
 const STORAGE_CONTRACT_ABI = [
   {
@@ -197,6 +198,7 @@ module.exports = {
   LISTENER_CONTRACT_ADDRESS,
   BLOCK_PADDING,
   BASE_IPFS_GATEWAY_URL,
-  DAG_GET_IPFS_GATEWAY_URL,
+  DAG_GET_IPFS_ENDPOINT,
+  DAG_PUT_IPFS_ENDPOINT,
   baseUrlConstructor
 }
