@@ -136,7 +136,8 @@ describe('dag endpoints', () => {
         const jsonResponse = JSON.parse(res.text)
         expect(jsonResponse.baseUrl).toBeDefined()
         expect(jsonResponse.dagGetUrl).toBeDefined()
-        expect(Object.keys(jsonResponse).length).toBe(2)
+        expect(jsonResponse.dagPutUrl).toBeDefined()
+        expect(Object.keys(jsonResponse).length).toBe(3)
       })
   })
 
