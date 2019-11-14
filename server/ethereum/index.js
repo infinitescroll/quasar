@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const { ListenerContractToPoll, StorageContract, Pin } = require('../db')
+const { ListenerContract, StorageContract, Pin } = require('../db')
 const { provider } = require('./provider')
 const Scheduler = require('../scheduler')
 const emptyScheduler = require('../scheduler/emptyScheduler')
@@ -47,9 +47,9 @@ const handleListenEvent = async ({ event, returnValues }) => {
 const registerPinWatcher = () =>
   new Scheduler(async () => {
     const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
-    const contractsToPoll = await StorageContract.find({})
+    const StorageContracts = await StorageContract.find({})
     await Promise.all(
-      contractsToPoll.map(async contract => {
+      StorageContracts.map(async contract => {
         const web3Contract = new web3.eth.Contract(
           STORAGE_CONTRACT_ABI,
           contract.address
@@ -71,16 +71,16 @@ const registerPinWatcher = () =>
 
 const registerListenWatcher = address => {
   if (address) {
-    ListenerContractToPoll.create({
+    ListenerContract.create({
       address,
       lastPolledBlock: 0
     })
 
     return new Scheduler(async () => {
       const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
-      const contractsToPoll = await ListenerContractToPoll.find({})
+      const listenerContracts = await ListenerContract.find({})
       await Promise.all(
-        contractsToPoll.map(async contract => {
+        listenerContracts.map(async contract => {
           const web3Contract = new web3.eth.Contract(
             LISTENER_CONTRACT_ABI,
             contract.address

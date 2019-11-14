@@ -12,7 +12,7 @@ const {
   demoSmartContractJson1,
   demoSmartContractJson2
 } = require('../../mockData')
-const { ListenerContractToPoll, StorageContract, Pin } = require('../db')
+const { ListenerContract, StorageContract, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
@@ -51,7 +51,7 @@ describe('unit tests', () => {
       const listenWatcher = registerListenWatcher(
         demoListenerContractJson.address
       )
-      const listenerContract = await ListenerContractToPoll.create({
+      const listenerContract = await ListenerContract.create({
         address: demoListenerContractJson.address,
         lastPolledBlock: 0
       })
@@ -59,7 +59,7 @@ describe('unit tests', () => {
       await mineBlocks(1)
       await sleep(1000)
 
-      const updatedContract = await ListenerContractToPoll.findById(
+      const updatedContract = await ListenerContract.findById(
         listenerContract._id
       )
 
@@ -78,13 +78,13 @@ describe('unit tests', () => {
 
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
       const pinWatcher = registerPinWatcher()
-      const firstContractToPoll = await StorageContract.create({
+      const firstStorageContract = await StorageContract.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
 
-      const secondContractToPoll = await StorageContract.create({
+      const secondStorageContract = await StorageContract.create({
         address: demoSmartContractJson2.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
@@ -94,10 +94,10 @@ describe('unit tests', () => {
       await sleep(1000)
 
       const updatedFirstContractInDB = await StorageContract.findById(
-        firstContractToPoll._id
+        firstStorageContract._id
       )
       const updatedSecondContractInDB = await StorageContract.findById(
-        secondContractToPoll._id
+        secondStorageContract._id
       )
       expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
       expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)

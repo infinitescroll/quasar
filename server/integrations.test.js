@@ -9,7 +9,7 @@ const {
 } = require('../mockData')
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
-const { ListenerContractToPoll, StorageContract, Pin } = require('./db')
+const { ListenerContract, StorageContract, Pin } = require('./db')
 const {
   app,
   autoCleanDB,
@@ -84,14 +84,14 @@ beforeAll(async done => {
 beforeEach(async () => {
   pinWatcher = registerPinWatcher()
   listenWatcher = registerListenWatcher(listenerJSON.networks['123'].address)
-  await ListenerContractToPoll.create({
+  await ListenerContract.create({
     address: demoListenerContractJson.address,
     lastPolledBlock: 0
   })
 })
 
 afterEach(async () => {
-  await ListenerContractToPoll.deleteMany({})
+  await ListenerContract.deleteMany({})
   await StorageContract.deleteMany({})
 })
 
