@@ -3,6 +3,7 @@ const ipfs = require('../ipfs')
 var sizeof = require('object-sizeof')
 const multer = require('multer')
 const { Pin, SmartContractToPoll } = require('../db')
+const { MAX_FILE_SIZE } = require('../constants')
 const {
   BASE_IPFS_GATEWAY_URL,
   DAG_GET_IPFS_ENDPOINT,
@@ -27,6 +28,9 @@ router.post('/dag/put', async (req, res) => {
 })
 
 router.post('/files/add', upload.single('entry'), async (req, res) => {
+  if (req.file.size > MAX_FILE_SIZE)
+    return res.status(413).send("File is bigger than 1GB. That's too big.")
+
   try {
     const result = await ipfs.node.add(req.file.buffer)
     await Pin.create({
