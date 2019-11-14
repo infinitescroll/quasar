@@ -1,6 +1,26 @@
 const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
+const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
+
+const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
+const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'https'
+const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
+const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
+
+const baseUrlConstructor = (protocol, host, port, path) =>
+  `${protocol}://${host}:${port}` + (path ? `/${path}` : '')
+
+const BASE_IPFS_GATEWAY_URL = baseUrlConstructor(
+  IPFS_NODE_PROTOCOL,
+  IPFS_NODE_HOST,
+  IPFS_NODE_PORT,
+  IPFS_API_PATH
+)
+
+const DAG_GET_IPFS_ENDPOINT = 'dag/get?arg='
+const DAG_PUT_IPFS_ENDPOINT = 'dag/put'
+
 const STORAGE_CONTRACT_ABI = [
   {
     anonymous: false,
@@ -165,11 +185,22 @@ const LISTENER_CONTRACT_ABI = [
     type: 'function'
   }
 ]
+const LISTENER_CONTRACT_ADDRESS = process.env.LISTENER_CONTRACT_ADDRESS
+
+let docker_log = () => {}
+if (process.env.NODE_ENV !== 'test') docker_log = console.log
 
 module.exports = {
+  docker_log,
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL,
   MAX_FILE_SIZE
+  LISTENER_CONTRACT_ADDRESS,
+  BLOCK_PADDING,
+  BASE_IPFS_GATEWAY_URL,
+  DAG_GET_IPFS_ENDPOINT,
+  DAG_PUT_IPFS_ENDPOINT,
+  baseUrlConstructor
 }

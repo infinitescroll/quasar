@@ -48,7 +48,7 @@ describe('dag endpoints', () => {
     const match = pins.find(item => item.hash === hash)
     expect(match).toBeDefined()
     done()
-  })
+  }, 10000)
 
   test('POST dag should store pin in database for garbage collection', async done => {
     const dag = { test: '789' }
@@ -125,6 +125,20 @@ describe('dag endpoints', () => {
       .expect(400)
 
     done()
+  })
+
+  test('GET /ipfs-provider should return information about the ipfs provider quasar is connected to', () => {
+    return request(app)
+      .get('/api/v0/ipfs-provider')
+      .expect(200)
+      .expect(res => {
+        // res.json() dne on supertest response obj
+        const jsonResponse = JSON.parse(res.text)
+        expect(jsonResponse.baseUrl).toBeDefined()
+        expect(jsonResponse.dagGetUrl).toBeDefined()
+        expect(jsonResponse.dagPutUrl).toBeDefined()
+        expect(Object.keys(jsonResponse).length).toBe(3)
+      })
   })
 
   test('GET contracts returns list of contracts', async done => {

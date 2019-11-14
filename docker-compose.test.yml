@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    ports:
+      - "4001:4001"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:5001:5001"
+    logging:
+      driver: "none"
+
+  mongo:
+    image: mongo
+    hostname: mongo
+    restart: unless-stopped
+    volumes:
+      - dbdata:/data/db
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    logging:
+      driver: "none"
+
+  quasar:
+    build:
+      context: .
+      dockerfile: Dockerfile-test
+    image: quasar
+    container_name: quasar
+    restart: unless-stopped
+    links:
+      - mongo
+      - ipfs
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/home/node/quasar
+      - node_modules:/home/node/quasar/node_modules
+    env_file: .env
+    environment:
+      WAIT_HOSTS: mongo:27017, ipfs:5001
+      IPFS_NODE_HOST: ipfs
+      IPFS_NODE_PORT: 5001
+      DB_URL: mongodb://mongo:27017/test
+      NODE_ENV: test
+
+volumes:
+  dbdata:
+  node_modules:

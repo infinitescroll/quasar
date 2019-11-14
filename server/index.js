@@ -6,6 +6,8 @@ const mongoose = require('mongoose')
 const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
 const { Pin } = require('./db')
+const Scheduler = require('./scheduler')
+const { LISTENER_CONTRACT_ADDRESS } = require('./constants')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -14,9 +16,6 @@ if (!process.env['NODE_ENV']) {
 }
 
 const createApp = async () => {
-  registerListenWatcher()
-  registerPinWatcher()
-
   app.use(morgan('dev'))
   app.use(cors())
   app.use(express.json())
@@ -52,11 +51,10 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-const autoCleanDB = async () => {
-  await Pin.findandRemoveOldPins()
-  setInterval(async () => {
-    await Pin.findandRemoveOldPins()
-  }, 1209600000)
+const autoCleanDB = async (ttl, interval = 1209600000) => {
+  return new Scheduler(async () => {
+    await Pin.findandRemoveOldPins(ttl)
+  }, interval)
 }
 
 const bootApp = () => {
@@ -66,10 +64,11 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
+    registerListenWatcher(LISTENER_CONTRACT_ADDRESS)
+    registerPinWatcher()
+    autoCleanDB()
     await startListening()
   })
-
-  autoCleanDB()
 }
 
 // This evaluates as true when this file is run directly from the command line,
@@ -82,4 +81,11 @@ if (require.main === module) {
   createApp()
 }
 
-module.exports = { bootApp, startListening, app }
+module.exports = {
+  bootApp,
+  startListening,
+  autoCleanDB,
+  app,
+  registerListenWatcher,
+  registerPinWatcher
+}
