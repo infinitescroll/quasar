@@ -3,6 +3,7 @@ const ipfs = require('../ipfs')
 var sizeof = require('object-sizeof')
 const multer = require('multer')
 const { Pin, SmartContractToPoll } = require('../db')
+const { MAX_FILE_SIZE } = require('../constants')
 const upload = multer()
 module.exports = router
 
@@ -22,7 +23,7 @@ router.post('/dag/put', async (req, res) => {
 })
 
 router.post('/files/add', upload.single('entry'), async (req, res) => {
-  if (req.file.size > 1073741824)
+  if (req.file.size > MAX_FILE_SIZE)
     return res.status(413).send("File is bigger than 1GB. That's too big.")
 
   try {
