@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const web3 = require('web3')
 
-const smartContractToPollSchema = new mongoose.Schema(
+const listenerContractSchema = new mongoose.Schema(
   {
     address: {
       index: true,
@@ -12,16 +12,9 @@ const smartContractToPollSchema = new mongoose.Schema(
     lastPolledBlock: {
       type: Number,
       default: 0
-    },
-    sizeOfPinnedData: {
-      type: Number,
-      default: 0
     }
   },
   { strict: 'throw' }
 )
 
-module.exports = new mongoose.model(
-  'SmartContractToPoll',
-  smartContractToPollSchema
-)
+module.exports = new mongoose.model('ListenerContract', listenerContractSchema)

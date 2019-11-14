@@ -9,7 +9,7 @@ const {
 } = require('../mockData')
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
-const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('./db')
+const { ListenerContract, StorageContract, Pin } = require('./db')
 const {
   app,
   autoCleanDB,
@@ -84,15 +84,15 @@ beforeAll(async done => {
 beforeEach(async () => {
   pinWatcher = registerPinWatcher()
   listenWatcher = registerListenWatcher(listenerJSON.networks['123'].address)
-  await ListenerContractToPoll.create({
+  await ListenerContract.create({
     address: demoListenerContractJson.address,
     lastPolledBlock: 0
   })
 })
 
 afterEach(async () => {
-  await ListenerContractToPoll.deleteMany({})
-  await SmartContractToPoll.deleteMany({})
+  await ListenerContract.deleteMany({})
+  await StorageContract.deleteMany({})
 })
 
 describe('integration tests', () => {
@@ -106,34 +106,32 @@ describe('integration tests', () => {
         await mineBlocks(BLOCK_PADDING + 1)
         await sleep(1000)
 
-        const smartContractToPoll = await SmartContractToPoll.findOne({
+        const storageContract = await StorageContract.findOne({
           address: demoSmartContractJson1.address
         })
-        expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
-        expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
-        expect(smartContractToPoll.lastPolledBlock).toBeGreaterThan(0)
-        const secondSmartContractToPoll = await SmartContractToPoll.findOne({
+        expect(storageContract.address).toBe(demoSmartContractJson1.address)
+        expect(storageContract.sizeOfPinnedData).toBe(0)
+        expect(storageContract.lastPolledBlock).toBeGreaterThan(0)
+        const secondStorageContract = await StorageContract.findOne({
           address: demoSmartContractJson2.address
         })
-        expect(secondSmartContractToPoll.address).toBe(
+        expect(secondStorageContract.address).toBe(
           demoSmartContractJson2.address
         )
-        expect(secondSmartContractToPoll.sizeOfPinnedData).toBe(0)
-        expect(secondSmartContractToPoll.lastPolledBlock).toBeGreaterThan(0)
+        expect(secondStorageContract.sizeOfPinnedData).toBe(0)
+        expect(secondStorageContract.lastPolledBlock).toBeGreaterThan(0)
         await listenerUnsubscribe(demoSmartContractJson1.address)
         await mineBlocks(BLOCK_PADDING + 1)
         await sleep(1000)
 
-        const removedSmartContractToPoll = await SmartContractToPoll.findOne({
+        const removedStorageContract = await StorageContract.findOne({
           address: demoSmartContractJson1.address
         })
-        const nonRemovedSmartContractToPoll = await SmartContractToPoll.findOne(
-          {
-            address: demoSmartContractJson2.address
-          }
-        )
-        expect(removedSmartContractToPoll).toBe(null)
-        expect(nonRemovedSmartContractToPoll.address).toBe(
+        const nonRemovedStorageContract = await StorageContract.findOne({
+          address: demoSmartContractJson2.address
+        })
+        expect(removedStorageContract).toBe(null)
+        expect(nonRemovedStorageContract.address).toBe(
           demoSmartContractJson2.address
         )
         pinWatcher.stop()

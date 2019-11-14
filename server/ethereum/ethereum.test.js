@@ -12,7 +12,7 @@ const {
   demoSmartContractJson1,
   demoSmartContractJson2
 } = require('../../mockData')
-const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
+const { ListenerContract, StorageContract, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
@@ -28,7 +28,7 @@ beforeAll(async done => {
 })
 
 beforeEach(async () => {
-  await SmartContractToPoll.deleteMany({})
+  await StorageContract.deleteMany({})
 })
 
 describe('unit tests', () => {
@@ -51,7 +51,7 @@ describe('unit tests', () => {
       const listenWatcher = registerListenWatcher(
         demoListenerContractJson.address
       )
-      const listenerContract = await ListenerContractToPoll.create({
+      const listenerContract = await ListenerContract.create({
         address: demoListenerContractJson.address,
         lastPolledBlock: 0
       })
@@ -59,7 +59,7 @@ describe('unit tests', () => {
       await mineBlocks(1)
       await sleep(1000)
 
-      const updatedContract = await ListenerContractToPoll.findById(
+      const updatedContract = await ListenerContract.findById(
         listenerContract._id
       )
 
@@ -78,13 +78,13 @@ describe('unit tests', () => {
 
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
       const pinWatcher = registerPinWatcher()
-      const firstContractToPoll = await SmartContractToPoll.create({
+      const firstStorageContract = await StorageContract.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
 
-      const secondContractToPoll = await SmartContractToPoll.create({
+      const secondStorageContract = await StorageContract.create({
         address: demoSmartContractJson2.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
@@ -93,11 +93,11 @@ describe('unit tests', () => {
       await mineBlocks(1)
       await sleep(1000)
 
-      const updatedFirstContractInDB = await SmartContractToPoll.findById(
-        firstContractToPoll._id
+      const updatedFirstContractInDB = await StorageContract.findById(
+        firstStorageContract._id
       )
-      const updatedSecondContractInDB = await SmartContractToPoll.findById(
-        secondContractToPoll._id
+      const updatedSecondContractInDB = await StorageContract.findById(
+        secondStorageContract._id
       )
       expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
       expect(updatedSecondContractInDB.lastPolledBlock).toBeGreaterThan(0)
@@ -114,17 +114,17 @@ describe('unit tests', () => {
       }
 
       await handleListenEvent(eventObj)
-      const smartContractToPoll = await SmartContractToPoll.findOne({
+      const storageContract = await StorageContract.findOne({
         address: demoSmartContractJson1.address
       })
-      expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
-      expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
-      expect(smartContractToPoll.lastPolledBlock).toBe(0)
+      expect(storageContract.address).toBe(demoSmartContractJson1.address)
+      expect(storageContract.sizeOfPinnedData).toBe(0)
+      expect(storageContract.lastPolledBlock).toBe(0)
       done()
     })
 
     test('handleListenEvent removes smart contract from database when event type is "StopListening"', async done => {
-      await SmartContractToPoll.create({
+      await StorageContract.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
@@ -136,10 +136,10 @@ describe('unit tests', () => {
       }
 
       await handleListenEvent(eventObj)
-      const smartContractToPoll = await SmartContractToPoll.findOne({
+      const storageContract = await StorageContract.findOne({
         address: demoSmartContractJson1.address
       })
-      expect(smartContractToPoll).toBe(null)
+      expect(storageContract).toBe(null)
       done()
     })
 
