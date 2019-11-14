@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
-contract Listener {
+import "./QuasarListener.sol";
+
+contract Listener is QuasarListener {
 
   /// Events
   event Listen(address contractAddress);
