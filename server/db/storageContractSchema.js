@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const web3 = require('web3')
 
-const smartContractToPollSchema = new mongoose.Schema(
+const storageContractSchema = new mongoose.Schema(
   {
     address: {
       index: true,
@@ -21,7 +21,4 @@ const smartContractToPollSchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
-module.exports = new mongoose.model(
-  'SmartContractToPoll',
-  smartContractToPollSchema
-)
+module.exports = new mongoose.model('StorageContract', storageContractSchema)

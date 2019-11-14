@@ -1,5 +1,5 @@
 const Pin = require('./pinSchema')
-const SmartContractToPoll = require('./smartContractToPollSchema')
+const StorageContract = require('./storageContractSchema')
 const ListenerContractToPoll = require('./listenerContractToPoll')
 
-module.exports = { ListenerContractToPoll, Pin, SmartContractToPoll }
+module.exports = { ListenerContractToPoll, Pin, StorageContract }

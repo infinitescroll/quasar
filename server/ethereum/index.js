@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
+const { ListenerContractToPoll, StorageContract, Pin } = require('../db')
 const { provider } = require('./provider')
 const Scheduler = require('../scheduler')
 const emptyScheduler = require('../scheduler/emptyScheduler')
@@ -28,7 +28,7 @@ const handlePinHashEvent = event => {
 const handleListenEvent = async ({ event, returnValues }) => {
   if (event === 'Listen') {
     docker_log(`Added contract ${returnValues.contractAddress} to listen to`)
-    return SmartContractToPoll.create({
+    return StorageContract.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
@@ -38,7 +38,7 @@ const handleListenEvent = async ({ event, returnValues }) => {
       'No longer listening to smart contract at ',
       returnValues.contract
     )
-    return SmartContractToPoll.deleteOne({
+    return StorageContract.deleteOne({
       address: returnValues.contractAddress
     })
   }
@@ -47,7 +47,7 @@ const handleListenEvent = async ({ event, returnValues }) => {
 const registerPinWatcher = () =>
   new Scheduler(async () => {
     const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
-    const contractsToPoll = await SmartContractToPoll.find({})
+    const contractsToPoll = await StorageContract.find({})
     await Promise.all(
       contractsToPoll.map(async contract => {
         const web3Contract = new web3.eth.Contract(

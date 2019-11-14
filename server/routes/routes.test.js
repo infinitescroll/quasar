@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 // const fs = require('fs')
 const { app } = require('../index')
 const { node } = require('../ipfs')
-const { Pin, SmartContractToPoll } = require('../db')
+const { Pin, StorageContract } = require('../db')
 
 const removeHashIfPinned = async cid => {
   const pins = await node.pin.ls()
@@ -71,11 +71,11 @@ describe('dag endpoints', () => {
     }
 
     await request(app)
-      .post('/api/v0/contracts')
+      .post('/api/v0/storageContracts')
       .send(body)
       .expect(201)
 
-    const doc = await SmartContractToPoll.findOne({
+    const doc = await StorageContract.findOne({
       address: body.contractAddress
     })
 
@@ -90,22 +90,22 @@ describe('dag endpoints', () => {
     }
 
     await request(app)
-      .post('/api/v0/contracts')
+      .post('/api/v0/storageContracts')
       .send(body)
       .expect(201)
 
-    let docs = await SmartContractToPoll.find({
+    let docs = await StorageContract.find({
       address: body.contractAddress
     })
 
     expect(docs.length).toBe(1)
 
     await request(app)
-      .post('/api/v0/contracts')
+      .post('/api/v0/storageContracts')
       .send(body)
       .expect(200)
 
-    docs = await SmartContractToPoll.find({
+    docs = await StorageContract.find({
       address: body.contractAddress
     })
 
@@ -120,7 +120,7 @@ describe('dag endpoints', () => {
     }
 
     await request(app)
-      .post('/api/v0/contracts')
+      .post('/api/v0/storageContracts')
       .send(body)
       .expect(400)
 
@@ -147,12 +147,12 @@ describe('dag endpoints', () => {
     }
 
     await request(app)
-      .post('/api/v0/contracts')
+      .post('/api/v0/storageContracts')
       .send(body)
       .expect(201)
 
     await request(app)
-      .get('/api/v0/contracts')
+      .get('/api/v0/storageContracts')
       .send()
       .expect(200)
       .expect(res => expect(res.body.length).toBeGreaterThan(0))

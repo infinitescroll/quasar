@@ -12,7 +12,7 @@ const {
   demoSmartContractJson1,
   demoSmartContractJson2
 } = require('../../mockData')
-const { ListenerContractToPoll, SmartContractToPoll, Pin } = require('../db')
+const { ListenerContractToPoll, StorageContract, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
@@ -28,7 +28,7 @@ beforeAll(async done => {
 })
 
 beforeEach(async () => {
-  await SmartContractToPoll.deleteMany({})
+  await StorageContract.deleteMany({})
 })
 
 describe('unit tests', () => {
@@ -78,13 +78,13 @@ describe('unit tests', () => {
 
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
       const pinWatcher = registerPinWatcher()
-      const firstContractToPoll = await SmartContractToPoll.create({
+      const firstContractToPoll = await StorageContract.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
 
-      const secondContractToPoll = await SmartContractToPoll.create({
+      const secondContractToPoll = await StorageContract.create({
         address: demoSmartContractJson2.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
@@ -93,10 +93,10 @@ describe('unit tests', () => {
       await mineBlocks(1)
       await sleep(1000)
 
-      const updatedFirstContractInDB = await SmartContractToPoll.findById(
+      const updatedFirstContractInDB = await StorageContract.findById(
         firstContractToPoll._id
       )
-      const updatedSecondContractInDB = await SmartContractToPoll.findById(
+      const updatedSecondContractInDB = await StorageContract.findById(
         secondContractToPoll._id
       )
       expect(updatedFirstContractInDB.lastPolledBlock).toBeGreaterThan(0)
@@ -114,17 +114,17 @@ describe('unit tests', () => {
       }
 
       await handleListenEvent(eventObj)
-      const smartContractToPoll = await SmartContractToPoll.findOne({
+      const storageContract = await StorageContract.findOne({
         address: demoSmartContractJson1.address
       })
-      expect(smartContractToPoll.address).toBe(demoSmartContractJson1.address)
-      expect(smartContractToPoll.sizeOfPinnedData).toBe(0)
-      expect(smartContractToPoll.lastPolledBlock).toBe(0)
+      expect(storageContract.address).toBe(demoSmartContractJson1.address)
+      expect(storageContract.sizeOfPinnedData).toBe(0)
+      expect(storageContract.lastPolledBlock).toBe(0)
       done()
     })
 
     test('handleListenEvent removes smart contract from database when event type is "StopListening"', async done => {
-      await SmartContractToPoll.create({
+      await StorageContract.create({
         address: demoSmartContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
@@ -136,10 +136,10 @@ describe('unit tests', () => {
       }
 
       await handleListenEvent(eventObj)
-      const smartContractToPoll = await SmartContractToPoll.findOne({
+      const storageContract = await StorageContract.findOne({
         address: demoSmartContractJson1.address
       })
-      expect(smartContractToPoll).toBe(null)
+      expect(storageContract).toBe(null)
       done()
     })
 

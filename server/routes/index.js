@@ -2,7 +2,7 @@ const router = require('express').Router()
 const ipfs = require('../ipfs')
 var sizeof = require('object-sizeof')
 const multer = require('multer')
-const { Pin, SmartContractToPoll } = require('../db')
+const { Pin, StorageContract } = require('../db')
 const {
   BASE_IPFS_GATEWAY_URL,
   DAG_GET_IPFS_ENDPOINT,
@@ -40,20 +40,29 @@ router.post('/files/add', upload.single('entry'), async (req, res) => {
   }
 })
 
-router.post('/contracts', async (req, res) => {
+router.post('/storageContracts', async (req, res) => {
   try {
-    const count = await SmartContractToPoll.count({
+    const count = await StorageContract.count({
       address: req.body.contractAddress
     })
 
     if (count > 0) return res.status(200).send()
 
-    await SmartContractToPoll.create({
+    await StorageContract.create({
       address: req.body.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
     })
     res.status(201).send()
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
+
+router.get('/storageContracts', async (_, res) => {
+  try {
+    const contracts = await StorageContract.find()
+    res.status(200).send(contracts)
   } catch (error) {
     res.status(400).send(error)
   }
@@ -65,13 +74,4 @@ router.get('/ipfs-provider', (_, res) => {
     dagGetUrl: DAG_GET_IPFS_ENDPOINT,
     dagPutUrl: DAG_PUT_IPFS_ENDPOINT
   })
-})
-
-router.get('/contracts', async (_, res) => {
-  try {
-    const contracts = await SmartContractToPoll.find()
-    res.status(200).send(contracts)
-  } catch (error) {
-    res.status(400).send(error)
-  }
 })
