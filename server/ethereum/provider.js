@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const providerNetwork = process.env.BLOCKCHAIN_NETWORK || 'local'
 const blockchainHttpUrl = process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
 
