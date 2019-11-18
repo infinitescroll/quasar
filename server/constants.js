@@ -2,6 +2,7 @@ const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
 const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
 const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
+const TTL = process.env.TTL || 14
 
 const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
 const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'https'
@@ -202,5 +203,6 @@ module.exports = {
   BASE_IPFS_GATEWAY_URL,
   DAG_GET_IPFS_ENDPOINT,
   DAG_PUT_IPFS_ENDPOINT,
+  TTL,
   baseUrlConstructor
 }
