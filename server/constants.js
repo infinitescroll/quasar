@@ -10,9 +10,10 @@ const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
 
 const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
-const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'https'
-const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5001'
+const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'http'
+const IPFS_NODE_PORT = process.env.IPFS_NODE_PORT || '5002'
 const IPFS_API_PATH = process.env.IPFS_API_PATH || ''
+const IPFS_AUTH = process.env.IPFS_AUTH || ''
 
 const baseUrlConstructor = (protocol, host, port, path) =>
   `${protocol}://${host}:${port}` + (path ? `/${path}` : '')
@@ -200,6 +201,11 @@ module.exports = {
   BLOCKCHAIN_NETWORK,
   BLOCKCHAIN_PROVIDER_HTTP_URL,
   docker_log,
+  IPFS_NODE_HOST,
+  IPFS_NODE_PROTOCOL,
+  IPFS_NODE_PORT,
+  IPFS_API_PATH,
+  IPFS_AUTH,
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,
