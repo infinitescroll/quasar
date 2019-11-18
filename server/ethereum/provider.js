@@ -1,17 +1,17 @@
-require('dotenv').config()
-
-const providerNetwork = process.env.BLOCKCHAIN_NETWORK || 'local'
-const blockchainHttpUrl = process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
+const {
+  BLOCKCHAIN_NETWORK,
+  BLOCKCHAIN_PROVIDER_HTTP_URL
+} = require('../constants')
 
 let provider
 let networkId
 
-if (providerNetwork === 'rinkeby') {
+if (BLOCKCHAIN_NETWORK === 'rinkeby') {
   networkId = '4'
-  provider = blockchainHttpUrl
-} else if (providerNetwork === 'mainnet') {
+  provider = BLOCKCHAIN_PROVIDER_HTTP_URL
+} else if (BLOCKCHAIN_NETWORK === 'mainnet') {
   networkId = '1'
-  provider = blockchainHttpUrl
+  provider = BLOCKCHAIN_PROVIDER_HTTP_URL
 } else {
   networkId = '123'
   provider = 'http://localhost:8545'
