@@ -1,13 +1,18 @@
-let DB_POLL_INTERVAL
-let CONTRACT_POLL_INTERVAL
+require('dotenv').config()
 
-if (process.env.NODE_ENV === 'test') {
-  DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 100
-  CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 100
-} else {
-  DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
-  CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
-}
+const BLOCKCHAIN_NETWORK = process.env.BLOCKCHAIN_NETWORK || 'local'
+const BLOCKCHAIN_PROVIDER_HTTP_URL =
+  process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
+
+const DB_POLL_INTERVAL =
+  process.env.NODE_ENV === 'test'
+    ? 100
+    : process.env.DB_POLL_INTERVAL || 604800000
+
+const CONTRACT_POLL_INTERVAL =
+  process.env.NODE_ENV === 'test'
+    ? 100
+    : process.env.CONTRACT_POLL_INTERVAL || 600000
 
 const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
@@ -200,6 +205,8 @@ let docker_log = () => {}
 if (process.env.NODE_ENV !== 'test') docker_log = console.log
 
 module.exports = {
+  BLOCKCHAIN_NETWORK,
+  BLOCKCHAIN_PROVIDER_HTTP_URL,
   docker_log,
   LISTENER_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,

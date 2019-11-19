@@ -1,7 +1,9 @@
 pragma solidity ^0.4.24;
 
+import "./DataStore.sol";
 
-contract Storage {
+
+contract Storage is DataStore {
 
     /// Events
     event PinHash(string cid);
