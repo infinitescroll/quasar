@@ -4,8 +4,16 @@ const BLOCKCHAIN_NETWORK = process.env.BLOCKCHAIN_NETWORK || 'local'
 const BLOCKCHAIN_PROVIDER_HTTP_URL =
   process.env.BLOCKCHAIN_PROVIDER_HTTP_URL || ''
 
-const DB_POLL_INTERVAL = process.env.DB_POLL_INTERVAL || 604800000
-const CONTRACT_POLL_INTERVAL = process.env.CONTRACT_POLL_INTERVAL || 600000
+const DB_POLL_INTERVAL =
+  process.env.NODE_ENV === 'test'
+    ? 100
+    : process.env.DB_POLL_INTERVAL || 604800000
+
+const CONTRACT_POLL_INTERVAL =
+  process.env.NODE_ENV === 'test'
+    ? 100
+    : process.env.CONTRACT_POLL_INTERVAL || 600000
+
 const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
 

@@ -20,12 +20,14 @@ const createApp = async () => {
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use(
-    rateLimit({
-      windowMs: process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
-      max: process.env.RATE_LIMIT_MAX || 100
-    })
-  )
+  if (process.env['NODE_ENV'] !== 'test') {
+    app.use(
+      rateLimit({
+        windowMs: process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
+        max: process.env.RATE_LIMIT_MAX || 100
+      })
+    )
+  }
 
   app.use('/api/v0', require('./routes'))
 
