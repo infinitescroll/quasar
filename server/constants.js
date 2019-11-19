@@ -16,6 +16,7 @@ const CONTRACT_POLL_INTERVAL =
 
 const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || 1073741824
 const BLOCK_PADDING = process.env.BLOCK_PADDING || 15
+const TTL = process.env.TTL || 14
 
 const IPFS_NODE_HOST = process.env.IPFS_NODE_HOST || 'localhost'
 const IPFS_NODE_PROTOCOL = process.env.IPFS_NODE_PROTOCOL || 'http'
@@ -224,5 +225,6 @@ module.exports = {
   BASE_IPFS_GATEWAY_URL,
   DAG_GET_IPFS_ENDPOINT,
   DAG_PUT_IPFS_ENDPOINT,
+  TTL,
   baseUrlConstructor
 }

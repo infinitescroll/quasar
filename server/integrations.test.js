@@ -9,13 +9,13 @@ const {
 } = require('../mockData')
 const accounts = require('../accounts.json')
 const listenerJSON = require('../build/contracts/Listener.json')
-const { ListenerContract, StorageContract, Pin } = require('./db')
 const {
-  app,
-  autoCleanDB,
-  registerListenWatcher,
-  registerPinWatcher
-} = require('./index')
+  ListenerContract,
+  StorageContract,
+  Pin,
+  registerOptimisticPinChecker
+} = require('./db')
+const { app, registerListenWatcher, registerPinWatcher } = require('./index')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 const mineBlocks = require('../utils/mineBlocks')(web3)
 const sleep = require('../utils/sleep')
@@ -175,7 +175,7 @@ describe('integration tests', () => {
 
   test(`registerOldPinRemover removes old pins`, done => {
     const server = app.listen('9093', async () => {
-      const scheduler = await autoCleanDB(0, 500)
+      const scheduler = await registerOptimisticPinChecker(0, 500)
       const dagVal = { test: '12345' }
       const dagRequest = await request(app)
         .post('/api/v0/dag/put')

@@ -5,9 +5,12 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const rateLimit = require('express-rate-limit')
 const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
-const { Pin } = require('./db')
-const Scheduler = require('./scheduler')
-const { LISTENER_CONTRACT_ADDRESS } = require('./constants')
+const { registerOptimisticPinChecker } = require('./db')
+const {
+  DB_POLL_INTERVAL,
+  LISTENER_CONTRACT_ADDRESS,
+  TTL
+} = require('./constants')
 const PORT = process.env.PORT || 3001
 const app = express()
 
@@ -53,12 +56,6 @@ const startListening = async () => {
   app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 }
 
-const autoCleanDB = async (ttl, interval = 1209600000) => {
-  return new Scheduler(async () => {
-    await Pin.findandRemoveOldPins(ttl)
-  }, interval)
-}
-
 const bootApp = () => {
   mongoose.connect(process.env.DB_URL || 'mongodb://localhost/test', {
     useNewUrlParser: true
@@ -68,7 +65,7 @@ const bootApp = () => {
   db.once('open', async () => {
     registerListenWatcher(LISTENER_CONTRACT_ADDRESS)
     registerPinWatcher()
-    autoCleanDB()
+    registerOptimisticPinChecker(TTL, DB_POLL_INTERVAL)
     await startListening()
   })
 }
@@ -86,7 +83,6 @@ if (require.main === module) {
 module.exports = {
   bootApp,
   startListening,
-  autoCleanDB,
   app,
   registerListenWatcher,
   registerPinWatcher
