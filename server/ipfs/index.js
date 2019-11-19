@@ -1,20 +1,38 @@
 const ipfsClient = require('ipfs-http-client')
+const {
+  IPFS_NODE_HOST,
+  IPFS_NODE_PROTOCOL,
+  IPFS_NODE_PORT,
+  IPFS_API_PATH,
+  IPFS_AUTH
+} = require('../constants')
 
 const options = {
-  host: process.env.IPFS_NODE_HOST || 'localhost',
-  port: process.env.IPFS_NODE_PORT || '5002',
-  protocol: process.env.IPFS_NODE_PROTOCOL || 'http',
-  headers: process.env.IPFS_AUTH
+  host: IPFS_NODE_HOST,
+  port: IPFS_NODE_PORT,
+  protocol: IPFS_NODE_PROTOCOL,
+  headers: IPFS_AUTH
     ? {
-        Authorization: process.env.IPFS_AUTH
+        Authorization: IPFS_AUTH
       }
     : null,
-  'api-path': process.env.IPFS_API_PATH || null
+  'api-path': IPFS_API_PATH
 }
 
-const optionsFiltered = Object.fromEntries(
-  Object.entries(options).filter(option => option[1])
-)
-const node = new ipfsClient(optionsFiltered)
+// this function can be improved when we add more headers
+const formatHeaders = options => {
+  if (!options.headers) delete options.headers
+  return options
+}
 
-module.exports = { node }
+const removeEmptyFields = options => {
+  const newOptions = {}
+  Object.keys(options).forEach(key => {
+    if (options[key]) newOptions[key] = options[key]
+  })
+  return newOptions
+}
+
+const node = new ipfsClient(removeEmptyFields(formatHeaders(options)))
+
+module.exports = { node, formatHeaders, removeEmptyFields }
