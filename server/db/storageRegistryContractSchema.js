@@ -7,6 +7,7 @@ const storageRegistrySchema = new mongoose.Schema(
       index: true,
       type: String,
       required: true,
+      unique: true,
       validate: contractAddress => web3.utils.isAddress(contractAddress)
     },
     lastPolledBlock: {

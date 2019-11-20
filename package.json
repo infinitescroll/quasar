@@ -7,6 +7,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "start:chain": "ganache-cli",
+    "cleanDB": "node ./scripts/cleanDB.js",
     "create:pinEvent:local": "cross-env BLOCKCHAIN_NETWORK=local node ./scripts/createPinEvent.js",
     "create:pinEvent:rinkeby": "cross-env BLOCKCHAIN_NETWORK=rinkeby node ./scripts/createPinEvent.js",
     "create:listenEvent:local": "cross-env BLOCKCHAIN_NETWORK=local node ./scripts/createListenEvent.js",
@@ -67,6 +68,7 @@
   "homepage": "https://github.com/openworklabs/Quasar#readme",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.0.18",
+    "bluebird": "^3.7.1",
     "chalk": "^2.4.2",
     "cors": "^2.8.5",
     "cross-env": "^6.0.0",

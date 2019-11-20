@@ -21,4 +21,22 @@ const storageContractSchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
+class StorageContractClass {
+  static async createIfDNE({ address }) {
+    console.log('ADDRESS', address)
+    const storageContract = await this.findOne({ address })
+    console.log('STORAGE CONTRACT', storageContract)
+    if (!storageContract) {
+      await this.create({
+        address,
+        lastPolledBlock: 0,
+        sizeOfPinnedData: 0
+      })
+    }
+    return
+  }
+}
+
+storageContractSchema.loadClass(StorageContractClass)
+
 module.exports = new mongoose.model('StorageContract', storageContractSchema)
