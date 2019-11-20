@@ -91,8 +91,7 @@ beforeEach(async () => {
     storageRegistry.networks['123'].address
   )
   await StorageRegistryContract.findOrCreate({
-    address: demoStorageRegistryContractJson.address,
-    lastPolledBlock: 0
+    address: demoStorageRegistryContractJson.address
   })
 })
 

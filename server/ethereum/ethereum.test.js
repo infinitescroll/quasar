@@ -54,8 +54,7 @@ describe('unit tests', () => {
         demoStorageRegistryContractJson.address
       )
       const storageRegistry = await StorageRegistryContract.findOrCreate({
-        address: demoStorageRegistryContractJson.address,
-        lastPolledBlock: 0
+        address: demoStorageRegistryContractJson.address
       })
 
       await mineBlocks(1)
