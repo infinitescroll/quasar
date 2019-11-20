@@ -23,9 +23,7 @@ const storageContractSchema = new mongoose.Schema(
 
 class StorageContractClass {
   static async createIfDNE({ address }) {
-    console.log('ADDRESS', address)
     const storageContract = await this.findOne({ address })
-    console.log('STORAGE CONTRACT', storageContract)
     if (!storageContract) {
       await this.create({
         address,

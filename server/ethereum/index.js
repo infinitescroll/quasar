@@ -47,7 +47,6 @@ const registerPinWatcher = () =>
   new Scheduler(async () => {
     const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
     const storageContracts = await StorageContract.find({})
-    console.log('STORAGE CONTRACATS', storageContracts.length)
     await Promise.all(
       storageContracts.map(async contract => {
         const web3Contract = new web3.eth.Contract(
@@ -71,10 +70,7 @@ const registerPinWatcher = () =>
 
 const registerStorageRegistryWatcher = async address => {
   if (address) {
-    await StorageRegistryContract.create({
-      address,
-      lastPolledBlock: 0
-    })
+    await StorageRegistryContract.createIfDNE({ address })
 
     return new Scheduler(async () => {
       const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
@@ -97,7 +93,6 @@ const registerStorageRegistryWatcher = async address => {
               fromBlock,
               toBlock: latestBlock
             })
-            console.log('EVENTS', events)
             await Promise.mapSeries(events, handleStorageRegistryEvent)
             await contract.update({ lastPolledBlock: latestBlock })
           }

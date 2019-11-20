@@ -53,7 +53,7 @@ describe('unit tests', () => {
       const storageRegistryWatcher = await registerStorageRegistryWatcher(
         demoStorageRegistryContractJson.address
       )
-      const storageRegistry = await StorageRegistryContract.create({
+      const storageRegistry = await StorageRegistryContract.createIfDNE({
         address: demoStorageRegistryContractJson.address,
         lastPolledBlock: 0
       })

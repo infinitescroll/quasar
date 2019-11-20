@@ -18,6 +18,21 @@ const storageRegistrySchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
+class StorageRegistryContractClass {
+  static async createIfDNE({ address }) {
+    const storageRegistryContract = await this.findOne({ address })
+    if (!storageRegistryContract) {
+      await this.create({
+        address,
+        lastPolledBlock: 0
+      })
+    }
+    return
+  }
+}
+
+storageRegistrySchema.loadClass(StorageRegistryContractClass)
+
 module.exports = new mongoose.model(
   'StorageRegistryContract',
   storageRegistrySchema
