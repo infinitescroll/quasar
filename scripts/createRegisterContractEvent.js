@@ -2,10 +2,10 @@ const Web3 = require('web3')
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 const storageJSON = require('../build/contracts/Storage.json')
 const storageRegistry = require('../build/contracts/Registry.json')
-const accounts = require('../accounts.json')
 
 require('dotenv').config()
-const network = process.env.BLOCKCHAIN_NETWORK
+const network = process.env.BLOCKCHAIN_NETWORK || 'local'
+
 const web3Provider =
   network === 'rinkeby'
     ? new HDWalletProvider(
@@ -18,7 +18,7 @@ const web3Provider =
 const createRegisterEvent = () =>
   new Promise((resolve, reject) => {
     const web3 = new Web3(web3Provider)
-    web3.eth.getAccounts((err, gotAccounts) => {
+    web3.eth.getAccounts((err, accounts) => {
       if (err) return reject(err)
       const storageRegistryContract = new web3.eth.Contract(
         storageRegistry.abi,
@@ -29,15 +29,10 @@ const createRegisterEvent = () =>
         .registerContract(
           storageJSON.networks[network === 'rinkeby' ? '4' : '123'].address
         )
-        .send(
-          {
-            from: network === 'rinkeby' ? gotAccounts[0] : accounts[0]
-          },
-          (error, res) => {
-            if (error) reject(error)
-            resolve(res)
-          }
-        )
+        .send({ from: accounts[0] }, (error, res) => {
+          if (error) reject(error)
+          resolve(res)
+        })
     })
   })
 
