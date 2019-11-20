@@ -53,9 +53,8 @@ describe('unit tests', () => {
       const storageRegistryWatcher = await registerStorageRegistryWatcher(
         demoStorageRegistryContractJson.address
       )
-      const storageRegistry = await StorageRegistryContract.create({
-        address: demoStorageRegistryContractJson.address,
-        lastPolledBlock: 0
+      const storageRegistry = await StorageRegistryContract.findOrCreate({
+        address: demoStorageRegistryContractJson.address
       })
 
       await mineBlocks(1)

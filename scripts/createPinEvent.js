@@ -1,10 +1,11 @@
 const Web3 = require('web3')
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 const storageJSON = require('../build/contracts/Storage.json')
-const accounts = require('../accounts.json')
+const mineBlocks = require('../utils/mineBlocks')
 
 require('dotenv').config()
 const network = process.env.BLOCKCHAIN_NETWORK
+
 const web3Provider =
   network === 'rinkeby'
     ? new HDWalletProvider(
@@ -12,12 +13,15 @@ const web3Provider =
         process.env.BLOCKCHAIN_PROVIDER_HTTP_URL,
         1
       )
-    : new Web3.providers.WebsocketProvider('ws://localhost:8545')
+    : new Web3.providers.HttpProvider('http://localhost:8545')
+
+const web3 = new Web3(web3Provider)
+
+const mine = mineBlocks(web3)
 
 const createPinEvent = () =>
   new Promise((resolve, reject) => {
-    const web3 = new Web3(web3Provider)
-    web3.eth.getAccounts((err, gotAccounts) => {
+    web3.eth.getAccounts((err, accounts) => {
       if (err) return reject(err)
 
       const testKey = web3.utils.fromAscii('testKey')
@@ -29,20 +33,20 @@ const createPinEvent = () =>
 
       contract.methods
         .registerData(testKey, 'qm123')
-        .send(
-          { from: network === 'rinkeby' ? gotAccounts[0] : accounts[0] },
-          (error, res) => {
-            if (error) reject(error)
-            resolve(res)
-          }
-        )
+        .send({ from: accounts[0] }, async (error, res) => {
+          if (error) reject(error)
+          await mine(5)
+
+          resolve(res)
+        })
     })
   })
 
 const start = async () => {
   try {
-    const res = await createPinEvent()
-    console.log('tx successfully completed: ', res)
+    const txHash = await createPinEvent()
+    const tx = await web3.eth.getTransaction(txHash)
+    console.log('tx successfully completed: ', tx)
   } catch (error) {
     console.log('tx unsuccessfull, error: ', error)
   }

@@ -7,6 +7,7 @@ const storageRegistrySchema = new mongoose.Schema(
       index: true,
       type: String,
       required: true,
+      unique: true,
       validate: contractAddress => web3.utils.isAddress(contractAddress)
     },
     lastPolledBlock: {
@@ -16,6 +17,21 @@ const storageRegistrySchema = new mongoose.Schema(
   },
   { strict: 'throw' }
 )
+
+class StorageRegistryContractClass {
+  static async findOrCreate({ address }) {
+    const storageRegistryContract = await this.findOne({ address })
+    if (!storageRegistryContract) {
+      return this.create({
+        address,
+        lastPolledBlock: 0
+      })
+    }
+    return storageRegistryContract
+  }
+}
+
+storageRegistrySchema.loadClass(StorageRegistryContractClass)
 
 module.exports = new mongoose.model(
   'StorageRegistryContract',
