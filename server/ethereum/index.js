@@ -1,10 +1,10 @@
 const Web3 = require('web3')
-const { ListenerContract, StorageContract, Pin } = require('../db')
+const { StorageRegistryContract, StorageContract, Pin } = require('../db')
 const { provider } = require('./provider')
 const Scheduler = require('../scheduler')
 const emptyScheduler = require('../scheduler/emptyScheduler')
 const {
-  LISTENER_CONTRACT_ABI,
+  STORAGE_REGISTRY_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   CONTRACT_POLL_INTERVAL,
   docker_log,
@@ -25,15 +25,15 @@ const handlePinHashEvent = event => {
   return Pin.deleteMany({ cid: event.returnValues.cid })
 }
 
-const handleListenEvent = async ({ event, returnValues }) => {
-  if (event === 'Listen') {
+const handleStorageRegistryEvent = async ({ event, returnValues }) => {
+  if (event === 'Register') {
     docker_log(`Added contract ${returnValues.contractAddress} to listen to`)
     return StorageContract.create({
       address: returnValues.contractAddress,
       lastPolledBlock: 0,
       sizeOfPinnedData: 0
     })
-  } else if (event === 'StopListening') {
+  } else if (event === 'Unregister') {
     docker_log(
       'No longer listening to smart contract at ',
       returnValues.contract
@@ -69,47 +69,48 @@ const registerPinWatcher = () =>
     )
   }, CONTRACT_POLL_INTERVAL)
 
-const registerListenWatcher = address => {
+const registerStorageRegistryWatcher = async address => {
   if (address) {
-    ListenerContract.create({
+    await StorageRegistryContract.create({
       address,
       lastPolledBlock: 0
     })
 
     return new Scheduler(async () => {
       const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING
-      const listenerContracts = await ListenerContract.find({})
+      const storageRegistrys = await StorageRegistryContract.find({})
       await Promise.all(
-        listenerContracts.map(async contract => {
+        storageRegistrys.map(async contract => {
           const web3Contract = new web3.eth.Contract(
-            LISTENER_CONTRACT_ABI,
+            STORAGE_REGISTRY_CONTRACT_ABI,
             contract.address
           )
+
           // mostly for test suites - make sure we are gathering information from new blocks
           if (latestBlock - contract.lastPolledBlock > 0) {
             const events = await web3Contract.getPastEvents('allEvents', {
               fromBlock:
-                contract.lastPolledBlock === 0
-                  ? 0
-                  : contract.lastPolledBlock + 1,
+                contract.lastPolledBlock === 0 ? 0 : contract.lastPolledBlock,
               toBlock: latestBlock
             })
-            await Promise.all(events.map(handleListenEvent))
+            await Promise.all(events.map(handleStorageRegistryEvent))
             await contract.update({ lastPolledBlock: latestBlock })
           }
         })
       )
     }, CONTRACT_POLL_INTERVAL)
   }
-
+  console.error(
+    'No storage registry contract address passed to registerStorageRegistry Watcher. Not listening.'
+  )
   return emptyScheduler
 }
 
 module.exports = {
   registerPinWatcher,
-  registerListenWatcher,
+  registerStorageRegistryWatcher,
   getContract,
-  handleListenEvent,
+  handleStorageRegistryEvent,
   handlePinHashEvent,
   web3
 }

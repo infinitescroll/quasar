@@ -1,7 +1,7 @@
 const Web3 = require('web3')
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 const storageJSON = require('../build/contracts/Storage.json')
-const listenerJSON = require('../build/contracts/Listener.json')
+const storageRegistry = require('../build/contracts/Registry.json')
 const accounts = require('../accounts.json')
 
 require('dotenv').config()
@@ -15,18 +15,18 @@ const web3Provider =
       )
     : new Web3.providers.WebsocketProvider('ws://localhost:8545')
 
-const createListenEvent = () =>
+const createRegisterEvent = () =>
   new Promise((resolve, reject) => {
     const web3 = new Web3(web3Provider)
     web3.eth.getAccounts((err, gotAccounts) => {
       if (err) return reject(err)
-      const listenerContract = new web3.eth.Contract(
-        listenerJSON.abi,
-        listenerJSON.networks[network === 'rinkeby' ? '4' : '123'].address
+      const storageRegistryContract = new web3.eth.Contract(
+        storageRegistry.abi,
+        storageRegistry.networks[network === 'rinkeby' ? '4' : '123'].address
       )
 
-      listenerContract.methods
-        .listenToContract(
+      storageRegistryContract.methods
+        .registerContract(
           storageJSON.networks[network === 'rinkeby' ? '4' : '123'].address
         )
         .send(
@@ -43,7 +43,7 @@ const createListenEvent = () =>
 
 const start = async () => {
   try {
-    const res = await createListenEvent()
+    const res = await createRegisterEvent()
     console.log('tx successfully completed: ', res)
   } catch (error) {
     console.log('tx unsuccessfull, error: ', error)

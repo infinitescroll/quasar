@@ -4,19 +4,18 @@ const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const rateLimit = require('express-rate-limit')
-const { registerListenWatcher, registerPinWatcher } = require('./ethereum')
-const { registerOptimisticPinChecker } = require('./db')
+const {
+  registerStorageRegistryWatcher,
+  registerPinWatcher
+} = require('./ethereum')
+const { registerPinChecker } = require('./db')
 const {
   DB_POLL_INTERVAL,
-  LISTENER_CONTRACT_ADDRESS,
+  STORAGE_REGISTRY_CONTRACT_ADDRESS,
   TTL
 } = require('./constants')
 const PORT = process.env.PORT || 3001
 const app = express()
-
-if (!process.env['NODE_ENV']) {
-  require('dotenv').config({ path: __dirname + '/.env' })
-}
 
 const createApp = async () => {
   app.use(morgan('dev'))
@@ -63,9 +62,9 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
-    registerListenWatcher(LISTENER_CONTRACT_ADDRESS)
+    registerStorageRegistryWatcher(STORAGE_REGISTRY_CONTRACT_ADDRESS)
     registerPinWatcher()
-    registerOptimisticPinChecker(TTL, DB_POLL_INTERVAL)
+    registerPinChecker(TTL, DB_POLL_INTERVAL)
     await startListening()
   })
 }
@@ -84,6 +83,6 @@ module.exports = {
   bootApp,
   startListening,
   app,
-  registerListenWatcher,
+  registerStorageRegistryWatcher,
   registerPinWatcher
 }

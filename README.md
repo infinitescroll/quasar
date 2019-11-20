@@ -189,7 +189,7 @@ BLOCK_PADDING=20 # Buffer of eth blocks ignored from HEAD
 BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/<project-id>
 MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball bernie twentytwenty
 BLOCKCHAIN_NETWORK=rinkeby
-LISTENER_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
+STORAGE_REGISTRY_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
 ```
 
 ## Dev setup

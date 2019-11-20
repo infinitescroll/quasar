@@ -1,11 +1,11 @@
 const Pin = require('./pinSchema')
 const StorageContract = require('./storageContractSchema')
-const ListenerContract = require('./listenerContractSchema')
-const registerOptimisticPinChecker = require('./optimisticPinChecker')
+const StorageRegistryContract = require('./storageRegistryContractSchema')
+const registerPinChecker = require('./pinChecker')
 
 module.exports = {
-  ListenerContract,
+  StorageRegistryContract,
   Pin,
   StorageContract,
-  registerOptimisticPinChecker
+  registerPinChecker
 }
