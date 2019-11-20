@@ -1,18 +1,18 @@
 const mongoose = require('mongoose')
 const {
-  handleListenEvent,
+  handleStorageRegistryEvent,
   handlePinHashEvent,
   registerPinWatcher,
-  registerListenWatcher
+  registerStorageRegistryWatcher
 } = require('./')
 
 const { node } = require('../ipfs')
 const {
-  demoListenerContractJson,
-  demoSmartContractJson1,
-  demoSmartContractJson2
+  demoStorageRegistryContractJson,
+  demoStorageContractJson1,
+  demoStorageContractJson2
 } = require('../../mockData')
-const { ListenerContract, StorageContract, Pin } = require('../db')
+const { StorageRegistryContract, StorageContract, Pin } = require('../db')
 const Scheduler = require('../scheduler')
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
@@ -32,39 +32,41 @@ beforeEach(async () => {
 })
 
 describe('unit tests', () => {
-  describe('registerListenWatcher', () => {
-    test('registerListenWatcher returns an instance of the scheduler', () => {
-      const listenerWatcher = registerListenWatcher(
-        demoListenerContractJson.address
+  describe('registerStorageRegistryWatcher', () => {
+    test('registerStorageRegistryWatcher returns an instance of the scheduler', async done => {
+      const storageRegistryWatcher = await registerStorageRegistryWatcher(
+        demoStorageRegistryContractJson.address
       )
-      listenerWatcher.stop()
-      expect(listenerWatcher instanceof Scheduler).toBe(true)
+      storageRegistryWatcher.stop()
+      expect(storageRegistryWatcher instanceof Scheduler).toBe(true)
+      done()
     })
 
-    test('registerListenWatcher does not return an instance of the scheduler when no address is passed', () => {
-      const listenerWatcher = registerListenWatcher()
-      listenerWatcher.stop()
-      expect(listenerWatcher instanceof Scheduler).toBe(false)
+    test('registerStorageRegistryWatcher does not return an instance of the scheduler when no address is passed', async done => {
+      const storageRegistryWatcher = await registerStorageRegistryWatcher()
+      storageRegistryWatcher.stop()
+      expect(storageRegistryWatcher instanceof Scheduler).toBe(false)
+      done()
     })
 
-    test('registerListenWatcher polls database and updates last polled block on each contract', async done => {
-      const listenWatcher = registerListenWatcher(
-        demoListenerContractJson.address
+    test('registerStorageRegistryWatcher polls database and updates last polled block on each contract', async done => {
+      const storageRegistryWatcher = await registerStorageRegistryWatcher(
+        demoStorageRegistryContractJson.address
       )
-      const listenerContract = await ListenerContract.create({
-        address: demoListenerContractJson.address,
+      const storageRegistry = await StorageRegistryContract.create({
+        address: demoStorageRegistryContractJson.address,
         lastPolledBlock: 0
       })
 
       await mineBlocks(1)
       await sleep(1000)
 
-      const updatedContract = await ListenerContract.findById(
-        listenerContract._id
+      const updatedContract = await StorageRegistryContract.findById(
+        storageRegistry._id
       )
 
       expect(updatedContract.lastPolledBlock).toBeGreaterThan(0)
-      listenWatcher.stop()
+      storageRegistryWatcher.stop()
       done()
     })
   })
@@ -79,13 +81,13 @@ describe('unit tests', () => {
     test('registerPinWatcher polls database and updates last polled block on each contract', async done => {
       const pinWatcher = registerPinWatcher()
       const firstStorageContract = await StorageContract.create({
-        address: demoSmartContractJson1.address,
+        address: demoStorageContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
 
       const secondStorageContract = await StorageContract.create({
-        address: demoSmartContractJson2.address,
+        address: demoStorageContractJson2.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
@@ -107,37 +109,37 @@ describe('unit tests', () => {
   })
 
   describe('handlers', () => {
-    test('handleListenEvent adds smart contract to database when event type is "Listen"', async done => {
+    test('handleStorageRegistryEvent adds smart contract to database when event type is "Register"', async done => {
       const eventObj = {
-        event: 'Listen',
-        returnValues: { contractAddress: demoSmartContractJson1.address }
+        event: 'Register',
+        returnValues: { contractAddress: demoStorageContractJson1.address }
       }
 
-      await handleListenEvent(eventObj)
+      await handleStorageRegistryEvent(eventObj)
       const storageContract = await StorageContract.findOne({
-        address: demoSmartContractJson1.address
+        address: demoStorageContractJson1.address
       })
-      expect(storageContract.address).toBe(demoSmartContractJson1.address)
+      expect(storageContract.address).toBe(demoStorageContractJson1.address)
       expect(storageContract.sizeOfPinnedData).toBe(0)
       expect(storageContract.lastPolledBlock).toBe(0)
       done()
     })
 
-    test('handleListenEvent removes smart contract from database when event type is "StopListening"', async done => {
+    test('handleStorageRegistryEvent removes smart contract from database when event type is "Unregister"', async done => {
       await StorageContract.create({
-        address: demoSmartContractJson1.address,
+        address: demoStorageContractJson1.address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
 
       const eventObj = {
-        event: 'StopListening',
-        returnValues: { contractAddress: demoSmartContractJson1.address }
+        event: 'Unregister',
+        returnValues: { contractAddress: demoStorageContractJson1.address }
       }
 
-      await handleListenEvent(eventObj)
+      await handleStorageRegistryEvent(eventObj)
       const storageContract = await StorageContract.findOne({
-        address: demoSmartContractJson1.address
+        address: demoStorageContractJson1.address
       })
       expect(storageContract).toBe(null)
       done()

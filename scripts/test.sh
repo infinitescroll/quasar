@@ -5,6 +5,7 @@ set - o ipfs shutdown kill
 
 echo "Running: "$0
 
+rm -rf build
 mongod --logpath /dev/null &
 node ./scripts/startIpfs &
 sleep 5 &

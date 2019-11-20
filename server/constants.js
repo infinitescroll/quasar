@@ -147,7 +147,7 @@ const STORAGE_CONTRACT_ABI = [
   }
 ]
 
-const LISTENER_CONTRACT_ABI = [
+const STORAGE_REGISTRY_CONTRACT_ABI = [
   {
     anonymous: false,
     inputs: [
@@ -157,7 +157,7 @@ const LISTENER_CONTRACT_ABI = [
         type: 'address'
       }
     ],
-    name: 'Listen',
+    name: 'Register',
     type: 'event'
   },
   {
@@ -169,7 +169,7 @@ const LISTENER_CONTRACT_ABI = [
         type: 'address'
       }
     ],
-    name: 'StopListening',
+    name: 'Unregister',
     type: 'event'
   },
   {
@@ -180,7 +180,7 @@ const LISTENER_CONTRACT_ABI = [
         type: 'address'
       }
     ],
-    name: 'listenToContract',
+    name: 'registerContract',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -194,14 +194,16 @@ const LISTENER_CONTRACT_ABI = [
         type: 'address'
       }
     ],
-    name: 'unsubscribeContract',
+    name: 'unregisterContract',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function'
   }
 ]
-const LISTENER_CONTRACT_ADDRESS = process.env.LISTENER_CONTRACT_ADDRESS
+
+const STORAGE_REGISTRY_CONTRACT_ADDRESS =
+  process.env.STORAGE_REGISTRY_CONTRACT_ADDRESS
 
 let docker_log = () => {}
 if (process.env.NODE_ENV !== 'test') docker_log = console.log
@@ -215,12 +217,12 @@ module.exports = {
   IPFS_NODE_PORT,
   IPFS_API_PATH,
   IPFS_AUTH,
-  LISTENER_CONTRACT_ABI,
+  STORAGE_REGISTRY_CONTRACT_ABI,
   STORAGE_CONTRACT_ABI,
   DB_POLL_INTERVAL,
   CONTRACT_POLL_INTERVAL,
   MAX_FILE_SIZE,
-  LISTENER_CONTRACT_ADDRESS,
+  STORAGE_REGISTRY_CONTRACT_ADDRESS,
   BLOCK_PADDING,
   BASE_IPFS_GATEWAY_URL,
   DAG_GET_IPFS_ENDPOINT,

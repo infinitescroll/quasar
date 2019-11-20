@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const web3 = require('web3')
 
-const listenerContractSchema = new mongoose.Schema(
+const storageRegistrySchema = new mongoose.Schema(
   {
     address: {
       index: true,
@@ -17,4 +17,7 @@ const listenerContractSchema = new mongoose.Schema(
   { strict: 'throw' }
 )
 
-module.exports = new mongoose.model('ListenerContract', listenerContractSchema)
+module.exports = new mongoose.model(
+  'StorageRegistryContract',
+  storageRegistrySchema
+)
