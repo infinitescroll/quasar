@@ -29,7 +29,7 @@ const handlePinHashEvent = event => {
 const handleStorageRegistryEvent = async ({ event, returnValues }) => {
   if (event === 'Register') {
     docker_log(`Added contract ${returnValues.contractAddress} to listen to`)
-    return StorageContract.createIfDNE({
+    return StorageContract.findOrCreate({
       address: returnValues.contractAddress
     })
   } else if (event === 'Unregister') {
@@ -70,7 +70,7 @@ const registerPinWatcher = () =>
 
 const registerStorageRegistryWatcher = async address => {
   if (address) {
-    await StorageRegistryContract.createIfDNE({ address })
+    await StorageRegistryContract.findOrCreate({ address })
 
     return new Scheduler(async () => {
       const latestBlock = (await web3.eth.getBlockNumber()) - BLOCK_PADDING

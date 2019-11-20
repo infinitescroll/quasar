@@ -22,16 +22,16 @@ const storageContractSchema = new mongoose.Schema(
 )
 
 class StorageContractClass {
-  static async createIfDNE({ address }) {
+  static async findOrCreate({ address }) {
     const storageContract = await this.findOne({ address })
     if (!storageContract) {
-      await this.create({
+      return this.create({
         address,
         lastPolledBlock: 0,
         sizeOfPinnedData: 0
       })
     }
-    return
+    return storageContract
   }
 }
 

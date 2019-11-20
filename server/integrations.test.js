@@ -90,7 +90,7 @@ beforeEach(async () => {
   storageRegistryWatcher = await registerStorageRegistryWatcher(
     storageRegistry.networks['123'].address
   )
-  await StorageRegistryContract.createIfDNE({
+  await StorageRegistryContract.findOrCreate({
     address: demoStorageRegistryContractJson.address,
     lastPolledBlock: 0
   })

@@ -19,15 +19,15 @@ const storageRegistrySchema = new mongoose.Schema(
 )
 
 class StorageRegistryContractClass {
-  static async createIfDNE({ address }) {
+  static async findOrCreate({ address }) {
     const storageRegistryContract = await this.findOne({ address })
     if (!storageRegistryContract) {
-      await this.create({
+      return this.create({
         address,
         lastPolledBlock: 0
       })
     }
-    return
+    return storageRegistryContract
   }
 }
 
