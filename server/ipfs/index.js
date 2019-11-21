@@ -1,5 +1,6 @@
 const ipfsClient = require('ipfs-http-client')
 const {
+  log,
   IPFS_NODE_HOST,
   IPFS_NODE_PROTOCOL,
   IPFS_NODE_PORT,
@@ -32,6 +33,11 @@ const removeEmptyFields = options => {
   })
   return newOptions
 }
+
+log(
+  'Started IPFS node with options: ',
+  removeEmptyFields(formatHeaders(options))
+)
 
 const node = new ipfsClient(removeEmptyFields(formatHeaders(options)))
 
