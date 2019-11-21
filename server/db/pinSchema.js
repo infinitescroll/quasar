@@ -25,7 +25,7 @@ class PinClass {
     oldPins.forEach(pin => log(`Found old pin with cid: ${pin.cid}`))
     await Promise.all(oldPins.map(async pin => await ipfs.node.pin.rm(pin.cid)))
     await this.deleteMany({ time: { $lt: cutoffDate } }).exec()
-    log('Deleted pins successfully')
+    if (oldPins.length > 0) log('Deleted pins successfully')
   }
 }
 

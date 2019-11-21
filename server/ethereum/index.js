@@ -19,15 +19,21 @@ const getContract = smartContractObj => {
   return new web3.eth.Contract(smartContractObj.abi, smartContractObj.address)
 }
 
-const logEvents = (contract, events) => {
+const logEvents = (contractType, contractAddress, events) => {
   if (events.length > 0) {
     log(
       `Found ${
         events.length
-      } events from contract: ${contract}: ${JSON.stringify(events, null, 2)}`
+      } events from contract: ${contractType} at address ${contractAddress}: ${JSON.stringify(
+        events,
+        null,
+        2
+      )}`
     )
   } else {
-    log(`No events found for type: ${contract}`)
+    log(
+      `No events found for contract: ${contractType} at address: ${contractAddress}`
+    )
   }
 }
 
@@ -45,7 +51,10 @@ const handleStorageRegistryEvent = async ({ event, returnValues }) => {
       address: returnValues.contractAddress
     })
   } else if (event === 'Unregister') {
-    log('No longer listening to smart contract at ', returnValues.contract)
+    log(
+      'No longer listening to smart contract at ',
+      returnValues.contractAddress
+    )
     return StorageContract.deleteOne({
       address: returnValues.contractAddress
     })
@@ -77,7 +86,7 @@ const registerPinWatcher = () =>
               contract.lastPolledBlock === 0 ? 0 : contract.lastPolledBlock + 1,
             toBlock: latestBlock
           })
-          logEvents(contract, events)
+          logEvents('storage', contract.address, events)
           await Promise.all(events.map(handlePinHashEvent))
           await contract.update({ lastPolledBlock: latestBlock })
         }
@@ -107,7 +116,7 @@ const registerStorageRegistryWatcher = async address => {
               fromBlock,
               toBlock: latestBlock
             })
-            logEvents(contract, events)
+            logEvents('storage registry', contract.address, events)
             await Promise.mapSeries(events, handleStorageRegistryEvent)
             await contract.update({ lastPolledBlock: latestBlock })
           }
