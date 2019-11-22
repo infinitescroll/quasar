@@ -144,7 +144,7 @@ describe('unit tests', () => {
       done()
     })
 
-    test('handlePinHashEvent removes file from database by cid', async done => {
+    test('handlePinHashEvent updates Pin document in database', async done => {
       const dagA = { firstTestKey: 'firstTestVal' }
       const cidA = await node.dag.put(dagA)
       const dagB = { secondTestKey: 'secondTestVal' }
