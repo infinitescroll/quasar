@@ -170,14 +170,14 @@ describe('unit tests', () => {
 
       await handlePinHashEvent(eventObj)
 
-      const confirmedCid = await Pin.findOne({
+      const confirmedPin = await Pin.findOne({
         cid: cidA.toBaseEncodedString()
       })
-      expect(confirmedCid.confirmed).toBe(true)
-      const unconfirmedCid = await Pin.findOne({
+      expect(confirmedPin.confirmed).toBe(true)
+      const unconfirmedPin = await Pin.findOne({
         cid: cidB.toBaseEncodedString()
       })
-      expect(unconfirmedCid.confirmed).toBe(false)
+      expect(unconfirmedPin.confirmed).toBe(false)
       done()
     })
   })
