@@ -205,13 +205,19 @@ const STORAGE_REGISTRY_CONTRACT_ABI = [
 const STORAGE_REGISTRY_CONTRACT_ADDRESS =
   process.env.STORAGE_REGISTRY_CONTRACT_ADDRESS
 
-let docker_log = () => {}
-if (process.env.NODE_ENV !== 'test') docker_log = console.log
+let log = () => {}
+
+if (process.env.NODE_ENV !== 'test') {
+  log = message => {
+    const time = Date.now()
+    console.log(`${time}: ${message}`)
+  }
+}
 
 module.exports = {
   BLOCKCHAIN_NETWORK,
   BLOCKCHAIN_PROVIDER_HTTP_URL,
-  docker_log,
+  log,
   IPFS_NODE_HOST,
   IPFS_NODE_PROTOCOL,
   IPFS_NODE_PORT,

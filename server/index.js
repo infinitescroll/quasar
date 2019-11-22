@@ -10,6 +10,7 @@ const {
 } = require('./ethereum')
 const { registerPinChecker } = require('./db')
 const {
+  log,
   DB_POLL_INTERVAL,
   STORAGE_REGISTRY_CONTRACT_ADDRESS,
   TTL
@@ -62,9 +63,21 @@ const bootApp = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
+    log(
+      'registering storage registry watcher at: ',
+      STORAGE_REGISTRY_CONTRACT_ADDRESS
+    )
     registerStorageRegistryWatcher(STORAGE_REGISTRY_CONTRACT_ADDRESS)
+    log('registering pin watcher')
     registerPinWatcher()
+    log(
+      'registering pin checker with TTL: ',
+      TTL,
+      ' and DB_POLL_INTERVAL: ',
+      DB_POLL_INTERVAL
+    )
     registerPinChecker(TTL, DB_POLL_INTERVAL)
+    log('starting api server')
     await startListening()
   })
 }
