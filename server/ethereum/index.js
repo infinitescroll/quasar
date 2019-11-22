@@ -41,7 +41,7 @@ const handlePinHashEvent = event => {
   log(
     `Request to pin ${event.returnValues.cid} received from contract ${event.address}`
   )
-  return Pin.deleteMany({ cid: event.returnValues.cid })
+  return Pin.updateOne({ cid: event.returnValues.cid }, { confirmed: true })
 }
 
 const handleStorageRegistryEvent = async ({ event, returnValues }) => {
