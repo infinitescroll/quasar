@@ -178,7 +178,7 @@ describe('integration tests', () => {
     })
   }, 10000)
 
-  test(`registerPinChecker removes old pins`, done => {
+  test(`registerPinChecker removes old unconfirmed pins`, done => {
     const server = app.listen('9093', async () => {
       const scheduler = await registerPinChecker(0, 500)
       const dagVal = { test: '12345' }
