@@ -232,11 +232,11 @@ describe('integration tests', () => {
       await mineBlocks(1)
       await sleep(500)
 
-      const optimisticallyPinnedFile = await Pin.findOne({
+      const pinDoc = await Pin.findOne({
         cid: hash.toBaseEncodedString()
       })
 
-      expect(optimisticallyPinnedFile).toBeTruthy()
+      expect(pinDoc.confirmed).toBe(false)
       pinWatcher.stop()
       storageRegistryWatcher.stop()
       server.close(done)
