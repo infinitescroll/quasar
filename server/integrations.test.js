@@ -146,7 +146,7 @@ describe('integration tests', () => {
     }, 10000)
   })
 
-  test(`emitting register event to storage registry contract, then emittting pinHash event to storage contract, removes associated document from database`, done => {
+  test(`emitting register event to storage registry contract, then emittting pinHash event to storage contract, updates associated document in database`, done => {
     const server = app.listen('9092', async () => {
       // set up smart contract
       await emitRegisterContractEvent(demoStorageContractJson1.address)
@@ -167,18 +167,18 @@ describe('integration tests', () => {
       await mineBlocks(BLOCK_PADDING + 1)
       await sleep(500)
 
-      const removedPinFile = await Pin.findOne({
+      const pinDoc = await Pin.findOne({
         cid: hash.toBaseEncodedString()
       })
 
-      expect(removedPinFile).toBe(null)
+      expect(pinDoc.confirmed).toBe(true)
       pinWatcher.stop()
       storageRegistryWatcher.stop()
       server.close(done)
     })
   }, 10000)
 
-  test(`registerPinChecker removes old pins`, done => {
+  test(`registerPinChecker removes old unconfirmed pins`, done => {
     const server = app.listen('9093', async () => {
       const scheduler = await registerPinChecker(0, 500)
       const dagVal = { test: '12345' }
@@ -232,11 +232,11 @@ describe('integration tests', () => {
       await mineBlocks(1)
       await sleep(500)
 
-      const optimisticallyPinnedFile = await Pin.findOne({
+      const pinDoc = await Pin.findOne({
         cid: hash.toBaseEncodedString()
       })
 
-      expect(optimisticallyPinnedFile).toBeTruthy()
+      expect(pinDoc.confirmed).toBe(false)
       pinWatcher.stop()
       storageRegistryWatcher.stop()
       server.close(done)

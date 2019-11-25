@@ -144,7 +144,7 @@ describe('unit tests', () => {
       done()
     })
 
-    test('handlePinHashEvent removes file from database by cid', async done => {
+    test('handlePinHashEvent updates Pin document in database', async done => {
       const dagA = { firstTestKey: 'firstTestVal' }
       const cidA = await node.dag.put(dagA)
       const dagB = { secondTestKey: 'secondTestVal' }
@@ -170,12 +170,14 @@ describe('unit tests', () => {
 
       await handlePinHashEvent(eventObj)
 
-      const removedCid = await Pin.find({
+      const confirmedPin = await Pin.findOne({
         cid: cidA.toBaseEncodedString()
       })
-      expect(removedCid.length).toBe(0)
-      const storedCid = await Pin.find({ cid: cidB.toBaseEncodedString() })
-      expect(storedCid.length).toBe(1)
+      expect(confirmedPin.confirmed).toBe(true)
+      const unconfirmedPin = await Pin.findOne({
+        cid: cidB.toBaseEncodedString()
+      })
+      expect(unconfirmedPin.confirmed).toBe(false)
       done()
     })
   })

@@ -11,7 +11,8 @@ const pinSchema = new mongoose.Schema(
       required: true,
       validate: cid => isIPFS.cid(cid)
     },
-    time: { type: Date, required: true }
+    time: { type: Date, required: true },
+    confirmed: { type: Boolean, default: false }
   },
   { strict: 'throw' }
 )
@@ -21,11 +22,16 @@ class PinClass {
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - ttl)
     log('Finding and removing old pins...')
-    const oldPins = await this.find({ time: { $lt: cutoffDate } }).exec()
-    oldPins.forEach(pin => log(`Found old pin with cid: ${pin.cid}`))
-    await Promise.all(oldPins.map(async pin => await ipfs.node.pin.rm(pin.cid)))
+    const oldUnconfirmedPins = await this.find({
+      confirmed: false,
+      time: { $lt: cutoffDate }
+    }).exec()
+    oldUnconfirmedPins.forEach(pin => log(`Found old pin with cid: ${pin.cid}`))
+    await Promise.all(
+      oldUnconfirmedPins.map(async pin => await ipfs.node.pin.rm(pin.cid))
+    )
     await this.deleteMany({ time: { $lt: cutoffDate } }).exec()
-    if (oldPins.length > 0) log('Deleted pins successfully')
+    if (oldUnconfirmedPins.length > 0) log('Deleted pins successfully')
   }
 }
 
