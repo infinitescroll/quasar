@@ -45,7 +45,7 @@ router.post('/files/add', upload.single('entry'), async (req, res) => {
 })
 
 router.get('/cat', async (req, res) => {
-  if (!req.query.arg) res.status(400).send('"arg" param missing')
+  if (!req.query.arg) return res.status(400).send('"arg" param missing')
 
   try {
     const result = await ipfs.node.get(req.query.arg)
