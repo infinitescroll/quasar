@@ -73,7 +73,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
-    "ipfs-http-client": "^39.0.1",
+    "ipfs-http-client": "^40.0.1",
     "is-ipfs": "^0.6.1",
     "mongoose": "^5.7.3",
     "morgan": "^1.9.1",
