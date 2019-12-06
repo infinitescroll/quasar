@@ -27,7 +27,7 @@ router.post('/dag/put', async (req, res) => {
   }
 })
 
-router.post('/files/add', upload.single('entry'), async (req, res) => {
+router.post('/add', upload.single('entry'), async (req, res) => {
   if (req.file.size > MAX_FILE_SIZE)
     return res.status(413).send("File is bigger than 1GB. That's too big.")
 
