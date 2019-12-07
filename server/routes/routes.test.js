@@ -1,7 +1,5 @@
 const request = require('supertest')
 const mongoose = require('mongoose')
-// const FormData = require('form-data')
-// const fs = require('fs')
 const { app } = require('../index')
 const { node } = require('../ipfs')
 const { Pin, StorageContract } = require('../db')
@@ -173,6 +171,7 @@ describe('dag endpoints', () => {
 })
 
 /*
+  This route tested in the integration tests.
   This test is commented out because 2 things need to be fixed:
 
   1. https://github.com/visionmedia/superagent/issues/1520

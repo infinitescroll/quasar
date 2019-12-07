@@ -38,7 +38,7 @@ router.post('/add', upload.single('entry'), async (req, res) => {
       cid: result[0].hash,
       time: new Date()
     })
-    res.status(200).send(result[0].hash)
+    res.status(201).send(result[0].hash)
   } catch (error) {
     res.status(400).send(error)
   }
