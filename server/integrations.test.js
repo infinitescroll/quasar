@@ -301,4 +301,29 @@ describe('integration tests', () => {
       server.close(done)
     })
   }, 10000)
+
+  test(`/cat endpoint should return file`, done => {
+    const server = app.listen('9095', async () => {
+      const form = new FormData()
+      form.append('entry', fs.createReadStream('./mockData/testFile.md'))
+      const res = await axios.post('http://localhost:9095/api/v0/add', form, {
+        headers: form.getHeaders()
+      })
+
+      const isSuccessStatus = () => {
+        if (res.status === 201 || res.status === 200) return true
+        return false
+      }
+
+      expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
+      expect(isSuccessStatus()).toBe(true)
+
+      const catRes = await axios.get(
+        'http://localhost:9095/api/v0/cat?arg=QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU'
+      )
+      expect(catRes.data).toBe('This file is used to test the /add endpoint.')
+      expect(catRes.status).toBe(200)
+      server.close(done)
+    })
+  }, 10000)
 })
