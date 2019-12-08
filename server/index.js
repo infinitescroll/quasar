@@ -15,7 +15,7 @@ const {
   STORAGE_REGISTRY_CONTRACT_ADDRESS,
   TTL
 } = require('./constants')
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3003
 const app = express()
 
 const createApp = async () => {
