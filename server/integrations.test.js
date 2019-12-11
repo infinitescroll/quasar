@@ -215,7 +215,7 @@ describe('integration tests', () => {
   }, 10000)
 
   test(`registerPinChecker doesn't remove old confirmed pins`, done => {
-    const server = app.listen('9093', async () => {
+    const server = app.listen('9094', async () => {
       const dag = { testKey: 'testVal:old confirmed pin' }
       const hash = await node.dag.put(dag)
       await node.pin.add(hash.toBaseEncodedString())
@@ -252,7 +252,7 @@ describe('integration tests', () => {
   }, 10000)
 
   test(`events within BLOCK_PADDING should be ignored`, done => {
-    const server = app.listen('9094', async () => {
+    const server = app.listen('9095', async () => {
       // set up smart contract
       await emitRegisterContractEvent(demoStorageContractJson1.address)
       await mineBlocks(BLOCK_PADDING + 1)
@@ -284,7 +284,7 @@ describe('integration tests', () => {
   }, 10000)
 
   test(`/add endpoint should return hash and success status`, done => {
-    const server = app.listen('9095', async () => {
+    const server = app.listen('9096', async () => {
       const form = new FormData()
       form.append('entry', fs.createReadStream('./mockData/testFile.md'))
       const res = await axios.post('http://localhost:9095/api/v0/add', form, {
@@ -303,7 +303,7 @@ describe('integration tests', () => {
   }, 10000)
 
   test(`/cat endpoint should return file`, done => {
-    const server = app.listen('9095', async () => {
+    const server = app.listen('9097', async () => {
       const form = new FormData()
       form.append('entry', fs.createReadStream('./mockData/testFile.md'))
       const res = await axios.post('http://localhost:9095/api/v0/add', form, {
