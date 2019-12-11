@@ -1,3 +1,6 @@
+# Motivations
+
+
 ## Why should each DAO have at least one data store?
 
 DAOs produce data and they need a reliable place to store it. It can’t all go on-chain. The responsibilities of the DAO data store are primarily to:

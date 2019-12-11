@@ -8,11 +8,11 @@ aragon.js should handle application layer support for using the DAO data store. 
 
 ## Bootstrapping storage with Aragon Association node
 
-New Aragon DAOs shouldn’t have to worry about hosting their own DAO data store. To get started, organizations by default will connect with Aragon Association’s data store and be given a free amount of storage space. When the organization runs out of space, admins can either self host their own DAO data store or pay the Aragon Association to provide more space.
+New Aragon DAOs shouldn’t have to worry about hosting their own data store. To get started, organizations by default will connect with Aragon Association’s data store and be given a free amount of storage space. When the organization runs out of space, admins can either self host their own DAO data store or pay the Aragon Association to provide more space.
 
 A few small tweaks have already been made to support the beginning of this flow:
 
-- Quasar can expose an optional `POST` endpoint `/api/v0/storageContracts` to register a new storage smart contract. We [use this in the Aragon Client](https://github.com/openworklabs/aragon/blob/feat/client-storage/src/storage/Quasar.js#L13) to register a new storage contract with Quasar when the new DAO is loaded.
+- Quasar exposess an optional `POST` endpoint `/api/v0/storageContracts` to register a new storage smart contract. We [use this in the Aragon Client](https://github.com/openworklabs/aragon/blob/feat/client-storage/src/storage/Quasar.js#L13) to register a new storage contract with Quasar when the new DAO is loaded.
 - Quasar uses an optional `MAX_FILE_SIZE` environment variable to limit the size of each optimistic pin request.
 - Quasar stores the size of each piece of data that goes into the storage layer.
 

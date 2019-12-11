@@ -10,8 +10,10 @@ Quasar is smart contract based IPFS storage built for the Aragon Network but itâ
 
 ## Learn more
 
-[Instructions on using Quasar](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md)<br />
-[Instructions on how Quasar works](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md)<br />
-[Motivation behind Quasar](https://github.com/openworklabs/quasar/blob/update/docs/docs/motivations.md)<br />
-[Next steps and future roadmap](https://github.com/openworklabs/quasar/blob/update/docs/docs/future.md)<br />
+If you want to know why we built Quasar, check out [motivation behind Quasar](https://github.com/openworklabs/quasar/blob/update/docs/docs/motivations.md).
 
+If you just want to get started running Quasar, see the instructions [on using Quasar](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md).
+
+If you want to know how Quasar works under the hood, see [how Quasar works](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md).
+
+For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/update/docs/docs/usageWithAragon.md) doc.
