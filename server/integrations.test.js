@@ -2,9 +2,9 @@ const mongoose = require('mongoose')
 const request = require('supertest')
 const Web3 = require('web3')
 const { node } = require('./ipfs')
-const FormData = require('form-data')
-const fs = require('fs')
-const axios = require('axios')
+// const FormData = require('form-data')
+// const fs = require('fs')
+// const axios = require('axios')
 const {
   demoStorageRegistryContractJson,
   demoStorageContractJson1,
@@ -183,7 +183,7 @@ describe('integration tests', () => {
 
   test(`registerPinChecker removes old unconfirmed pins`, done => {
     const server = app.listen('9093', async () => {
-      const scheduler = await registerPinChecker(0, 800)
+      const scheduler = await registerPinChecker(0, 500)
       const dagVal = { test: '123456' }
       const dagRequest = await request(app)
         .post('/api/v0/dag/put')
@@ -302,28 +302,28 @@ describe('integration tests', () => {
   //   })
   // }, 10000)
 
-  test(`/cat endpoint should return file`, done => {
-    const server = app.listen('9097', async () => {
-      const form = new FormData()
-      form.append('entry', fs.createReadStream('./mockData/testFile.md'))
-      const res = await axios.post('http://localhost:9095/api/v0/add', form, {
-        headers: form.getHeaders()
-      })
+  // test(`/cat endpoint should return file`, done => {
+  //   const server = app.listen('9097', async () => {
+  //     const form = new FormData()
+  //     form.append('entry', fs.createReadStream('./mockData/testFile.md'))
+  //     const res = await axios.post('http://localhost:9095/api/v0/add', form, {
+  //       headers: form.getHeaders()
+  //     })
 
-      const isSuccessStatus = () => {
-        if (res.status === 201 || res.status === 200) return true
-        return false
-      }
+  //     const isSuccessStatus = () => {
+  //       if (res.status === 201 || res.status === 200) return true
+  //       return false
+  //     }
 
-      expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
-      expect(isSuccessStatus()).toBe(true)
+  //     expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
+  //     expect(isSuccessStatus()).toBe(true)
 
-      const catRes = await axios.get(
-        'http://localhost:9095/api/v0/cat?arg=QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU'
-      )
-      expect(catRes.data).toBe('This file is used to test the /add endpoint.')
-      expect(catRes.status).toBe(200)
-      server.close(done)
-    })
-  }, 10000)
+  //     const catRes = await axios.get(
+  //       'http://localhost:9095/api/v0/cat?arg=QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU'
+  //     )
+  //     expect(catRes.data).toBe('This file is used to test the /add endpoint.')
+  //     expect(catRes.status).toBe(200)
+  //     server.close(done)
+  //   })
+  // }, 10000)
 })
