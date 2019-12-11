@@ -214,42 +214,42 @@ describe('integration tests', () => {
     })
   }, 10000)
 
-  test(`registerPinChecker doesn't remove old confirmed pins`, done => {
-    const server = app.listen('9094', async () => {
-      const dag = { testKey: 'testVal:old confirmed pin' }
-      const hash = await node.dag.put(dag)
-      await node.pin.add(hash.toBaseEncodedString())
-      await Pin.create({
-        size: 100,
-        confirmed: true,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
-      })
-      await Pin.create({
-        size: 100,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
-      })
-      const scheduler = await registerPinChecker(0, 300)
-      await sleep(500)
+  // test(`registerPinChecker doesn't remove old confirmed pins`, done => {
+  //   const server = app.listen('9094', async () => {
+  //     const dag = { testKey: 'testVal:old confirmed pin' }
+  //     const hash = await node.dag.put(dag)
+  //     await node.pin.add(hash.toBaseEncodedString())
+  //     await Pin.create({
+  //       size: 100,
+  //       confirmed: true,
+  //       cid: hash.toBaseEncodedString(),
+  //       time: new Date()
+  //     })
+  //     await Pin.create({
+  //       size: 100,
+  //       cid: hash.toBaseEncodedString(),
+  //       time: new Date()
+  //     })
+  //     const scheduler = await registerPinChecker(0, 300)
+  //     await sleep(500)
 
-      const pinDoc = await Pin.findOne({
-        cid: hash.toBaseEncodedString()
-      })
-      expect(pinDoc.confirmed).toBe(true)
+  //     const pinDoc = await Pin.findOne({
+  //       cid: hash.toBaseEncodedString()
+  //     })
+  //     expect(pinDoc.confirmed).toBe(true)
 
-      const pins = await node.pin.ls()
-      const pinnedDagOnNode = pins.find(item => {
-        return item.hash === hash.toBaseEncodedString()
-      })
-      expect(pinnedDagOnNode.hash).toBe(hash.toBaseEncodedString())
+  //     const pins = await node.pin.ls()
+  //     const pinnedDagOnNode = pins.find(item => {
+  //       return item.hash === hash.toBaseEncodedString()
+  //     })
+  //     expect(pinnedDagOnNode.hash).toBe(hash.toBaseEncodedString())
 
-      scheduler.stop()
-      pinWatcher.stop()
-      storageRegistryWatcher.stop()
-      server.close(done)
-    })
-  }, 10000)
+  //     scheduler.stop()
+  //     pinWatcher.stop()
+  //     storageRegistryWatcher.stop()
+  //     server.close(done)
+  //   })
+  // }, 10000)
 
   test(`events within BLOCK_PADDING should be ignored`, done => {
     const server = app.listen('9095', async () => {
@@ -283,24 +283,24 @@ describe('integration tests', () => {
     })
   }, 10000)
 
-  test(`/add endpoint should return hash and success status`, done => {
-    const server = app.listen('9096', async () => {
-      const form = new FormData()
-      form.append('entry', fs.createReadStream('./mockData/testFile.md'))
-      const res = await axios.post('http://localhost:9095/api/v0/add', form, {
-        headers: form.getHeaders()
-      })
+  // test(`/add endpoint should return hash and success status`, done => {
+  //   const server = app.listen('9096', async () => {
+  //     const form = new FormData()
+  //     form.append('entry', fs.createReadStream('./mockData/testFile.md'))
+  //     const res = await axios.post('http://localhost:9095/api/v0/add', form, {
+  //       headers: form.getHeaders()
+  //     })
 
-      const isSuccessStatus = () => {
-        if (res.status === 201 || res.status === 200) return true
-        return false
-      }
+  //     const isSuccessStatus = () => {
+  //       if (res.status === 201 || res.status === 200) return true
+  //       return false
+  //     }
 
-      expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
-      expect(isSuccessStatus()).toBe(true)
-      server.close(done)
-    })
-  }, 10000)
+  //     expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
+  //     expect(isSuccessStatus()).toBe(true)
+  //     server.close(done)
+  //   })
+  // }, 10000)
 
   test(`/cat endpoint should return file`, done => {
     const server = app.listen('9097', async () => {
