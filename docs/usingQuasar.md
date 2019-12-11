@@ -1,6 +1,6 @@
 # Quasar start up guide
 
-If you run into any trouble, see the section [troubleshooting]() or file a new issue on our github page.
+If you run into any trouble, file an issue.
 
 ### Dependencies
 
@@ -9,7 +9,7 @@ If you run into any trouble, see the section [troubleshooting]() or file a new i
 
 ### Configuring a .env file
 
-There are a few required `.env` variables. An example can be found [here]().
+There are a few required `.env` variables. An example can be found [here](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example).
 
 ### Run Quasar Locally
 
@@ -22,20 +22,20 @@ There are a few required `.env` variables. An example can be found [here]().
 
 `npm run test` runs the jest testing suite.
 
-`npm run emit:registerEvent` - fires a `Register` event on the storage registry contract registered with Quasar.
+`npm run emit:registerEvent` - fires a `Register` event on the storage registry contract registered with Quasar.<br />
 `npm run emit:pinHashEvent` fires a `PinHash` event on the storage contract registered with Quasar.
 
-Note - both these scripts work on rinkeby and local chains. Extra steps are required for this to work on `rinkeby`.
+Note - both these scripts work on rinkeby and local chains. [Extra steps](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#rinkeby-usage) are required for this to work on rinkeby.
 
 ## Customizing Quasar's configuration
 
-Full [example]()
+Full [example](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example)
 
 ### Ethereum networks
 
 Quasar connects to an Ethereum node using the web3 HTTP provider:
 
-`BLOCKCHAIN_NETWORK` is one of either `local`, `mainnet`, or `rinkeby`.
+`BLOCKCHAIN_NETWORK` is one of either `local`, `mainnet`, or `rinkeby`.<br />
 `BLOCKCHAIN_PROVIDER_HTTP_URL` is an ethereum node http url. Common variables:
 
 *ganache*
@@ -80,7 +80,7 @@ Quasar polls the Ethereum blockchain to listen for events and the database to re
 `CONTRACT_POLL_INTERVAL` (ms) - How often Quasar polls contracts on Ethereum. Set to 30 minutes by default. Should be set to a much smaller number (like `50` ms) when running tests.
 `BLOCK_PADDING` (Padding of eth blocks ignored from HEAD) is set to 15 by default.
 
-### Example
+## Example .env file
 
 ```
 # IPFS variables are optional - Quasar defaults to local IPFS node values
