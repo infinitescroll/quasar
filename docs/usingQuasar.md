@@ -9,7 +9,7 @@ If you run into any trouble, file an issue.
 
 ### Configuring a .env file
 
-There are a few required `.env` variables. An example can be found [here](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example).
+There are a few required `.env` variables. An example can be found [here](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example). The only required variable is the `STORAGE_REGISTRY_CONTRACT_ADDRESS`.
 
 ### Run Quasar Locally
 
@@ -83,6 +83,9 @@ Quasar polls the Ethereum blockchain to listen for events and the database to re
 ## Example .env file
 
 ```
+# REQUIRED
+STORAGE_REGISTRY_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
+
 # IPFS variables are optional - Quasar defaults to local IPFS node values
 IPFS_NODE_HOST=localhost
 IPFS_NODE_PROTOCOL=http
@@ -90,7 +93,7 @@ IPFS_AUTH=Basic [auth_key_here]
 IPFS_NODE_PORT=5001
 IPFS_API_PATH=/ipfs/api/v0/
 
-# MongoDB auth — REQUIRED
+# MongoDB auth — required if your mongo is password procted (locally it might not be)
 MONGO_INITDB_ROOT_USERNAME=<username>
 MONGO_INITDB_ROOT_PASSWORD=<password>
 
@@ -104,7 +107,6 @@ BLOCK_PADDING=20 # Buffer of eth blocks ignored from HEAD
 BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/<project-id>
 BLOCKCHAIN_NETWORK=rinkeby
 MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball bernie twentytwenty
-STORAGE_REGISTRY_CONTRACT_ADDRESS=0xD712b21A5E8D9G0FE307E0fef6bC82c700a10D
 ```
 
 ## Rinkeby usage

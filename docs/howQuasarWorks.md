@@ -4,9 +4,11 @@ At the highest level, Quasar is composed of 4 parts:
 
 1. **Storage layer** - an IPFS node or cluster (or any alternative that implements the js-ipfs [interface](https://github.com/ipfs/interface-js-ipfs-core)).
 2. **Storage wrapper** - A wrapper around the storage layer that manages what data gets stored. The wrapper runs a number of microservices (explained [here]() that could eventually be abstracted into their own modules.
-3. **Storage contract(s**) - One or more contracts that use event logs to tell the storage wrapper what data to pin to the storage layer.
+3. **Storage contract(s**) - One or more contracts that use `PinHash` smart contract event logs to tell the storage wrapper what data to pin to the storage layer.
 4. **Storage registry contract** - a single contract that stores pointers to each of the storage contracts.
 ![](https://paper-attachments.dropbox.com/s_E5062EC0ED2F89286569337DBE9E4F39ED10C38B3CAEFF747B255F9A4D2850D0_1574302599340_image.png)
+
+Quasar's primary objective is to listen for IPFS `cid`s that are emitted through [`PinHash` ethereum events]((https://github.com/openworklabs/quasar/blob/primary/contracts/DataStore.sol)). When Quasar hears of a new `cid` from one of it's storage contracts through an event, it confirms that `cid` as valid in the storage layer and persists it.
 
 ## Optimistic Pinning
 
@@ -52,6 +54,12 @@ To ask Quasar to listen for `PinHash` events from a *new* storage contract, emit
 ![](https://paper-attachments.dropbox.com/s_E5062EC0ED2F89286569337DBE9E4F39ED10C38B3CAEFF747B255F9A4D2850D0_1574357434057_image.png)
 
 ## Registering new storage contracts to listen to
+
+Quasar is associated with a single [storage registry contract](https://github.com/openworklabs/quasar/blob/primary/contracts/StorageRegistry.sol) that holds references to all the storage contracts to listen to. Using API keys to register storage contracts would not _truly_ be trustless (also, why wouldn't you just use those API keys to manage the pinning permission on your node?). Using a smart contract allows us to inherit more flexible authentication schemes.
+
+Any time you want to register a new storage contract with Quasar, simply fire the `Register` event from the storage registry contract. Note - registering storage contracts that do not implement the [storage contract interface](https://github.com/openworklabs/quasar/blob/primary/contracts/DataStore.sol) will not work. To tell Quasar to stop listening to any contract, emit an `Unregister` event with the contract’s address to unregister.
+
+More information about this in the [configuration doc](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#customizing-quasars-configuration)
 
 Quasar is associated with a single storage registry contract that holds references to all the storage contracts to listen to. After deploying a [storage registry contract](https://github.com/openworklabs/quasar/blob/primary/contracts/StorageRegistry.sol) to Ethereum, copy the contract’s address, and pass it to Quasar via the `STORAGE_REGISTRY_CONTRACT_ADDRESS` (see [constants.js](https://github.com/openworklabs/quasar/blob/primary/server/constants.js) [file](https://github.com/openworklabs/quasar/blob/primary/server/constants.js) for full list of environment variables).
 
