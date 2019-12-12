@@ -17,3 +17,9 @@ To get started running Quasar, see the [instructions](https://github.com/openwor
 Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md) under the hood.
 
 For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/update/docs/docs/usageWithAragon.md) doc.
+
+Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/) for funding this work and making Quasar possible.
+
+## Bugs
+
+If you find any bugs, please make sure an issue doesn't already exist before filing a new one. Leave as much detail to replicate as you can.
