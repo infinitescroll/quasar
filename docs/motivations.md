@@ -6,9 +6,9 @@ The obvious solution is to host an IPFS node that acts as a "pinning node" to en
 
 | **Strategy** | **Pros** | **Cons** |
 |-------------------------------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| A public pinninig node | Do not have to worry about managing permissions. | Legal and economic implications if people pin large amounts of data to the node or illegal content. |
+| A public pinning node | Do not have to worry about managing permissions. | Legal and economic implications if people pin large amounts of data to the node or illegal content. |
 | A private (permissioned) pinning node | Avoid legal and economic risks. | Managing API keys. Will not work for sites that do not require a "log in" functionality (like an Aragon DAO). |
-| A smart contract based pinning node | Flexible permission systems. No management of API keys. | A lot of boilerplate. |
+| **A smart contract based pinning node** | Flexible permission systems. No management of API keys. | A lot of boilerplate. |
 
 Using smart contracts to determine who can pin data, or what data can get pinned, allows any smart contract developer to create their own pinning permissions. For example, anyone could easily build a permission system that permits holders of your token to pin to your IPFS node. This isn't possible with traditional metohds.
 

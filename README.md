@@ -18,6 +18,8 @@ Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/update/doc
 
 For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/update/docs/docs/usageWithAragon.md) doc.
 
+[Examples](https://github.com/openworklabs/quasar/blob/update/docs/docs/examples.md) of interacting with Quasar from the browser.
+
 Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/) for funding this work and making Quasar possible.
 
 ## Bugs

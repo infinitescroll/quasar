@@ -1,28 +1,30 @@
-# The roadmap
+# Usages in aragon
 
-These roadmap items are specifically tailored to the Aragon DAO ecosystem. Not everything in this list of roadmap items is planned on being built in AGP73. No particular order among these initiatives has been determined yet.
+We implemented support for Quasar in both aragon.js and the Aragon client, so the A1 team can evaluate handling "DAO datastore" support in multiple places by seeing it in action (we call an IPFS node wrapped in Quasar a "DAO datastore" in the context of Aragon).
 
-## aragon.js application support for DAO data store usage
+We think it makes more sense to handle support for Quasar in the wrapper > client because there's no benefit to performing IPFS operations directly inside react components (rather than in a background script). Achieving Quasar support is also way simpler through aragon.js.
 
-aragon.js should handle application layer support for using the DAO data store. `@aragon/api` could expose simple endpoints to simplify these interactions, like setting and getting data, and registering smart contracts with Quasar. We are starting on an experimental implementation for [Open Enterprises Project’s App](https://github.com/AutarkLabs/open-enterprise/tree/dev/apps/projects) in the coming weeks.
+All experimental Quasar features can be found in `experimental-oe` branches of aragon client and aragon.js.
 
-## Bootstrapping storage with Aragon Association node
+## aragon.js
 
-New Aragon DAOs shouldn’t have to worry about hosting their own data store. To get started, organizations by default will connect with Aragon Association’s data store and be given a free amount of storage space. When the organization runs out of space, admins can either self host their own DAO data store or pay the Aragon Association to provide more space.
+Adding support for interacting with the DAO's data store in aragon.js gives aragon apps a way to store user generated content without hosting their own storage infrastructure. We implemented the following changes to give support to the Open Enterprise Projects App through aragon.js:
 
-A few small tweaks have already been made to support the beginning of this flow:
+- Emitting `PinHash` events in the [Projects' app contract]() whenever data should get pinned.
+- Marking the projects app as "storage" in its [`arap.json`]()
+- Iterating through the DAO' apps, and [registering each app marked as "storage" (in its `arap.json`) with Quasar](). See section on [registering new storage contracts to listen to]() for more information.
+- aragon-api support for data sstore methods through the [datastore handler]()
+- aragon-wrapper support through the [datastore class]()
 
-- Quasar exposess an optional `POST` endpoint `/api/v0/storageContracts` to register a new storage smart contract. We [use this in the Aragon Client](https://github.com/openworklabs/aragon/blob/feat/client-storage/src/storage/Quasar.js#L13) to register a new storage contract with Quasar when the new DAO is loaded.
-- Quasar uses an optional `MAX_FILE_SIZE` environment variable to limit the size of each optimistic pin request.
-- Quasar stores the size of each piece of data that goes into the storage layer.
+## aragon/client
 
-What else needs to happen in order for this to work:
+Our first take at building support for Quasar was done completely in the client. The goal was to support pinning a blob of data that represents the organization's settings.
 
-- Quasar needs to store the total amount of data pinned by each smart contract.
-- Quasar needs to be able to associate multiple smart contracts with one Aragon “organization”.
-- Frontend UI and notification service should be built to inform DAO when storage is running out.
-- Build native support for DAO data store initialization into @aragon/cli.
-- Aragon Association payments backend must be built (could use a web2 solution like stripe or accept DAI over a smart contract).
-----------
+- When the DAO loads, [determine if there's a storage app installed]() via the kernal (note - we could loop through the organization apps' arap.json files to determine if any of them are marked as `storage` like we implemented in aragon.js. This would allow a DAO to pin data without having a dedicated storage smart contract installed).
+- Expose functions via an DAO datastore hook that provides information about the IPFS connection, the storage app, and methods to get and set data.
 
-[Open Work Labs](https://www.openworklabs.com/)
+Exposing hooks in this way provides an alternative support mechanism for datastore interaction via aragon.js. If requests to interact with the datastore were pushed to an Observable (in a similar way as signing messages or transactions), the client could subscribe to the "datastore" observable (hypothetically). When an aragon app wishes to make a call to the datastore, it `next`s the request to the associated observable. The client hears the update to the observable, and can easily handle it with the associated methods exposed from the `useOrganizationDataStore` hook. More information about this is in the code video walkthrough.
+
+## Future revenue model
+
+New Aragon DAOs shouldn’t have to worry about hosting their own DAO datastore. To get started, organizations by default will connect with Aragon Association’s data store and be given a free amount of storage space. When the organization runs out of space, admins can either self host their own DAO data store or pay the Aragon Association to provide more space. This could serve as an early revenue model for the Association, especially if Aragon Apps get in the habit of using the datastore methods to store user generated content.
