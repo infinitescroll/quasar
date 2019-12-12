@@ -25,3 +25,5 @@ Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/)
 ## Bugs
 
 If you find any bugs, please make sure an issue doesn't already exist before filing a new one. Leave as much detail to replicate as you can.
+
+<img src="./docs/owl.svg">
