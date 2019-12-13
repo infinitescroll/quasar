@@ -62,7 +62,7 @@ test('can add + remove old pins from db', async done => {
   const outdatedPins = await Pin.find({ time: { $lt: cuttoff } }).exec()
   expect(outdatedPins.length).toBe(2)
 
-  await Pin.findandRemoveOldPins()
+  await Pin.removeOldUnconfirmedPins()
   const oldPins = await Pin.find({ time: { $lt: cuttoff } })
   expect(oldPins.length).toBe(0)
 
