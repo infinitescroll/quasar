@@ -59,7 +59,7 @@ Quasar is associated with a single [storage registry contract](https://github.co
 
 Any time you want to register a new storage contract with Quasar, simply fire the `Register` event from the storage registry contract. Note - registering storage contracts that do not implement the [storage contract interface](https://github.com/openworklabs/quasar/blob/primary/contracts/DataStore.sol) will not work. To tell Quasar to stop listening to any contract, emit an `Unregister` event with the contract’s address to unregister.
 
-More information about this in the [configuration doc](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#customizing-quasars-configuration)
+More information about this in the [configuration doc](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#customizing-quasars-configuration)
 
 Quasar is associated with a single storage registry contract that holds references to all the storage contracts to listen to. After deploying a [storage registry contract](https://github.com/openworklabs/quasar/blob/primary/contracts/StorageRegistry.sol) to Ethereum, copy the contract’s address, and pass it to Quasar via the `STORAGE_REGISTRY_CONTRACT_ADDRESS` (see [constants.js](https://github.com/openworklabs/quasar/blob/primary/server/constants.js) [file](https://github.com/openworklabs/quasar/blob/primary/server/constants.js) for full list of environment variables).
 

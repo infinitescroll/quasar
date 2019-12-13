@@ -5,11 +5,11 @@ If you run into any trouble, file an issue.
 ### Dependencies
 
 - [MonboDB](https://www.mongodb.com/) - for any issues related directly to mongoDB, we'd recommend checking their documentation first.
-- [Node.js](https://nodejs.org/en/) - we've been using node `v12.9.0` with no problems.
+- [Node.js](https://nodejs.org/en/) - supports node versions 10, 11, and 12.
 
 ### Configuring a .env file
 
-There are a few required `.env` variables. An example can be found [here](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example). The only required variable is the `STORAGE_REGISTRY_CONTRACT_ADDRESS`.
+There are a few required `.env` variables. An example can be found [here](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#example). The only required variable is the `STORAGE_REGISTRY_CONTRACT_ADDRESS`.
 
 ### Run Quasar Locally
 
@@ -25,11 +25,11 @@ There are a few required `.env` variables. An example can be found [here](https:
 `npm run emit:registerEvent` - fires a `Register` event on the storage registry contract registered with Quasar.<br />
 `npm run emit:pinHashEvent` fires a `PinHash` event on the storage contract registered with Quasar.
 
-Note - both these scripts work on rinkeby and local chains. [Extra steps](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#rinkeby-usage) are required for this to work on rinkeby.
+Note - both these scripts work on rinkeby and local chains. [Extra steps](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#rinkeby-usage) are required for this to work on rinkeby.
 
 ## Customizing Quasar's configuration
 
-Full [example](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md#example)
+Full [example](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#example)
 
 ### Ethereum networks
 

@@ -10,15 +10,15 @@ Quasar is smart contract based IPFS storage built for the Aragon Network but itâ
 
 ## Learn more
 
-To find out why we built Quasar, check out [motivation](https://github.com/openworklabs/quasar/blob/update/docs/docs/motivations.md).
+To find out why we built Quasar, check out [motivation](https://github.com/openworklabs/quasar/blob/primary/docs/motivations.md).
 
-To get started running Quasar, see the [instructions](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md).
+To get started running Quasar, see the [instructions](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md).
 
-Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/update/docs/docs/usingQuasar.md) under the hood.
+Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md) under the hood.
 
-For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/update/docs/docs/usageWithAragon.md) doc.
+For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/primary/docs/usageWithAragon.md) doc.
 
-[Examples](https://github.com/openworklabs/quasar/blob/update/docs/docs/examples.md) of interacting with Quasar from the browser.
+[Examples](https://github.com/openworklabs/quasar/blob/primary/docs/examples.md) of interacting with Quasar from the browser.
 
 Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/) for funding this work and making Quasar possible.
 

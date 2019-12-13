@@ -10,11 +10,13 @@ All experimental Quasar features can be found in `experimental-oe` branches of a
 
 Adding support for interacting with the DAO's data store in aragon.js gives aragon apps a way to store user generated content without hosting their own storage infrastructure. We implemented the following changes to give support to the Open Enterprise Projects App through aragon.js:
 
-- Emitting `PinHash` events in the [Projects' app contract]() whenever data should get pinned.
-- Marking the projects app as "storage" in its [`arap.json`]()
-- Iterating through the DAO' apps, and [registering each app marked as "storage" (in its `arap.json`) with Quasar](). See section on [registering new storage contracts to listen to]() for more information.
-- aragon-api support for data sstore methods through the [datastore handler]()
-- aragon-wrapper support through the [datastore class]()
+- Emitting `PinHash` events in the [Projects' app contract](https://github.com/AutarkLabs/open-enterprise/blob/experimental-oe/apps/projects/contracts/Projects.sol) whenever data should get pinned. (command + f "PinHash")
+- Marking the projects app as "storage" in its [`arap.json`](https://github.com/AutarkLabs/open-enterprise/blob/experimental-oe/apps/projects/arapp.json)
+- Iterating through the DAO' apps, and [registering each app marked as "storage" (in its `arap.json`) with Quasar](https://github.com/openworklabs/aragon.js/blob/experimental-oe/packages/aragon-wrapper/src/utils/quasar.js). See section on [registering new storage contracts to listen to](https://github.com/openworklabs/quasar/blob/primary/docs/howQuasarWorks.md#registering-new-storage-contracts-to-listen-to) for more information.
+- aragon-api support for data store methods through the [datastore handler](https://github.com/openworklabs/aragon.js/blob/experimental-oe/packages/aragon-api/src/index.js) (command + f "datastore")
+- aragon-wrapper support through the [datastore class](https://github.com/openworklabs/aragon.js/blob/experimental-oe/packages/aragon-wrapper/src/datastore/index.js)
+
+Note - we use FormData in the wrapper, which might break things when this package is required in a node environment (you would need to polyfill the FormData to use somethin that works in node). The security restrictions forbit us from passing FormData through the api calls, so we need to handle it on the wrapper side.
 
 ## aragon/client
 
