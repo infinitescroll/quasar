@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 const request = require('supertest')
 const Web3 = require('web3')
+const axios = require('axios')
+const fs = require('fs')
+const FormData = require('form-data')
 const { node } = require('./ipfs')
-// const FormData = require('form-data')
-// const fs = require('fs')
-// const axios = require('axios')
 const {
   demoStorageRegistryContractJson,
   demoStorageContractJson1,
@@ -104,227 +104,178 @@ afterEach(async () => {
 })
 
 describe('integration tests', () => {
-  describe('polling mechanisms', () => {
-    test('firing register event adds contract to db and begins polling, unregistering removes contract from db', done => {
-      const server = app.listen('9091', async () => {
-        await Promise.all([
-          await emitRegisterContractEvent(demoStorageContractJson1.address),
-          await emitRegisterContractEvent(demoStorageContractJson2.address)
-        ])
-        await mineBlocks(BLOCK_PADDING + 1)
-        await sleep(1000)
-
-        const storageContract = await StorageContract.findOne({
-          address: demoStorageContractJson1.address
-        })
-        expect(storageContract.address).toBe(demoStorageContractJson1.address)
-        expect(storageContract.sizeOfPinnedData).toBe(0)
-        expect(storageContract.lastPolledBlock).toBeGreaterThan(0)
-        const secondStorageContract = await StorageContract.findOne({
-          address: demoStorageContractJson2.address
-        })
-        expect(secondStorageContract.address).toBe(
-          demoStorageContractJson2.address
-        )
-        expect(secondStorageContract.sizeOfPinnedData).toBe(0)
-        expect(secondStorageContract.lastPolledBlock).toBeGreaterThan(0)
-        await emitUnregisterContractEvent(demoStorageContractJson1.address)
-        await mineBlocks(BLOCK_PADDING + 1)
-        await sleep(1000)
-
-        const removedStorageContract = await StorageContract.findOne({
-          address: demoStorageContractJson1.address
-        })
-        const nonRemovedStorageContract = await StorageContract.findOne({
-          address: demoStorageContractJson2.address
-        })
-        expect(removedStorageContract).toBe(null)
-        expect(nonRemovedStorageContract.address).toBe(
-          demoStorageContractJson2.address
-        )
-        pinWatcher.stop()
-        storageRegistryWatcher.stop()
-        server.close(done)
-      })
-    }, 10000)
-  })
-
-  test(`emitting register event to storage registry contract, then emittting pinHash event to storage contract, updates associated document in database`, done => {
-    const server = app.listen('9092', async () => {
-      // set up smart contract
-      await emitRegisterContractEvent(demoStorageContractJson1.address)
+  test('firing register event adds contract to db and begins polling, unregistering removes contract from db', done => {
+    const server = app.listen('9091', async () => {
+      await Promise.all([
+        await emitRegisterContractEvent(demoStorageContractJson1.address),
+        await emitRegisterContractEvent(demoStorageContractJson2.address)
+      ])
       await mineBlocks(BLOCK_PADDING + 1)
-      await sleep(500)
-
-      const testKey = web3.utils.fromAscii('testKey')
-      const dag = { testKey: 'testVal' }
-      const hash = await node.dag.put(dag)
-
-      // manually add pin to db, to be removed later
-      await Pin.create({
-        size: 100,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
-      })
-      await emitPinHashEvent(testKey, hash.toBaseEncodedString())
-      await mineBlocks(BLOCK_PADDING + 1)
-      await sleep(500)
-
-      const pinDoc = await Pin.findOne({
-        cid: hash.toBaseEncodedString()
-      })
-
-      expect(pinDoc.confirmed).toBe(true)
-      pinWatcher.stop()
-      storageRegistryWatcher.stop()
-      server.close(done)
-    })
-  }, 10000)
-
-  test(`registerPinChecker removes old unconfirmed pins`, done => {
-    const server = app.listen('9093', async () => {
-      const scheduler = await registerPinChecker(0, 500)
-      const dagVal = { test: '123456' }
-      const dagRequest = await request(app)
-        .post('/api/v0/dag/put')
-        .send(dagVal)
-
-      expect(dagRequest.res.statusCode).toBe(201)
-
-      const dag = await node.dag.get(dagRequest.res.text)
-      expect(dag.value).toStrictEqual(dagVal)
-
       await sleep(1000)
-
-      const removedPinnedDag = await Pin.findOne({
-        cid: dagRequest.res.text
+      const storageContract = await StorageContract.findOne({
+        address: demoStorageContractJson1.address
       })
-      expect(removedPinnedDag).toBeNull()
-
-      const pins = await node.pin.ls()
-      const removedPinnedDagOnNode = pins.find(item => {
-        return item.hash === dagRequest.res.text
+      expect(storageContract.address).toBe(demoStorageContractJson1.address)
+      expect(storageContract.sizeOfPinnedData).toBe(0)
+      expect(storageContract.lastPolledBlock).toBeGreaterThan(0)
+      const secondStorageContract = await StorageContract.findOne({
+        address: demoStorageContractJson2.address
       })
-      expect(removedPinnedDagOnNode).toBe(undefined)
-
-      scheduler.stop()
-      pinWatcher.stop()
-      storageRegistryWatcher.stop()
-      server.close(done)
-    })
-  }, 10000)
-
-  test(`registerPinChecker doesn't remove old confirmed pins`, done => {
-    const server = app.listen('9094', async () => {
-      const dag = { testKey: 'testVal:old confirmed pin' }
-      const hash = await node.dag.put(dag)
-      await node.pin.add(hash.toBaseEncodedString())
-      await Pin.create({
-        size: 100,
-        confirmed: true,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
-      })
-      await Pin.create({
-        size: 100,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
-      })
-      const scheduler = await registerPinChecker(0, 300)
-      await sleep(500)
-
-      const pinDoc = await Pin.findOne({
-        cid: hash.toBaseEncodedString()
-      })
-      expect(pinDoc.confirmed).toBe(true)
-
-      const pins = await node.pin.ls()
-      const pinnedDagOnNode = pins.find(item => {
-        return item.hash === hash.toBaseEncodedString()
-      })
-      expect(pinnedDagOnNode.hash).toBe(hash.toBaseEncodedString())
-
-      scheduler.stop()
-      pinWatcher.stop()
-      storageRegistryWatcher.stop()
-      server.close(done)
-    })
-  }, 10000)
-
-  test(`events within BLOCK_PADDING should be ignored`, done => {
-    const server = app.listen('9095', async () => {
-      // set up smart contract
-      await emitRegisterContractEvent(demoStorageContractJson1.address)
+      expect(secondStorageContract.address).toBe(
+        demoStorageContractJson2.address
+      )
+      expect(secondStorageContract.sizeOfPinnedData).toBe(0)
+      expect(secondStorageContract.lastPolledBlock).toBeGreaterThan(0)
+      await emitUnregisterContractEvent(demoStorageContractJson1.address)
       await mineBlocks(BLOCK_PADDING + 1)
-      await sleep(500)
-
-      const testKey = web3.utils.fromAscii('testKey1')
-      const dag = { testKey: 'testVal1' }
-      const hash = await node.dag.put(dag)
-
-      await Pin.create({
-        size: 100,
-        cid: hash.toBaseEncodedString(),
-        time: new Date()
+      await sleep(1000)
+      const removedStorageContract = await StorageContract.findOne({
+        address: demoStorageContractJson1.address
       })
-
-      await emitPinHashEvent(testKey, hash.toBaseEncodedString())
-      await mineBlocks(1)
-      await sleep(500)
-
-      const pinDoc = await Pin.findOne({
-        cid: hash.toBaseEncodedString()
+      const nonRemovedStorageContract = await StorageContract.findOne({
+        address: demoStorageContractJson2.address
       })
-
-      expect(pinDoc.confirmed).toBe(false)
+      expect(removedStorageContract).toBe(null)
+      expect(nonRemovedStorageContract.address).toBe(
+        demoStorageContractJson2.address
+      )
       pinWatcher.stop()
       storageRegistryWatcher.stop()
       server.close(done)
     })
   }, 10000)
+})
 
-  // test(`/add endpoint should return hash and success status`, done => {
-  //   console.log('trying')
-  //   const server = app.listen('9096', async () => {
-  //     const form = new FormData()
-  //     form.append('entry', fs.createReadStream('./mockData/testFile.md'))
-  //     const res = await axios.post('http://localhost:9096/api/v0/add', form, {
-  //       headers: form.getHeaders()
-  //     })
+test(`emitting register event to storage registry contract, then emittting pinHash event to storage contract, updates associated document in database`, done => {
+  const server = app.listen('9092', async () => {
+    // set up smart contract
+    await emitRegisterContractEvent(demoStorageContractJson1.address)
+    await mineBlocks(BLOCK_PADDING + 1)
+    await sleep(500)
+    const testKey = web3.utils.fromAscii('testKey')
+    const dag = { testKey: 'testVal' }
+    const hash = await node.dag.put(dag)
+    // manually add pin to db, to be removed later
+    await Pin.create({
+      size: 100,
+      cid: hash.toBaseEncodedString(),
+      time: new Date()
+    })
+    await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+    await mineBlocks(BLOCK_PADDING + 1)
+    await sleep(500)
+    const pinDoc = await Pin.findOne({
+      cid: hash.toBaseEncodedString()
+    })
+    expect(pinDoc.confirmed).toBe(true)
+    pinWatcher.stop()
+    storageRegistryWatcher.stop()
+    server.close(done)
+  })
+}, 10000)
 
-  //     const isSuccessStatus = () => {
-  //       if (res.status === 201 || res.status === 200) return true
-  //       return false
-  //     }
+test(`registerPinChecker removes old unconfirmed pins`, done => {
+  const server = app.listen('9093', async () => {
+    const scheduler = await registerPinChecker(0, 500)
+    const dagVal = { test: '123456' }
+    const dagRequest = await request(app)
+      .post('/api/v0/dag/put')
+      .send(dagVal)
+    expect(dagRequest.res.statusCode).toBe(201)
+    const dag = await node.dag.get(dagRequest.res.text)
+    expect(dag.value).toStrictEqual(dagVal)
+    await sleep(1000)
+    const removedPinnedDag = await Pin.findOne({
+      cid: dagRequest.res.text
+    })
+    expect(removedPinnedDag).toBeNull()
+    const pins = await node.pin.ls()
+    const removedPinnedDagOnNode = pins.find(item => {
+      return item.hash === dagRequest.res.text
+    })
+    expect(removedPinnedDagOnNode).toBe(undefined)
+    scheduler.stop()
+    pinWatcher.stop()
+    storageRegistryWatcher.stop()
+    server.close(done)
+  })
+}, 10000)
 
-  //     expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
-  //     expect(isSuccessStatus()).toBe(true)
-  //     server.close(done)
-  //   })
-  // }, 10000)
+test(`registerPinChecker doesn't remove old confirmed pins`, done => {
+  const server = app.listen('9094', async () => {
+    const dag = { testKey: 'testVal:old confirmed pin' }
+    const hash = await node.dag.put(dag)
+    await node.pin.add(hash.toBaseEncodedString())
+    await Pin.create({
+      size: 100,
+      confirmed: true,
+      cid: hash.toBaseEncodedString(),
+      time: new Date()
+    })
+    await Pin.create({
+      size: 100,
+      cid: hash.toBaseEncodedString(),
+      time: new Date()
+    })
+    const scheduler = await registerPinChecker(0, 300)
+    await sleep(500)
+    const pinDoc = await Pin.findOne({
+      cid: hash.toBaseEncodedString()
+    })
+    expect(pinDoc.confirmed).toBe(true)
+    const pins = await node.pin.ls()
+    const pinnedDagOnNode = pins.find(item => {
+      return item.hash === hash.toBaseEncodedString()
+    })
+    expect(pinnedDagOnNode.hash).toBe(hash.toBaseEncodedString())
+    scheduler.stop()
+    pinWatcher.stop()
+    storageRegistryWatcher.stop()
+    server.close(done)
+  })
+}, 10000)
 
-  // test(`/cat endpoint should return file`, done => {
-  //   const server = app.listen('9097', async () => {
-  //     const form = new FormData()
-  //     form.append('entry', fs.createReadStream('./mockData/testFile.md'))
-  //     const res = await axios.post('http://localhost:9097/api/v0/add', form, {
-  //       headers: form.getHeaders()
-  //     })
+test(`events within BLOCK_PADDING should be ignored`, done => {
+  const server = app.listen('9095', async () => {
+    // set up smart contract
+    await emitRegisterContractEvent(demoStorageContractJson1.address)
+    await mineBlocks(BLOCK_PADDING + 1)
+    await sleep(500)
+    const testKey = web3.utils.fromAscii('testKey1')
+    const dag = { testKey: 'testVal1' }
+    const hash = await node.dag.put(dag)
+    await Pin.create({
+      size: 100,
+      cid: hash.toBaseEncodedString(),
+      time: new Date()
+    })
+    await emitPinHashEvent(testKey, hash.toBaseEncodedString())
+    await mineBlocks(1)
+    await sleep(500)
+    const pinDoc = await Pin.findOne({
+      cid: hash.toBaseEncodedString()
+    })
+    expect(pinDoc.confirmed).toBe(false)
+    pinWatcher.stop()
+    storageRegistryWatcher.stop()
+    server.close(done)
+  })
+}, 10000)
 
-  //     const isSuccessStatus = () => {
-  //       if (res.status === 201 || res.status === 200) return true
-  //       return false
-  //     }
+test(`/add endpoint should add Pin to database`, done => {
+  const server = app.listen('9096', async () => {
+    const form = new FormData()
+    // using one readable stream in 2 places causes requests to hang
+    const readStream = await fs.createReadStream('./mockData/testFile.md')
+    form.append('entry', readStream)
 
-  //     expect(res.data).toBe('QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU')
-  //     expect(isSuccessStatus()).toBe(true)
+    const res = await axios.post('http://localhost:9096/api/v0/add', form, {
+      headers: form.getHeaders()
+    })
 
-  //     const catRes = await axios.get(
-  //       'http://localhost:9097/api/v0/cat?arg=QmaH3A1EmJaf9VYhZyXU7ctCY6tEMjuFdy3YeswgHpB5CU'
-  //     )
-  //     expect(catRes.data).toBe('This file is used to test the /add endpoint.')
-  //     expect(catRes.status).toBe(200)
-  //     server.close(done)
-  //   })
-  // }, 10000)
+    const pinDoc = await Pin.findOne({ cid: res.data })
+    expect(pinDoc).toBeTruthy()
+    expect(pinDoc.confirmed).toBeFalsy()
+    server.close(done)
+  })
 })

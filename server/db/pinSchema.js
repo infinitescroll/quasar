@@ -26,23 +26,27 @@ class PinClass {
       confirmed: false,
       time: { $lt: cutoffDate }
     }).exec()
-    oldUnconfirmedPins.forEach(pin => {
-      log(`Found old unconfirmed pin with cid: ${pin.cid}`)
-    })
+
     await Promise.all(
       oldUnconfirmedPins.map(async pin => {
+        log(`Found old unconfirmed pin with cid: ${pin.cid}`)
+        // we check to make sure there isn't already a pin that has been confirmed with the same CID
+        // guards against duplicate pins
         const confirmedPin = await this.findOne({
           cid: pin.cid,
           confirmed: true
         })
+
         if (!confirmedPin) await ipfs.node.pin.rm(pin.cid)
       })
     )
-    await this.deleteMany({
+    // delete the unconfirmed pins that have lived too long
+    const res = await this.deleteMany({
       confirmed: false,
       time: { $lt: cutoffDate }
     }).exec()
-    if (oldUnconfirmedPins.length > 0) log('Deleted pins successfully')
+    if (res.deletedCount > 0)
+      log(`Deleted ${res.deletedCount} pins successfully`)
   }
 }
 
