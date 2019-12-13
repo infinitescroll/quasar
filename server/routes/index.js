@@ -27,7 +27,20 @@ router.post('/dag/put', async (req, res) => {
   }
 })
 
-router.post('/files/add', upload.single('entry'), async (req, res) => {
+router.get('/dag/get', async (req, res) => {
+  if (!req.query.arg) return res.status(400).send('"arg" param missing')
+
+  try {
+    const result = await ipfs.node.dag.get(req.query.arg)
+    if (!result || !result.value || !result.value.dag)
+      return res.status(400).send('No dag found.')
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
+
+router.post('/add', upload.single('entry'), async (req, res) => {
   if (req.file.size > MAX_FILE_SIZE)
     return res.status(413).send("File is bigger than 1GB. That's too big.")
 
@@ -38,7 +51,18 @@ router.post('/files/add', upload.single('entry'), async (req, res) => {
       cid: result[0].hash,
       time: new Date()
     })
-    res.status(200).send(result[0].hash)
+    res.status(201).send(result[0].hash)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+})
+
+router.get('/cat', async (req, res) => {
+  if (!req.query.arg) return res.status(400).send('"arg" param missing')
+
+  try {
+    const result = await ipfs.node.get(req.query.arg)
+    res.status(200).send(result[0].content)
   } catch (error) {
     res.status(400).send(error)
   }
