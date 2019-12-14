@@ -7,13 +7,9 @@ contract Storage is DataStore {
 
     /// Events
     event PinHash(string cid);
-    event RegisterStorageProvider(string provider, string uri, address providerSetter);
 
     /// State: data registry
     mapping(bytes32 => string) internal registeredData;
-
-    string provider;
-    string uri;
 
     /**
      * @notice Set `_key` data to `_value`
@@ -30,18 +26,5 @@ contract Storage is DataStore {
 
     function getRegisteredData(bytes32 _key) external view returns(string) {
         return registeredData[_key];
-    }
-
-    function registerStorageProvider(string newProvider, string newUri) external {
-        provider = newProvider;
-        uri = newUri;
-        emit RegisterStorageProvider(provider, uri, msg.sender);
-    }
-
-    function getStorageProvider() external view returns(string, string) {
-        return (
-            provider,
-            uri
-        );
     }
 }
