@@ -32,8 +32,7 @@ router.get('/dag/get', async (req, res) => {
 
   try {
     const result = await ipfs.node.dag.get(req.query.arg)
-    if (!result || !result.value || !result.value.dag)
-      return res.status(400).send('No dag found.')
+    if (!result || !result.value) return res.status(400).send('No dag found.')
     res.status(200).send(result)
   } catch (error) {
     res.status(400).send(error)
