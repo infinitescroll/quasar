@@ -1,4 +1,4 @@
-# Usages in aragon
+# Usages in Aragon
 
 We implemented support for Quasar in both aragon.js and the Aragon client, so the A1 team can evaluate handling "DAO datastore" support in multiple places by seeing it in action (we call an IPFS node wrapped in Quasar a "DAO datastore" in the context of Aragon).
 
