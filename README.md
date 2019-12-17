@@ -20,7 +20,7 @@ For the Aragon community, see the [usage with Aragon](https://github.com/openwor
 
 [Examples](https://github.com/openworklabs/quasar/blob/primary/docs/examples.md) of interacting with Quasar from the browser.
 
-Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/) for funding this work and making Quasar possible.
+Thank you to [Aragon](https://aragon.org/) and [Autark](https://www.autark.xyz/) for funding this work!
 
 ## Bugs
 
