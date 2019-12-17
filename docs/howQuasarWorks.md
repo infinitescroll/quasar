@@ -3,7 +3,7 @@
 At the highest level, Quasar is composed of 4 parts:
 
 1. **Storage layer** - an IPFS node or cluster (or any alternative that implements the js-ipfs [interface](https://github.com/ipfs/interface-js-ipfs-core)).
-2. **Storage wrapper** - A wrapper around the storage layer that manages what data gets stored. The wrapper runs a number of microservices (explained [here]() that could eventually be abstracted into their own modules.
+2. **Storage wrapper** - A wrapper around the storage layer that manages what data gets stored. The wrapper runs a number of microservices (explained [here]()) that could eventually be abstracted into their own modules.
 3. **Storage contract(s**) - One or more contracts that use `PinHash` smart contract event logs to tell the storage wrapper what data to pin to the storage layer.
 4. **Storage registry contract** - a single contract that stores pointers to each of the storage contracts.
 ![](https://paper-attachments.dropbox.com/s_E5062EC0ED2F89286569337DBE9E4F39ED10C38B3CAEFF747B255F9A4D2850D0_1574302599340_image.png)
