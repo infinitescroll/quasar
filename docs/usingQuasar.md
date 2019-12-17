@@ -14,22 +14,22 @@ There are a few required `.env` variables. An example can be found [here](https:
 ### Run Quasar Locally
 
 1. `npm i`
-1. `npm run prepare:local:dev` - starts a local IPFS node, launches a local ganache-cli blockchain network, compiles and migrates a storage registry contract, and registers 1 storage contract for Quasar to listen to.
-2. take the `Registry` contract address and set it in your `.env` file as `STORAGE_REGISTRY_CONTRACT_ADDRESS`
-3. `npm run start:dev` - starts the Quasar dev server, listening on port 3001.
+1. `npm run prepare:local:dev` starts a local IPFS node, launches a local ganache-cli blockchain network, compiles and migrates a storage registry contract, and registers 1 storage contract for Quasar to listen to.
+2. Take the `Registry` contract address and set it in your `.env` file as `STORAGE_REGISTRY_CONTRACT_ADDRESS`
+3. `npm run start:dev` starts the Quasar dev server, listening on port 3001.
 
 ### Other scripts
 
 `npm run test` runs the jest testing suite.
 
-`npm run emit:registerEvent` - fires a `Register` event on the storage registry contract registered with Quasar.<br />
+`npm run emit:registerEvent` fires a `Register` event on the storage registry contract registered with Quasar.<br />
 `npm run emit:pinHashEvent` fires a `PinHash` event on the storage contract registered with Quasar.
 
 Note - both these scripts work on rinkeby and local chains. [Extra steps](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#rinkeby-usage) are required for this to work on rinkeby.
 
 ## Customizing Quasar's configuration
 
-Full [example](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#example)
+See full [example](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md#example).
 
 ### Ethereum networks
 
@@ -67,15 +67,12 @@ Quasar uses the `js-ipfs-http-client` to connect to a remote IPFS node. Technica
 
 Quasar polls the database to remove optimistically pinned data that has not been confirmed by a `PinHash` event within a given time frame.
 
-`DB_POLL_INTERVAL` (ms) - How often Quasar checks the DB to find and remove unconfirmed pins that are past their TTL. Set to 1 week by default. Should be set to a much smaller number (like `50` ms) when running tests.
+`DB_POLL_INTERVAL` (ms) - How often Quasar checks the DB to find and remove unconfirmed pins that are past their TTL. Should be set to a much smaller number (like `50` ms) when running tests.
 `TTL` (days) - Number of days for optmistically pinned data to remain available before being removed. Set to 14 days by default.
 
 ### Ethereum polling intervals
 
 Quasar polls the Ethereum blockchain to listen for events and the database to remove optimistically pinned data that has not been confirmed by a `PinHash` event within a given time frame.
-
-`DB_POLL_INTERVAL` (ms) - How often Quasar checks the DB to find and remove unconfirmed pins that are past their TTL. Set to 1 week by default. Should be set to a much smaller number (like `50` ms) when running tests.
-`TTL` (days) - Number of days for optmistically pinned data to remain available before being removed. Set to 14 days by default.
 
 `CONTRACT_POLL_INTERVAL` (ms) - How often Quasar polls contracts on Ethereum. Set to 30 minutes by default. Should be set to a much smaller number (like `50` ms) when running tests.
 `BLOCK_PADDING` (Padding of eth blocks ignored from HEAD) is set to 15 by default.
@@ -117,14 +114,14 @@ MNEMONIC=peanut butter tequila shots hotbox nuggets obesity funk chunk snowball 
 
 ## Deployment with Docker
 
-This assumes you have a docker instance with ssh access already running. [Digital Ocean](https://marketplace.digitalocean.com/apps/docker) provides a one-click Ubuntu-docker setup, and there are plenty of [tutorials](https://www.linux.com/tutorials/how-install-and-use-docker-linux/) to get you started if you want to _really_ self-host.
+This assumes you have a Docker instance with ssh access already running. [Digital Ocean](https://marketplace.digitalocean.com/apps/docker) provides a one-click Ubuntu-docker setup, and there are plenty of [tutorials](https://www.linux.com/tutorials/how-install-and-use-docker-linux/) to get you started if you want to _really_ self-host.
 
 1. Run `git clone http://github.com/openworklabs/quasar`.
 2. Add `.env` file in project root and enter required variables (see below).
-3. Make sure docker is running `systemctl start docker`.
+3. Make sure Docker is running `systemctl start docker`.
 4. Run `docker-compose up -d` (with external ipfs node) or `docker-compose -f docker-compose.ipfs.yml up -d` (with local ipfs node).
 
-Blockchain variables - REQUIRED when using Docker
+Blockchain variables - REQUIRED when using Docker:
 
 `BLOCKCHAIN_PROVIDER_HTTP_URL=https://rinkeby.infura.io/v3/<project-id>`<br />
 `BLOCKCHAIN_NETWORK=rinkeby`<br />
