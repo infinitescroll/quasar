@@ -14,7 +14,7 @@ async function addStorageContract(contractAddress) {
 
 // Get a list of storage contracts that quasar is listening to for pin events.
 async function getStorageContracts() {
-  const response = await fetch(`${quasarUrl}/api/v0/contracts`, {
+  const response = await fetch(`${quasarUrl}/api/v0/storageContracts`, {
     method: 'GET'
   })
   return await response.json()
@@ -38,7 +38,7 @@ async function dagPut(dag) {
 
 // Same as above, but files instead of dags.
 async function addFile(file) {
-  const response = await fetch(`${quasarUrl}/api/v0/files/add`, {
+  const response = await fetch(`${quasarUrl}/api/v0/add`, {
     method: 'POST',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -49,4 +49,20 @@ async function addFile(file) {
   storageContract.invokePinMethod(hash)
   return hash
 }
+
+async function dagGet(hash) {
+  const response = await fetch(
+    `${quasarUrl}/api/v0/dag/get?arg=${hash}`
+  )
+  // return the object
+  return response.json()
+}
+
+async function cat(hash) {
+  const result = await fetch(`${quasarUrl}/api/v0/cat?arg=${hash}`)
+  // handle the result here based on the file that was added
+  // for example, if you added an array buffer, you could:
+  const arrayBuffer = await result.arrayBuffer()
+}
+
 ```
