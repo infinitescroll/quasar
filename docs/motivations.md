@@ -10,7 +10,7 @@ The obvious solution is to host an IPFS node that acts as a "pinning node" to en
 | A private (permissioned) pinning node | Avoid legal and economic risks. | Managing API keys. Will not work for sites that do not require a "log in" functionality (like an Aragon DAO). |
 | **A smart contract based pinning node** | Flexible permission systems. No management of API keys. | A lot of boilerplate. |
 
-Using smart contracts to determine who can pin data, or what data can get pinned, allows any smart contract developer to create their own pinning permissions. For example, anyone could easily build a permission system that permits holders of your token to pin to your IPFS node. This isn't possible with traditional metohds.
+Using smart contracts to determine who can pin data, or what data can get pinned, allows any smart contract developer to create their own pinning permissions. For example, anyone could easily build a permission system that permits holders of your token to pin to your IPFS node. This isn't possible with traditional methods.
 
 The second motivation behind Quasar is to enable smart contracts themselves to pin data. Obviously smart contracts running in the EVM cannot make requests to an IPFS node. This is an especially handy use case when running a DAO if, for example, you'd like your DAO to pin the results of a monthly reoccuring vote.
 
