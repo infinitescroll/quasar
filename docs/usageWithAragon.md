@@ -8,6 +8,8 @@ All experimental Quasar features can be found in `experimental-oe` branches of a
 
 ## aragon.js
 
+[Video walkthrough](https://youtu.be/MK5vYke2RUA)
+
 Adding support for interacting with the DAO's data store in aragon.js gives Aragon apps a way to store user generated content without hosting their own storage infrastructure. We implemented the following changes to give support to the Open Enterprise Projects App through aragon.js:
 
 - Emitting `PinHash` events in the [Projects' app contract](https://github.com/AutarkLabs/open-enterprise/blob/experimental-oe/apps/projects/contracts/Projects.sol) whenever data should get pinned. (command + f "PinHash")
@@ -19,6 +21,8 @@ Adding support for interacting with the DAO's data store in aragon.js gives Arag
 Note - we use FormData in the wrapper, which might break things when this package is required in a Node environment (you would need to polyfill the FormData to use somethin that works in Node). The security restrictions forbid us from passing FormData through the api calls, so we need to handle it on the wrapper side.
 
 ## aragon/client
+
+[Video walkthrough](https://youtu.be/Nx6kQDUBlHc)
 
 Our first take at building support for Quasar was done completely in the client. The goal was to support pinning a blob of data that represents the organization's settings.
 
