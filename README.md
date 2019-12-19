@@ -14,7 +14,7 @@ To find out why we built Quasar, check out [motivation](https://github.com/openw
 
 To get started running Quasar, see the [instructions](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md).
 
-Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/primary/docs/usingQuasar.md) under the hood.
+Here's [how Quasar works](https://github.com/openworklabs/quasar/blob/primary/docs/howQuasarWorks.md) under the hood.
 
 For the Aragon community, see the [usage with Aragon](https://github.com/openworklabs/quasar/blob/primary/docs/usageWithAragon.md) doc.
 
